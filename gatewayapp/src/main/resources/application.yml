@@ -1,0 +1,28 @@
+server:
+  port: 8099
+
+spring:
+  profiles:
+    include: db
+  main:
+    allow-bean-definition-overriding: true
+
+  cloud:
+    gateway:
+      routes:
+
+
+        - id: oder-ms-route
+          uri: http://localhost:8083
+          predicates:
+            - Path=/order/**
+#          filters:
+#            - AddRequestHeader=X-Auth-Token, ${jwtSecret}
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: debug
+
+jwtSecret: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9123saddsaA2sdGgfsa
+jwtExpirationInMs: 3600000
