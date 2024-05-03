@@ -40,6 +40,11 @@ public class OrderController {
         List<OrderDto> orders = orderService.getAllOrders();
         return ResponseEntity.ok(orders);
     }
+
+    @GetMapping("/customer/{customerId}")
+    public List<OrderDto> getOrdersByCustomerId(@PathVariable Long customerId) {
+        return orderService.findOrdersByCustomerID(customerId);
+    }
 }
 
 

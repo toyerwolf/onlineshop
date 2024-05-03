@@ -1,6 +1,7 @@
 package com.example.springsecurity.repository;
 
 import com.example.springsecurity.entity.Customer;
+import com.example.springsecurity.entity.Order;
 import com.example.springsecurity.entity.User;
 import org.mapstruct.control.MappingControl;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,6 +16,7 @@ import java.util.Optional;
 public interface CustomerRepository extends JpaRepository<Customer,Long> {
 
 
+    //Object potomu chto vozrashayets dva znacheniya
     @Query(value = "SELECT " +
             "   EXTRACT(YEAR FROM c.registered_at) AS year, " +
             "   COUNT(*) AS customer_registrations " +
@@ -26,4 +28,9 @@ public interface CustomerRepository extends JpaRepository<Customer,Long> {
             "   year ASC",
             nativeQuery = true)
     List<Object[]> getCustomerRegistrationsByYear();
+
+//Lower nujen dlya preobrozaniya stroki v nujniy registr
+    //etot query budet iskat nezavisimo v poiske pishesh s bolshoy bukvi ili s malenkoy
+@Query(value = "SELECT * FROM customer WHERE name LIKE :keyword OR LOWER(name) LIKE LOWER(CONCAT(:keyword, '%')) OR LOWER(surname) LIKE LOWER(CONCAT(:keyword, '%')) OR LOWER(address) LIKE LOWER(CONCAT(:keyword, '%'))", nativeQuery = true)
+    List<Customer> searchCustomers(String keyword);
 }

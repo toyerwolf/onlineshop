@@ -59,5 +59,7 @@ public interface OrderRepository extends JpaRepository<Order,Long> {
             nativeQuery = true)
     List<Object[]> getSoldProductSalesStatistics();
 
+    List<Order> findAllByCustomer_Id(Long customerId);
+
 
 }

@@ -26,4 +26,6 @@ public interface OrderService {
     Map<Integer, Integer> getProductSalesStatistics();
 
     Map<Integer, BigDecimal> getTotalProductSalesRevenueByYear();
+
+    List<OrderDto> findOrdersByCustomerID(Long customerId);
 }

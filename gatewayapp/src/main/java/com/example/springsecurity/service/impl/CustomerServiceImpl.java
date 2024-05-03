@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -77,5 +78,13 @@ public class CustomerServiceImpl implements CustomerService {
             customerRegistrationsByYear.put(year, customerRegistrations);
         }
         return customerRegistrationsByYear;
+    }
+
+    @Override
+    public List<CustomerDto> searchCustomers(String keyword) {
+        List<Customer> customers=customerRepository.searchCustomers(keyword);
+        return customers.stream()
+                .map(CustomerMapper.INSTANCE::toDto)
+                .collect(Collectors.toList());
     }
 }

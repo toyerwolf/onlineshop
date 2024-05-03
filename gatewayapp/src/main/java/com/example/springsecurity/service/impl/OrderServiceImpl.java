@@ -22,10 +22,11 @@ import com.example.springsecurity.req.OrderRequest;
 import com.example.springsecurity.service.CustomerService;
 import com.example.springsecurity.service.OrderService;
 import com.example.springsecurity.service.ProductService;
-import com.example.springsecurity.util.OrderValidationService;
+
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -99,7 +100,6 @@ public class OrderServiceImpl implements OrderService {
             Integer totalSold = ((Number) result[1]).intValue();
             soldProductsByYear.put(productName, totalSold);
         }
-
         return soldProductsByYear;
     }
 
@@ -111,7 +111,6 @@ public class OrderServiceImpl implements OrderService {
             int totalSold = ((Number) row[1]).intValue();
             salesByYear.put(year, totalSold);
         }
-
         return salesByYear;
     }
 
@@ -128,7 +127,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-
+    public List<OrderDto> findOrdersByCustomerID(Long customerId) {
+        List<Order> orders = orderRepository.findAllByCustomer_Id(customerId);
+        return orders.stream()
+                .map(orderMapper::orderToOrderDto)
+                .collect(Collectors.toList());
+    }
 
 
     private BigDecimal calculateTotalAmount(OrderRequest orderRequest) {

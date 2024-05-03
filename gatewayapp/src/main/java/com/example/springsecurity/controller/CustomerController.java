@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("customers")
 @AllArgsConstructor
@@ -29,6 +31,11 @@ public class CustomerController {
             @RequestParam int pageSize) {
         Page<CustomerDto> customersPage = customerService.getAllCustomer(pageNumber, pageSize);
         return ResponseEntity.ok(customersPage);
+    }
+
+    @GetMapping("/searching")
+    public List<CustomerDto> searchCustomers(@RequestParam String keyword) {
+        return customerService.searchCustomers(keyword);
     }
 
 }
