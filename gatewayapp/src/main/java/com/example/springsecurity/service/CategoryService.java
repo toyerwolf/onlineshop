@@ -13,7 +13,7 @@ public interface CategoryService {
 
     List<CategoryDto> getAllCategories();
 
-    public Optional<CategoryDtoForClient> getCategoryById(Long categoryId);
+    Optional<CategoryDtoForClient> getCategoryById(Long categoryId);
 
     void createCategory(CategoryReq categoryReq);
 

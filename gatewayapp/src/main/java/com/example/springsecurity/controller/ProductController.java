@@ -85,4 +85,9 @@ public class ProductController {
         return ResponseEntity.ok("Product count decreased successfully");
     }
 
+    @GetMapping("/{orderId}/products")
+    public ResponseEntity<List<ProductDto>> getProductsByOrderId(@PathVariable Long orderId) {
+        List<ProductDto> products = productService.findProductsByOrderId(orderId);
+        return ResponseEntity.ok(products);
+    }
 }

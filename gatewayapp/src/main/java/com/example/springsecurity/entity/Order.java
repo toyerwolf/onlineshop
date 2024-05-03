@@ -5,10 +5,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Data
@@ -32,27 +29,19 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+//    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+//    private List<OrderProduct> orderProducts=new ArrayList<>();
 
 
+//    @ManyToMany
+//    @JoinTable(
+//            name = "order_product",
+//            joinColumns = @JoinColumn(name = "order_id"),
+//            inverseJoinColumns = @JoinColumn(name = "product_id")
+//    )
+//    private Set<Product> products = new HashSet<>();
 
 
-    @ManyToMany
-    @JoinTable(
-            name = "order_product",
-            joinColumns = @JoinColumn(name = "order_id"),
-            inverseJoinColumns = @JoinColumn(name = "product_id")
-    )
-    private Set<Product> products = new HashSet<>();
-
-    @ElementCollection
-    @CollectionTable(
-            name = "order_product_quantity",
-            joinColumns = @JoinColumn(name = "order_id")
-    )
-
-    @MapKeyJoinColumn(name = "product_id")
-    @Column(name = "quantity")
-    private Map<Product, Integer> productsWithQuantity = new HashMap<>();
 
 
 

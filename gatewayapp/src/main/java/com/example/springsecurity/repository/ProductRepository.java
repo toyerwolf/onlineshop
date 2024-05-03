@@ -18,5 +18,8 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
     @Query("SELECT p FROM Product p WHERE lower(p.name) LIKE lower(concat('%', :keyword, '%'))")
     List<Product> searchProductByName(@Param("keyword") String keyword);
 
+    @Query("SELECT DISTINCT p FROM Product p JOIN FETCH p.orderProducts op WHERE op.order.id = :orderId")
+    List<Product> findProductsByOrderId(Long orderId);
+
 
 }

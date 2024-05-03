@@ -17,18 +17,17 @@ public interface ProductService {
 
     List<ProductDto> findProductsByCategoryId(Long categoryId);
 
-    public ProductDto getProductById(Long productId);
+    ProductDto getProductById(Long productId);
 
     void updateProduct(Long productId, ProductRequest productRequest);
     void deleteProduct(Long productId);
 
     Page<ProductDto> getAllProducts(int page,int pageSize);
 
-    public List<ProductDto> searchProductByName(String keyword);
+    List<ProductDto> searchProductByName(String keyword);
 
-    public void decreaseCount(Long productId, int quantity);
+   void decreaseCount(Long productId, int quantity);
 
-    public Product findProductById(Long productId);
-
-
+     Product findProductById(Long productId);
+     List<ProductDto> findProductsByOrderId(Long orderId);
 }

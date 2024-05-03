@@ -17,8 +17,6 @@ public interface OrderService {
 
     void markOrderAsDelivered(Long orderId);
 
-    List<ProductDto> findProductsByOrderId(Long orderId);
-
     List<OrderDto> getAllOrders();
 
     Map<String, Integer> countSoldProductsByYear(int year);
@@ -28,4 +26,7 @@ public interface OrderService {
     Map<Integer, BigDecimal> getTotalProductSalesRevenueByYear();
 
     List<OrderDto> findOrdersByCustomerID(Long customerId);
+
+    List<ProductDto> findProductsByOrderId(Long orderId);
+
 }

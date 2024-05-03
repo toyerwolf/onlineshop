@@ -3,7 +3,11 @@ package com.example.springsecurity.repository;
 import com.example.springsecurity.entity.Customer;
 import com.example.springsecurity.entity.Order;
 import com.example.springsecurity.entity.User;
+import org.jetbrains.annotations.NotNull;
 import org.mapstruct.control.MappingControl;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -14,6 +18,11 @@ import java.util.Optional;
 
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer,Long> {
+
+
+    @EntityGraph(attributePaths = {"user", "address"})
+    @NotNull
+    Page<Customer> findAll(@NotNull Pageable pageable);
 
 
     //Object potomu chto vozrashayets dva znacheniya

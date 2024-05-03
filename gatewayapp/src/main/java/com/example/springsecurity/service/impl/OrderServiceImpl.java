@@ -5,10 +5,7 @@ import com.example.springsecurity.dto.OrderDto;
 
 import com.example.springsecurity.dto.ProductDto;
 import com.example.springsecurity.dto.SalesStaticDto;
-import com.example.springsecurity.entity.Customer;
-import com.example.springsecurity.entity.Order;
-import com.example.springsecurity.entity.Product;
-import com.example.springsecurity.entity.Status;
+import com.example.springsecurity.entity.*;
 import com.example.springsecurity.exception.InsufficientBalanceException;
 import com.example.springsecurity.exception.InsufficientQuantityException;
 import com.example.springsecurity.exception.NotFoundException;
@@ -16,6 +13,7 @@ import com.example.springsecurity.mapper.CustomerMapper;
 import com.example.springsecurity.mapper.OrderMapper;
 import com.example.springsecurity.mapper.ProductMapper;
 
+import com.example.springsecurity.repository.OrderProductRepository;
 import com.example.springsecurity.repository.OrderRepository;
 import com.example.springsecurity.repository.ProductRepository;
 import com.example.springsecurity.req.OrderRequest;
@@ -43,11 +41,12 @@ public class OrderServiceImpl implements OrderService {
     private OrderRepository orderRepository;
     private final ProductMapper productMapper=ProductMapper.INSTANCE;
     private final OrderMapper orderMapper=OrderMapper.INSTANCE;
+    private final OrderProductRepository orderProductRepository;
 
 
     @Override
     @Transactional
-    public void makeOrder(Long customerId,OrderRequest orderRequest) {
+    public void makeOrder(Long customerId, OrderRequest orderRequest) {
         Customer customer = customerService.findCustomerById(customerId);
         BigDecimal totalAmount = calculateTotalAmount(orderRequest);
         validateCustomerBalance(customer, totalAmount);
@@ -55,7 +54,8 @@ public class OrderServiceImpl implements OrderService {
         validateProductQuantities(productQuantities);
         decreaseCustomerBalance(customer.getId(), totalAmount);
         decreaseProductCount(productQuantities);
-        Order order = createOrder(customer, totalAmount, productQuantities);
+        Order order = createOrder(customer, totalAmount);
+        saveOrderProducts(order, productQuantities);
         orderRepository.save(order);
     }
 
@@ -69,15 +69,6 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(Status.DELIVERED);
         order.setUpdatedAt(LocalDateTime.now());
         orderRepository.save(order);
-    }
-
-    @Override
-    public List<ProductDto> findProductsByOrderId(Long orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new NotFoundException("Order not found for id: " + orderId));
-        return order.getProducts().stream()
-                .map(productMapper::toDto)
-                .collect(Collectors.toList());
     }
 
 
@@ -127,14 +118,18 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
+    @Override
     public List<OrderDto> findOrdersByCustomerID(Long customerId) {
         List<Order> orders = orderRepository.findAllByCustomer_Id(customerId);
-        return orders.stream()
-                .map(orderMapper::orderToOrderDto)
-                .collect(Collectors.toList());
+        return orderMapper.ordersToOrderDtos(orders);
     }
 
+    public List<ProductDto> findProductsByOrderId(Long orderId) {
+        return productService.findProductsByOrderId(orderId);
+    }
 
+    //proxodimsa po mapu,berem id  kajdogo prodcuta i kolichestvo kajdogo produkta
+    //esli est discount price ispolzuyem ego esli netu sam price,i umnojayem na count
     private BigDecimal calculateTotalAmount(OrderRequest orderRequest) {
         BigDecimal totalAmount = BigDecimal.ZERO;
         for (Map.Entry<Long, Integer> entry : orderRequest.getProductQuantities().entrySet()) {
@@ -154,6 +149,7 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    //key sam produkt,a value kolichestvo
     private void validateProductQuantities(Map<Product, Integer> productQuantities) {
         for (Map.Entry<Product, Integer> entry : productQuantities.entrySet()) {
             Product product = entry.getKey();
@@ -164,6 +160,8 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+
+    //prinimayet map s id producta i kolichestvo kajdogo produkta
     private Map<Product, Integer> getProductQuantities(Map<Long, Integer> productQuantities) {
         Map<Product, Integer> products = new HashMap<>();
         for (Map.Entry<Long, Integer> entry : productQuantities.entrySet()) {
@@ -175,13 +173,12 @@ public class OrderServiceImpl implements OrderService {
         return products;
     }
 
-    private Order createOrder(Customer customer, BigDecimal totalAmount, Map<Product, Integer> productsWithQuantity) {
+    private Order createOrder(Customer customer, BigDecimal totalAmount) {
         Order order = new Order();
         order.setCustomer(customer);
         order.setTotalAmount(totalAmount);
         order.setCreatedAt(LocalDateTime.now());
         order.setStatus(Status.ORDERED);
-        order.setProductsWithQuantity(productsWithQuantity);
         return order;
     }
 
@@ -195,8 +192,20 @@ public class OrderServiceImpl implements OrderService {
             Integer quantity = entry.getValue();
             productService.decreaseCount(product.getId(), quantity);
         }
-}
-}
+    }
+
+    private void saveOrderProducts(Order order, Map<Product, Integer> productQuantities) {
+        for (Map.Entry<Product, Integer> entry : productQuantities.entrySet()) {
+            Product product = entry.getKey();
+            Integer quantity = entry.getValue();
+            OrderProduct orderProduct = new OrderProduct();
+            orderProduct.setOrder(order);
+            orderProduct.setProduct(product);
+            orderProduct.setQuantity(quantity);
+            orderProduct.setProductName(product.getName());
+            orderProductRepository.save(orderProduct);
+        }
+    }}
 
 
 

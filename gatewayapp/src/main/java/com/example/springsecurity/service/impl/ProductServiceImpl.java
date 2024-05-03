@@ -2,22 +2,20 @@ package com.example.springsecurity.service.impl;
 
 import com.example.springsecurity.dto.ProductDto;
 import com.example.springsecurity.entity.Category;
+import com.example.springsecurity.entity.Order;
+import com.example.springsecurity.entity.OrderProduct;
 import com.example.springsecurity.entity.Product;
 import com.example.springsecurity.exception.InsufficientQuantityException;
 import com.example.springsecurity.exception.NotFoundException;
 import com.example.springsecurity.mapper.ProductMapper;
 import com.example.springsecurity.repository.CategoryRepository;
+import com.example.springsecurity.repository.OrderRepository;
 import com.example.springsecurity.repository.ProductRepository;
 import com.example.springsecurity.req.ProductRequest;
 import com.example.springsecurity.service.ImageService;
 import com.example.springsecurity.service.ProductService;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -29,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,11 +37,13 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ImageService imageService;
+    private final OrderRepository orderRepository;
 
-    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository, ImageService imageService) {
+    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository, ImageService imageService, OrderRepository orderRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.imageService = imageService;
+        this.orderRepository = orderRepository;
     }
 
     private final ProductMapper productMapper=ProductMapper.INSTANCE;
@@ -176,6 +177,12 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new NotFoundException("Product not found"));
     }
 
+    public List<ProductDto> findProductsByOrderId(Long orderId) {
+        List<Product> products = productRepository.findProductsByOrderId(orderId);
+        return products.stream()
+                .map(productMapper::toDto)
+                .collect(Collectors.toList());
+    }
 
 
 }

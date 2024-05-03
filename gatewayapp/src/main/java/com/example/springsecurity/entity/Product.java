@@ -29,10 +29,9 @@ public class Product {
 
     private int quantity;
 
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
-
 
     private String imageUrl;
 
@@ -48,6 +47,9 @@ public class Product {
         this.category = category;
         category.getProducts().add(this);
     }
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<OrderProduct> orderProducts;
+
 
 
 
