@@ -1,23 +1,18 @@
 server:
-  port: 8099
+  port: 8098
 
 spring:
   profiles:
     include: db
   main:
     allow-bean-definition-overriding: true
+  mvc:
+    static-path-pattern: /static/**
+  web:
+    resources:
+      static-locations: classpath:/static/
 
-  cloud:
-    gateway:
-      routes:
 
-
-        - id: oder-ms-route
-          uri: http://localhost:8083
-          predicates:
-            - Path=/order/**
-#          filters:
-#            - AddRequestHeader=X-Auth-Token, ${jwtSecret}
 
 logging:
   level:
@@ -25,4 +20,21 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: debug
 
 jwtSecret: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9123saddsaA2sdGgfsa
-jwtExpirationInMs: 3600000
+jwtExpirationInMs: 36000
+refreshTokenExpiration: 3600000
+allowed-file-extension: jpg,jpeg,gif,ico,png
+
+# Настройки JWT
+jwt:
+  secret: ${jwtSecret}
+  expirationInMs: ${jwtExpirationInMs}
+  refreshTokenExpiration: ${refreshTokenExpiration}
+
+# Настройки загрузки файлов
+file:
+  allowed-extensions: ${allowed-file-extension}
+
+image-url-prefix: /static/
+
+
+

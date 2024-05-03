@@ -1,68 +1,47 @@
 package com.example.springsecurity.service.impl;
 
-
-import com.example.springsecurity.dto.RoleDto;
-
+import com.example.springsecurity.entity.Customer;
 import com.example.springsecurity.entity.Role;
 import com.example.springsecurity.entity.User;
 import com.example.springsecurity.exception.CustomerAlreadyExist;
-
 import com.example.springsecurity.repository.UserRepository;
-import com.example.springsecurity.req.UserReq;
+import com.example.springsecurity.req.UserRegistrationReq;
 import com.example.springsecurity.service.RegistrationService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
-import java.util.HashSet;
-import java.util.Set;
+import java.time.LocalDateTime;
 
 @Service
 @AllArgsConstructor
 public class RegistrationServiceImpl implements RegistrationService {
 
-
-private final UserRepository userRepository;
-
-private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
-@Transactional
+    @Transactional
     @Override
-    public void register(UserReq userReq) {
-        if (userRepository.existsByUsername(userReq.getUsername())) {
+    public void register(UserRegistrationReq request) {
+        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
             throw new CustomerAlreadyExist("Username is already taken");
         }
-
-        if (userRepository.existsByEmail(userReq.getEmail())) {
-            throw new CustomerAlreadyExist("Email is already in use");
-        }
-
-        User newUser=new User();
-        newUser.setUsername(userReq.getUsername());
-        newUser.setEmail(userReq.getEmail());
-        String hashedPassword = passwordEncoder.encode(userReq.getPassword());
-        newUser.setPassword(hashedPassword);
-        newUser.setBirthday(userReq.getBirthday());
-        newUser.setName(userReq.getName());
-        newUser.setSurname(userReq.getSurname());
-        newUser.setPhoneNumber(userReq.getPhoneNumber());
-        Set<Role> roles=new HashSet<>();
-        newUser.setLocked(userReq.getLocked());
-        for(RoleDto roleDto:userReq.getRoleDtos()){
-            Role role=new Role();
-            role.setRole(roleDto.getRole());
-            roles.add(role);
-        }
-        newUser.setRoles(roles);
-        userRepository.save(newUser);
-    }
+       User user=new User();
+        user.setUsername(request.getUsername());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setLocked(false);
+        user.setCreatedAt(LocalDateTime.now());
+        user.setRole(Role.USER);
+        Customer customer = new Customer();
+        customer.setName(request.getName());
+        customer.setSurname(request.getSurname());
+       customer.setRegisteredAt(LocalDateTime.now());
+        customer.setAddress(request.getAddress());
+        customer.setBalance(request.getBalance());
+        user.setCustomer(customer);
+        userRepository.save(user);
 
     }
-
-
-
-
-
+}

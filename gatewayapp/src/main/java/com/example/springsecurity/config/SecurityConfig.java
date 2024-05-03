@@ -1,8 +1,9 @@
 package com.example.springsecurity.config;
 
 import com.example.springsecurity.securiy.JwtAuthenticationEntryPoint;
+
 import com.example.springsecurity.securiy.JwtAuthenticationFilter;
-import com.example.springsecurity.service.impl.CustomUserDetailsService;
+import com.example.springsecurity.service.impl.CustomerUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,11 +35,11 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-    private final CustomUserDetailsService userDetailsService;
+    private final CustomerUserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public SecurityConfig(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
-                          CustomUserDetailsService userDetailsService,
+                          CustomerUserDetailsService userDetailsService,
                           JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.userDetailsService = userDetailsService;
@@ -75,8 +76,7 @@ public class SecurityConfig {
                     return corsConfiguration;
                 }))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll().
-                        requestMatchers("/admin/**").hasAnyRole("ADMIN")
+                        .requestMatchers("/auth/**").permitAll().requestMatchers("/users/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
