@@ -1,5 +1,6 @@
 package com.example.springsecurity.exception;
 
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,4 +28,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException e){
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(HttpStatus.FORBIDDEN,e.getMessage()));
     }
+
+    @ExceptionHandler(value = ConstraintViolationException.class)
+    public ResponseEntity<?> handleMethodArgumentNotValidException(ConstraintViolationException e){
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(HttpStatus.FORBIDDEN,e.getMessage()));
+    }
+
+
 }

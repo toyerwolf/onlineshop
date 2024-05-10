@@ -39,7 +39,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         customer.setSurname(request.getSurname());
        customer.setRegisteredAt(LocalDateTime.now());
         customer.setAddress(request.getAddress());
-        customer.setBalance(request.getBalance());
+//        customer.setBalance(request.getBalance());
         user.setCustomer(customer);
         userRepository.save(user);
 

@@ -3,6 +3,7 @@ package com.example.springsecurity.service.impl;
 import com.example.springsecurity.dto.CustomerDto;
 
 import com.example.springsecurity.entity.Customer;
+import com.example.springsecurity.entity.CustomerCardDetails;
 import com.example.springsecurity.exception.InsufficientBalanceException;
 import com.example.springsecurity.exception.NotFoundException;
 import com.example.springsecurity.mapper.CustomerMapper;
@@ -86,5 +87,17 @@ public class CustomerServiceImpl implements CustomerService {
         return customers.stream()
                 .map(CustomerMapper.INSTANCE::toDto)
                 .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public CustomerCardDetails getCustomerCardById(Customer customer, Long cardId) {
+        List<CustomerCardDetails> cards = customer.getCards();
+        for (CustomerCardDetails card : cards) {
+            if (card.getId().equals(cardId)) {
+                return card;
+            }
+        }
+        throw new RuntimeException("Card not found for customer");
     }
 }

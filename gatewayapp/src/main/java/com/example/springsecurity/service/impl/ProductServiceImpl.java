@@ -15,6 +15,7 @@ import com.example.springsecurity.req.ProductRequest;
 import com.example.springsecurity.service.ImageService;
 import com.example.springsecurity.service.ProductService;
 import jakarta.transaction.Transactional;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -25,10 +26,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,6 +49,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper=ProductMapper.INSTANCE;
 
    @Value("${image-url-prefix}")
+   @Setter
    private String imageUrlPrefix;
 
     @Override
@@ -123,7 +124,6 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<ProductDto> getAllProducts(int page, int pageSize) {
         Pageable pageRequest = PageRequest.of(page - 1, pageSize);
-
         Page<Product> products = productRepository.findAll(pageRequest);
         List<ProductDto> productDtos = productMapper.toDtoList(products.getContent());
         for (ProductDto productDto : productDtos) {
@@ -158,7 +158,7 @@ public class ProductServiceImpl implements ProductService {
 
 
     @NotNull
-    private static ProductDto getProductDto(Product product) {
+    static ProductDto getProductDto(Product product) {
         ProductDto productDto = new ProductDto();
         productDto.setId(product.getId());
         productDto.setName(product.getName());
@@ -168,6 +168,7 @@ public class ProductServiceImpl implements ProductService {
         productDto.setCreatedAt(product.getCreatedAt());
         productDto.setUpdatedAt(product.getUpdatedAt());
         productDto.setDeleted(product.isDeleted());
+        productDto.setImageUrl(product.getImageUrl());
 //        productDto.setCategoryId(product.getCategory().getCategoryId());
         return productDto;
     }
@@ -183,6 +184,45 @@ public class ProductServiceImpl implements ProductService {
                 .map(productMapper::toDto)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public Map<String, Integer> countSoldProductsByYear(int year) {
+        List<Object[]> results = productRepository.countSoldProductsByYear(year);
+        Map<String, Integer> soldProductsByYear = new HashMap<>();
+        for (Object[] result : results) {
+            String productName = (String) result[2];
+            Integer totalSold = ((Number) result[1]).intValue();
+            soldProductsByYear.put(productName, totalSold);
+        }
+        return soldProductsByYear;
+    }
+
+
+    @Override
+    public Map<Integer, Integer> getProductSalesStatistics() {
+        List<Object[]> salesData = productRepository.getProductSalesStatistics();
+        Map<Integer, Integer> salesByYear = new HashMap<>();
+        for (Object[] row : salesData) {
+            int year = ((Number) row[0]).intValue();
+            int totalSold = ((Number) row[1]).intValue();
+            salesByYear.put(year, totalSold);
+        }
+        return salesByYear;
+    }
+
+
+    @Override
+    public Map<Integer, BigDecimal> getTotalProductSalesRevenueByYear() {
+        List<Object[]> salesData = productRepository.getSoldProductSalesStatistics();
+        Map<Integer, BigDecimal> totalRevenueByYear = new HashMap<>();
+        for (Object[] row : salesData) {
+            int year = ((Number) row[0]).intValue();
+            BigDecimal totalRevenue = (BigDecimal) row[1];
+            totalRevenueByYear.put(year, totalRevenue);
+        }
+        return totalRevenueByYear;
+    }
+
 
 
 }

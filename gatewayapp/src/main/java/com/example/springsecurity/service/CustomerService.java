@@ -2,6 +2,7 @@ package com.example.springsecurity.service;
 
 import com.example.springsecurity.dto.CustomerDto;
 import com.example.springsecurity.entity.Customer;
+import com.example.springsecurity.entity.CustomerCardDetails;
 import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
@@ -21,4 +22,6 @@ public interface CustomerService {
     Map<Integer, Long> getCustomerRegistrationsByYear();
 
      List<CustomerDto> searchCustomers(String keyword);
+
+    CustomerCardDetails getCustomerCardById(Customer customer, Long cardId);
 }

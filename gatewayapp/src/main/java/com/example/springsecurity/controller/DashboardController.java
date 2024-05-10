@@ -3,6 +3,7 @@ package com.example.springsecurity.controller;
 import com.example.springsecurity.dto.SalesStaticDto;
 import com.example.springsecurity.service.CustomerService;
 import com.example.springsecurity.service.OrderService;
+import com.example.springsecurity.service.ProductService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -20,13 +21,13 @@ import java.util.Map;
 @AllArgsConstructor
 public class DashboardController {
 
-    private final OrderService orderService;
+    private final ProductService productService;
 private final CustomerService customerService;
 
     @Secured("ADMIN")
     @GetMapping("products/total-sold")
     public Map<String, Integer> getSoldProductCountsByYear(@RequestParam int year) {
-        return orderService.countSoldProductsByYear(year);
+        return productService.countSoldProductsByYear(year);
     }
 
 
@@ -35,7 +36,7 @@ private final CustomerService customerService;
     @Secured("ADMIN")
     @GetMapping("/product-sales-statistic")
     public ResponseEntity<Map<Integer, Integer>> getProductSalesStatistics() {
-        Map<Integer, Integer> salesByYear = orderService.getProductSalesStatistics();
+        Map<Integer, Integer> salesByYear = productService.getProductSalesStatistics();
         return ResponseEntity.ok(salesByYear);
     }
 
@@ -43,7 +44,7 @@ private final CustomerService customerService;
     @Secured("ADMIN")
     @GetMapping("/totalRevenueByYear")
     public ResponseEntity<Map<Integer, BigDecimal>> getTotalProductSalesRevenue() {
-        Map<Integer, BigDecimal> totalRevenueByYear = orderService.getTotalProductSalesRevenueByYear();
+        Map<Integer, BigDecimal> totalRevenueByYear = productService.getTotalProductSalesRevenueByYear();
         return ResponseEntity.ok(totalRevenueByYear);
     }
 

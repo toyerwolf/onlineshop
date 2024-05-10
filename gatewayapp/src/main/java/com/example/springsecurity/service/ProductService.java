@@ -9,7 +9,9 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 public interface ProductService {
 
@@ -30,4 +32,14 @@ public interface ProductService {
 
      Product findProductById(Long productId);
      List<ProductDto> findProductsByOrderId(Long orderId);
+
+    Map<String, Integer> countSoldProductsByYear(int year);
+
+    Map<Integer, Integer> getProductSalesStatistics();
+
+    Map<Integer, BigDecimal> getTotalProductSalesRevenueByYear();
+
+
+
+
 }

@@ -1,6 +1,7 @@
 package com.example.springsecurity.repository;
 
 import com.example.springsecurity.entity.Customer;
+import com.example.springsecurity.entity.CustomerCardDetails;
 import com.example.springsecurity.entity.Order;
 import com.example.springsecurity.entity.User;
 import org.jetbrains.annotations.NotNull;
@@ -42,4 +43,6 @@ public interface CustomerRepository extends JpaRepository<Customer,Long> {
     //etot query budet iskat nezavisimo v poiske pishesh s bolshoy bukvi ili s malenkoy
 @Query(value = "SELECT * FROM customer WHERE name LIKE :keyword OR LOWER(name) LIKE LOWER(CONCAT(:keyword, '%')) OR LOWER(surname) LIKE LOWER(CONCAT(:keyword, '%')) OR LOWER(address) LIKE LOWER(CONCAT(:keyword, '%'))", nativeQuery = true)
     List<Customer> searchCustomers(String keyword);
+
+
 }

@@ -27,10 +27,29 @@ public class Order {
     private LocalDateTime updatedAt;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private OrderStatus status;
 
-//    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-//    private List<OrderProduct> orderProducts=new ArrayList<>();
+    private boolean isPaid;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<OrderProduct> orderProducts=new ArrayList<>();
+
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+
+    //metod dlya polucheniya produktov ix iz kolichestva
+    public Map<Product, Integer> getProductQuantities() {
+        Map<Product, Integer> productQuantities = new HashMap<>();
+        for (OrderProduct orderItem : orderProducts) {
+            Product product = orderItem.getProduct();
+            Integer quantity = orderItem.getQuantity();
+            productQuantities.put(product, quantity);
+        }
+        return productQuantities;
+    }
 
 
 //    @ManyToMany

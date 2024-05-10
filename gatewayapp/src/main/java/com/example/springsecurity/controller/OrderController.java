@@ -2,7 +2,10 @@ package com.example.springsecurity.controller;
 
 import com.example.springsecurity.dto.OrderDto;
 import com.example.springsecurity.dto.ProductDto;
+import com.example.springsecurity.entity.Order;
 import com.example.springsecurity.req.OrderRequest;
+import com.example.springsecurity.service.OrderService;
+import com.example.springsecurity.service.ProductService;
 import com.example.springsecurity.service.impl.OrderServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,7 +18,8 @@ import java.util.List;
 @RequestMapping("orders")
 @AllArgsConstructor
 public class OrderController {
-    private final OrderServiceImpl orderService;
+    private final OrderService orderService;
+    private final ProductService productService;
 
     @PostMapping("{customerId}")
     public ResponseEntity<String> makeOrder(@PathVariable("customerId")Long customerId,@RequestBody OrderRequest orderRequest) {
@@ -31,7 +35,7 @@ public class OrderController {
 
     @GetMapping("/{orderId}/products")
     public ResponseEntity<List<ProductDto>> getProductsByOrderId(@PathVariable Long orderId) {
-        List<ProductDto> products = orderService.findProductsByOrderId(orderId);
+        List<ProductDto> products = productService.findProductsByOrderId(orderId);
         return ResponseEntity.ok(products);
     }
 
@@ -44,6 +48,14 @@ public class OrderController {
     @GetMapping("/customer/{customerId}")
     public List<OrderDto> getOrdersByCustomerId(@PathVariable Long customerId) {
         return orderService.findOrdersByCustomerID(customerId);
+    }
+
+    @PostMapping("/{customerId}/{cardId}")
+    public ResponseEntity<Order> makeOrder(@PathVariable Long customerId,
+                                           @PathVariable Long cardId,
+                                           @RequestBody OrderRequest orderRequest) {
+        Order order = orderService.makeOrderWithCard(customerId, orderRequest, cardId);
+        return ResponseEntity.ok(order);
     }
 }
 
