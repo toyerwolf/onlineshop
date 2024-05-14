@@ -2,6 +2,8 @@ package com.example.springsecurity.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -11,6 +13,7 @@ import java.util.List;
 
 @Entity
 @Data
+
 public class Customer {
 
 
@@ -27,11 +30,11 @@ public class Customer {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    @JsonIgnore
+//    @JsonIgnore
     private User user;
 
 
-    @JsonIgnore
+//    @JsonIgnore
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Order> orderList;
 

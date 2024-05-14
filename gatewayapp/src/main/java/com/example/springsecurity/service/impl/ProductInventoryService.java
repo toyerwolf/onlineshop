@@ -57,7 +57,6 @@ public class ProductInventoryService {
     public void increaseProductCount(Product product, int quantity) {
         Product existingProduct = productRepository.findById(product.getId())
                 .orElseThrow(() -> new NotFoundException("Product not found with id: " + product.getId()));
-
         int newQuantity = existingProduct.getQuantity() + quantity;
         existingProduct.setQuantity(newQuantity);
         productRepository.save(existingProduct);

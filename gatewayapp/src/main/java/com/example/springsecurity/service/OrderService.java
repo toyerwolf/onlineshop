@@ -2,6 +2,7 @@ package com.example.springsecurity.service;
 
 import com.example.springsecurity.dto.OrderDto;
 
+import com.example.springsecurity.dto.OrderResponse;
 import com.example.springsecurity.dto.ProductDto;
 import com.example.springsecurity.dto.SalesStaticDto;
 import com.example.springsecurity.entity.Order;
@@ -14,14 +15,14 @@ import java.util.Map;
 
 public interface OrderService {
 
-    void makeOrder(Long customerId,OrderRequest orderRequest);
+    OrderResponse makeOrder(Long customerId, OrderRequest orderRequest);
 
     void markOrderAsDelivered(Long orderId);
 
     List<OrderDto> getAllOrders();
 
     List<OrderDto> findOrdersByCustomerID(Long customerId);
-    Order makeOrderWithCard(Long customerId, OrderRequest orderRequest, Long cardId);
+    OrderResponse makeOrderWithCard(Long customerId, OrderRequest orderRequest, Long cardId);
 
 
 }

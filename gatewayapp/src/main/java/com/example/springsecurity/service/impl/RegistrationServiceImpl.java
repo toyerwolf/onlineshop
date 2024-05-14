@@ -3,7 +3,7 @@ package com.example.springsecurity.service.impl;
 import com.example.springsecurity.entity.Customer;
 import com.example.springsecurity.entity.Role;
 import com.example.springsecurity.entity.User;
-import com.example.springsecurity.exception.CustomerAlreadyExist;
+import com.example.springsecurity.exception.AlreadyExistException;
 import com.example.springsecurity.repository.UserRepository;
 import com.example.springsecurity.req.UserRegistrationReq;
 import com.example.springsecurity.service.RegistrationService;
@@ -26,7 +26,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     public void register(UserRegistrationReq request) {
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-            throw new CustomerAlreadyExist("Username is already taken");
+            throw new AlreadyExistException("Username is already taken");
         }
        User user=new User();
         user.setUsername(request.getUsername());

@@ -11,7 +11,7 @@ import java.util.Map;
 
 public interface CustomerService {
 
-    void decreaseBalance(Long userId, BigDecimal amount);
+
 
     CustomerDto getCustomerById(Long customerID);
 

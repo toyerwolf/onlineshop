@@ -4,6 +4,7 @@ import com.example.springsecurity.dto.CategoryDto;
 import com.example.springsecurity.dto.CategoryDtoForClient;
 import com.example.springsecurity.dto.ProductDto;
 import com.example.springsecurity.entity.Category;
+import com.example.springsecurity.entity.Product;
 import com.example.springsecurity.exception.NotFoundException;
 import com.example.springsecurity.mapper.CategoryMapper;
 import com.example.springsecurity.repository.CategoryRepository;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -27,6 +29,8 @@ public class CategoryServiceImpl implements CategoryService {
     public List<CategoryDto> getAllCategories() {
         return CategoryMapper.INSTANCE.categoriesToCategoryDTOs(categoryRepository.findAll());
     }
+
+
 
     @Override
     public Optional<CategoryDtoForClient> getCategoryById(Long categoryId) {
@@ -79,6 +83,9 @@ public class CategoryServiceImpl implements CategoryService {
 
         return categoryDto;
     }
+
+
+
     }
 
 

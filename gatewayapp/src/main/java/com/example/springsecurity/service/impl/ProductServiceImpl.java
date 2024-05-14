@@ -37,13 +37,11 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ImageService imageService;
-    private final OrderRepository orderRepository;
 
     public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository, ImageService imageService, OrderRepository orderRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.imageService = imageService;
-        this.orderRepository = orderRepository;
     }
 
     private final ProductMapper productMapper=ProductMapper.INSTANCE;

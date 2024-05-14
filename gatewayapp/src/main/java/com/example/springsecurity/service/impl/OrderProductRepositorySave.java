@@ -5,13 +5,14 @@ import com.example.springsecurity.entity.OrderProduct;
 import com.example.springsecurity.entity.Product;
 import com.example.springsecurity.repository.OrderProductRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@Repository
+@Component
 @AllArgsConstructor
 public class OrderProductRepositorySave {
 

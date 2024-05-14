@@ -3,6 +3,8 @@ package com.example.springsecurity.service.impl;
 
 import com.example.springsecurity.dto.OrderDto;
 
+import com.example.springsecurity.dto.OrderProductDto;
+import com.example.springsecurity.dto.OrderResponse;
 import com.example.springsecurity.entity.*;
 ;
 import com.example.springsecurity.exception.AppException;
@@ -21,6 +23,7 @@ import com.example.springsecurity.service.*;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -48,13 +51,14 @@ public class OrderServiceImpl implements OrderService {
     private final OrderProductRepositorySave orderProductRepositorySave;
     private final CardService cardService;
     private final OrderCancellationService orderCancellationService;
+    private final OrderProductService orderProductService;
     public static final long DELAY_IN_MINUTES = 1;
 
 
 
     @Override
     @Transactional
-    public void makeOrder(Long customerId, OrderRequest orderRequest) {
+    public OrderResponse makeOrder(Long customerId, OrderRequest orderRequest) {
         Customer customer = customerService.findCustomerById(customerId);
         BigDecimal totalAmount = calculateTotalAmount(orderRequest);
         customerBalanceService.validateCustomerBalance(customer, totalAmount);
@@ -62,13 +66,26 @@ public class OrderServiceImpl implements OrderService {
        productInventoryService.validateProductQuantities(productQuantities);
        Order order = createOrder(customer, totalAmount);
        productInventoryService.decreaseProductCount(productQuantities);
-        orderRepository.save(order);
+        saveOrder(order);
         saveOrderProduct(order,productQuantities);
+        return getOrderResponse(order);
+    }
+
+    @NotNull OrderResponse getOrderResponse(Order order) {
+        List<OrderProductDto> orderProducts = orderProductService.findOrderProductsByOrderId(order.getId());
+        OrderResponse orderResponse = new OrderResponse();
+        orderResponse.setId(order.getId());
+        orderResponse.setTotalAmount(order.getTotalAmount());
+        orderResponse.setCreatedAt(order.getCreatedAt());
+        orderResponse.setStatus(order.getStatus());
+        orderResponse.setPaid(order.isPaid());
+        orderResponse.setProducts(orderProducts);
         scheduleOrderPaymentCheck(order.getId());
+        return orderResponse;
     }
 
     @Transactional
-    public Order makeOrderWithCard(Long customerId, OrderRequest orderRequest, Long cardId) {
+    public OrderResponse makeOrderWithCard(Long customerId, OrderRequest orderRequest, Long cardId) {
         Customer customer = customerService.findCustomerById(customerId);
         CustomerCardDetails card = customerService.getCustomerCardById(customer, cardId);
         if (cardService.isCardExpired(card.getExpirationDate())) {
@@ -80,9 +97,9 @@ public class OrderServiceImpl implements OrderService {
         productInventoryService.validateProductQuantities(productQuantities);
         productInventoryService.decreaseProductCount(productQuantities);
         Order order = createOrder(customer, totalAmount);
-        orderRepository.save(order);
         saveOrderProduct(order, productQuantities);
-        return order;
+        saveOrder(order);
+        return getOrderResponse(order);
 
     }
 
@@ -191,8 +208,14 @@ public class OrderServiceImpl implements OrderService {
         }
 }
 
+    @Transactional
+    public void saveOrder(Order order) {
+        orderRepository.save(order);
 
 
+
+
+}
 }
 
 

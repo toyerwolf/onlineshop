@@ -1,20 +1,23 @@
 package com.example.springsecurity.dto;
 
 import com.example.springsecurity.entity.OrderStatus;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class OrderDto {
+@AllArgsConstructor
+@NoArgsConstructor
+public class OrderResponse {
+
     private Long id;
     private BigDecimal totalAmount;
-    private Long customerId;
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
     private OrderStatus status;
-
-
+    private boolean isPaid;
+    private List<OrderProductDto> products;
 }

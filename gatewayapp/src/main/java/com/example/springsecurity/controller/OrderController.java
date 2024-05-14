@@ -1,12 +1,14 @@
 package com.example.springsecurity.controller;
 
 import com.example.springsecurity.dto.OrderDto;
+import com.example.springsecurity.dto.OrderResponse;
 import com.example.springsecurity.dto.ProductDto;
 import com.example.springsecurity.entity.Order;
 import com.example.springsecurity.req.OrderRequest;
 import com.example.springsecurity.service.OrderService;
 import com.example.springsecurity.service.ProductService;
 import com.example.springsecurity.service.impl.OrderServiceImpl;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +24,9 @@ public class OrderController {
     private final ProductService productService;
 
     @PostMapping("{customerId}")
-    public ResponseEntity<String> makeOrder(@PathVariable("customerId")Long customerId,@RequestBody OrderRequest orderRequest) {
-        orderService.makeOrder(customerId,orderRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Order created successfully.");
+    public ResponseEntity<OrderResponse> makeOrder(@PathVariable("customerId")Long customerId,@Valid @RequestBody OrderRequest orderRequest) {
+        OrderResponse orderResponse=orderService.makeOrder(customerId,orderRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderResponse);
     }
 
     @PatchMapping("/{orderId}/deliver")
@@ -51,11 +53,11 @@ public class OrderController {
     }
 
     @PostMapping("/{customerId}/{cardId}")
-    public ResponseEntity<Order> makeOrder(@PathVariable Long customerId,
-                                           @PathVariable Long cardId,
-                                           @RequestBody OrderRequest orderRequest) {
-        Order order = orderService.makeOrderWithCard(customerId, orderRequest, cardId);
-        return ResponseEntity.ok(order);
+    public ResponseEntity<OrderResponse> makeOrderWithCard(@PathVariable Long customerId,
+                                                           @PathVariable Long cardId,
+                                                           @RequestBody OrderRequest orderRequest) {
+        OrderResponse orderResponse = orderService.makeOrderWithCard(customerId, orderRequest, cardId);
+        return ResponseEntity.ok(orderResponse);
     }
 }
 

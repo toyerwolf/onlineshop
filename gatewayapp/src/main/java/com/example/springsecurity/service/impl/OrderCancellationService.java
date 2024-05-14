@@ -26,7 +26,7 @@ public class OrderCancellationService {
         orderRepository.save(order);
     }
 
-    private void returnProductsToInventory(Order order) {
+    void returnProductsToInventory(Order order) {
         Map<Product, Integer> productQuantities = order.getProductQuantities();
         for (Map.Entry<Product, Integer> entry : productQuantities.entrySet()) {
             Product product = entry.getKey();

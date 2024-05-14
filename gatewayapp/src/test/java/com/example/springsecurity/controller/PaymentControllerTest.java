@@ -25,24 +25,32 @@ class PaymentControllerTest {
 
     @LocalServerPort
     private int port;
-    String token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE1MTgyNDg1LCJleHAiOjE3MTUxODYwODV9.bEvR3M1lbzqyBocXgKMNWfdBN02MM7LStTxfWtO8O5k";
+    String token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE1NTMwOTEwLCJleHAiOjE3MTU1MzQ1MTB9.e8dUNQJxX3HzIVEljBkD3uA0ulynA7FVikXfA1QMAjI";
 
     @Test
+    @Sql(scripts = {"classpath:sql/customerainsert.sql",
+            "classpath:sql/orderinsert.sql",
+            "classpath:sql/userinsert.sql",
+              "classpath:sql/card-add.sql"  })
+
     void processPayment_ValidRequest_ReturnsCreated() {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", token);
         PaymentRequest paymentRequest = new PaymentRequest();
-        paymentRequest.setOrderId(123L);
-        paymentRequest.setCustomerId(456L);
-        paymentRequest.setCardId(789L);
+        paymentRequest.setOrderId(1L);
+        paymentRequest.setCustomerId(2L);
+        paymentRequest.setCardId(1L);
         HttpEntity<PaymentRequest> requestEntity = new HttpEntity<>(paymentRequest, headers);
-        ResponseEntity<Void> response = restTemplate.exchange(
+        ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/payments"),
                 HttpMethod.POST,
                 requestEntity,
-                Void.class
+                String.class
         );
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals("Order with card created", response.getBody());
     }
 
     @Test

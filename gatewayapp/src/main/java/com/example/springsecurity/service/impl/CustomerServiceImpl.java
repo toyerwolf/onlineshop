@@ -30,18 +30,7 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper=CustomerMapper.INSTANCE;
 
-    @Override
-    public void decreaseBalance(Long customerId, BigDecimal amount) {
-        Customer customer=customerRepository.findById(customerId).orElseThrow(()->new NotFoundException("Customer not found"));
-        BigDecimal currentBalance = customer.getBalance();
-        if (currentBalance.compareTo(amount) < 0) {
-            throw new InsufficientBalanceException("Insufficient balance");
-        }
-        BigDecimal newBalance = currentBalance.subtract(amount);
-        customer.setBalance(newBalance);
-        customerRepository.save(customer);
 
-    }
 
     @Override
     public CustomerDto getCustomerById(Long customerID) {
@@ -66,6 +55,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 
     //berem dannie iz repository
+    @Override
     public Map<Integer, Long> getCustomerRegistrationsByYear() {
         //poluchayem dannie registracii customer-ov
         List<Object[]> registrationData = customerRepository.getCustomerRegistrationsByYear();
@@ -98,6 +88,6 @@ public class CustomerServiceImpl implements CustomerService {
                 return card;
             }
         }
-        throw new RuntimeException("Card not found for customer");
+        throw new NotFoundException("Card not found for customer");
     }
 }

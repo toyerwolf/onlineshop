@@ -17,9 +17,9 @@ public class PaymentController {
 
 
     @PostMapping
-    public ResponseEntity<Void> processPayment(@RequestBody PaymentRequest paymentRequest) {
+    public ResponseEntity<String> processPayment(@RequestBody PaymentRequest paymentRequest) {
         paymentService.processPaymentWithCard(paymentRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body("Order with card created");
     }
 
     @PostMapping("/paypal/{customerId}/{orderId}")

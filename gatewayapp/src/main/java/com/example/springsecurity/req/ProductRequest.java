@@ -1,9 +1,6 @@
 package com.example.springsecurity.req;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,14 +28,18 @@ public class ProductRequest {
 
 
     @NotNull(message = "Price cannot be null")
+    @Positive
     private BigDecimal price;
 
     @NotNull(message = "Quantity cannot be null")
     @Min(value = 0, message = "Quantity must be positive or zero")
     private int quantity;
 
+
+    @PositiveOrZero
     private BigDecimal discountPrice;
 
+    @PositiveOrZero
     private BigDecimal discount;
 
 

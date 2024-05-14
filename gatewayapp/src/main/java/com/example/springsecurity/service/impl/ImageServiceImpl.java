@@ -1,9 +1,12 @@
 package com.example.springsecurity.service.impl;
 
 import com.example.springsecurity.entity.Product;
+import com.example.springsecurity.exception.InvalidFileExtensionException;
+import com.example.springsecurity.exception.NotFoundException;
 import com.example.springsecurity.repository.ProductRepository;
 import com.example.springsecurity.service.ImageService;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,12 +23,12 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Objects;
 
-@Getter
+@Data
 @Service
 @AllArgsConstructor
 public class ImageServiceImpl implements ImageService {
 
-    @Setter
+
     @Value("${allowed-file-extension}")
     private List<String> allowedFileExtension;
     private final ProductRepository productRepository;
@@ -47,19 +50,19 @@ public class ImageServiceImpl implements ImageService {
             Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
             return filePath.getFileName().toString();
         } else {
-            throw new RuntimeException("Invalid extension for file");
+            throw new InvalidFileExtensionException("Invalid extension for file");
         }
     }
 
     @Override
     public void changeImage(Long productId, MultipartFile updatedImage) throws IOException {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+                .orElseThrow(() -> new NotFoundException("Product not found with id: " + productId));
         String originalFilename = updatedImage.getOriginalFilename();
         String[] fileParts = originalFilename.split("\\.");
         String fileExtension = fileParts[fileParts.length - 1];
         if (!allowedFileExtension.contains(fileExtension)) {
-            throw new RuntimeException("Invalid extension for file");
+            throw new InvalidFileExtensionException("Invalid extension for file");
         }
         String fileName = StringUtils.cleanPath(originalFilename);
         Path uploadPath = Paths.get(new ClassPathResource("static").getURI());
@@ -68,6 +71,8 @@ public class ImageServiceImpl implements ImageService {
         product.setImageUrl(originalFilename);
         productRepository.save(product);
 }
+
+
 
 
 }

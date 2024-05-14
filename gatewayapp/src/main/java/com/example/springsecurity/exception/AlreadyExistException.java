@@ -2,8 +2,8 @@ package com.example.springsecurity.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class CustomerAlreadyExist extends AppException{
-    public CustomerAlreadyExist(String message) {
+public class AlreadyExistException extends AppException{
+    public AlreadyExistException(String message) {
         super(HttpStatus.CONFLICT, message);
     }
 }

@@ -27,7 +27,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final CustomerService customerService;
     private final CardService cardService;
     private final PaymentRepository paymentRepository;
-    private final ProductInventoryService productInventoryService;
+    private final CustomerBalanceService customerBalanceService;
     private final OrderRepository orderRepository;
 
 
@@ -54,7 +54,7 @@ public class PaymentServiceImpl implements PaymentService {
         orderServiceimpl.validateOrder(order);
         Customer customer = customerService.findCustomerById(customerId);
         BigDecimal totalAmount = order.getTotalAmount();
-        customerService.decreaseBalance(customerId, totalAmount);
+        customerBalanceService.decreaseBalance(customerId, totalAmount);
         orderRepository.save(order);
         savePayPalPayment(order, customer, totalAmount);
         orderServiceimpl.updateOrderStatus(order);
@@ -73,7 +73,7 @@ public class PaymentServiceImpl implements PaymentService {
         paymentRepository.save(payment);
     }
 
-    private Payment createPayment(Order order, Customer customer, BigDecimal amount, PaymentMethod paymentMethod) {
+    Payment createPayment(Order order, Customer customer, BigDecimal amount, PaymentMethod paymentMethod) {
         Payment payment = new Payment();
         payment.setOrder(order);
         payment.setCustomer(customer);
@@ -82,4 +82,6 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setPaymentDate(LocalDateTime.now());
         return payment;
     }
+
+
 }

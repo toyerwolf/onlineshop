@@ -2,8 +2,9 @@ package com.example.springsecurity.service.impl;
 
 import com.example.springsecurity.entity.Customer;
 import com.example.springsecurity.entity.CustomerCardDetails;
-import com.example.springsecurity.exception.CustomerAlreadyExist;
+import com.example.springsecurity.exception.AlreadyExistException;
 import com.example.springsecurity.exception.InsufficientBalanceException;
+import com.example.springsecurity.exception.NotFoundException;
 import com.example.springsecurity.repository.CustomerCardDetailsRepository;
 import com.example.springsecurity.repository.CustomerRepository;
 import com.example.springsecurity.req.CustomerCardReq;
@@ -14,9 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 @Service
@@ -27,9 +25,10 @@ public class CardServiceImpl implements CardService {
    private final CustomerCardDetailsRepository cardDetailsRepository;
 
 
+   @Override
     public void addCardToCustomer(Long customerId, CustomerCardReq customerCardReq) {
         Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new NotFoundException("Customer not found"));
         if (isCardNumberUnique(customerCardReq.getCardNumber())) {
             CustomerCardDetails cardDetails = new CustomerCardDetails();
             cardDetails.setCardNumber(customerCardReq.getCardNumber());
@@ -39,7 +38,7 @@ public class CardServiceImpl implements CardService {
             customer.addCard(cardDetails);
             customerRepository.save(customer);
         } else {
-            throw new CustomerAlreadyExist("Card with this number already exists");
+            throw new AlreadyExistException("Card with this number already exists");
         }
     }
 
@@ -55,7 +54,7 @@ public class CardServiceImpl implements CardService {
         return currentDate.isAfter(expirationDate);
     }
 
-    private boolean isCardNumberUnique(String cardNumber) {
+    boolean isCardNumberUnique(String cardNumber) {
         Optional<CustomerCardDetails> existingCard = cardDetailsRepository.findByCardNumber(cardNumber);
         return existingCard.isEmpty();
     }
@@ -71,6 +70,8 @@ public class CardServiceImpl implements CardService {
         card.setCardBalance(newBalance);
         cardDetailsRepository.save(card);
     }
+
+
 
 }
 

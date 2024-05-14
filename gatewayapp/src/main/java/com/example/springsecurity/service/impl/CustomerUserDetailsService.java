@@ -45,7 +45,7 @@ public class CustomerUserDetailsService implements UserDetailsService {
 
     public UserDetails loadUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
         UserPrincipal userPrincipal=new UserPrincipal();
         userPrincipal.setId(user.getId());
         userPrincipal.setPassword(user.getPassword());
