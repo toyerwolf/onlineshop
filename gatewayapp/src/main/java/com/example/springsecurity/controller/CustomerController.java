@@ -6,6 +6,7 @@ import com.example.springsecurity.service.CustomerService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +26,8 @@ public class CustomerController {
 
 }
 
+
+    @Secured("ADMIN")
     @GetMapping()
     public ResponseEntity<Page<CustomerDto>> getAllCustomers(
             @RequestParam int pageNumber,
@@ -33,6 +36,8 @@ public class CustomerController {
         return ResponseEntity.ok(customersPage);
     }
 
+
+    @Secured("ADMIN")
     @GetMapping("/searching")
     public List<CustomerDto> searchCustomers(@RequestParam String keyword) {
         return customerService.searchCustomers(keyword);

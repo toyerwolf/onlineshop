@@ -72,8 +72,6 @@ class OrderServiceImplTest {
     private OrderCancellationService orderCancellationService;
 
 
-    @Mock
-    private OrderMapper orderMapper;
 
     @Mock
     private OrderProductService orderProductService;
@@ -120,7 +118,7 @@ class OrderServiceImplTest {
         OrderRequest orderRequest = new OrderRequest();
         orderRequest.setProductQuantities(productQuantities);
 
-        // Мокируем productService.findProductById для каждого продукта
+
         Product product1 = new Product();
         product1.setId(1L);
         product1.setPrice(BigDecimal.valueOf(15)); // Устанавливаем цену продукта

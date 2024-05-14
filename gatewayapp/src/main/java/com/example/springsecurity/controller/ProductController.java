@@ -24,6 +24,8 @@ public class ProductController {
 
 
 
+
+    @Secured("ADMIN")
     @PostMapping("/{categoryId}")
     public ResponseEntity<String> addProductToCategory(@ModelAttribute ProductRequest productRequest,
                                                        @PathVariable Long categoryId,
@@ -73,6 +75,8 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
+
+    @Secured("ADMIN")
     @GetMapping("/search")
     public List<ProductDto> searchProductByName(@RequestParam String keyword) {
         return productService.searchProductByName(keyword);

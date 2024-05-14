@@ -96,7 +96,6 @@ public class ProductServiceImpl implements ProductService {
         String imageUrl = imageUrlPrefix + product.getImageUrl();
         ProductDto productDto = productMapper.toDto(product);
         productDto.setImageUrl(imageUrl);
-
         return productDto;
     }
 
@@ -167,7 +166,7 @@ public class ProductServiceImpl implements ProductService {
         productDto.setUpdatedAt(product.getUpdatedAt());
         productDto.setDeleted(product.isDeleted());
         productDto.setImageUrl(product.getImageUrl());
-//        productDto.setCategoryId(product.getCategory().getCategoryId());
+        productDto.setCategoryName(product.getCategory().getName());
         return productDto;
     }
 
