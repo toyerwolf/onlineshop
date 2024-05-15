@@ -23,6 +23,7 @@ import com.example.springsecurity.service.*;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,6 @@ import static com.example.springsecurity.entity.OrderStatus.PAID;
 
 @Service
 @AllArgsConstructor
-
 public class OrderServiceImpl implements OrderService {
     private final ProductService productService;
     private final CustomerService customerService;

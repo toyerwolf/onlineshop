@@ -13,7 +13,7 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
 
 
     @Query("SELECT p FROM Product p LEFT JOIN FETCH p.category WHERE p.category.categoryId = :categoryId")
-    List<Product> findProductsByCategoryIdWithCategory(@Param("categoryId") Long categoryId);
+    List<Product> findProductsByCategoryId(@Param("categoryId") Long categoryId);
 
     @Query("SELECT p FROM Product p WHERE lower(p.name) LIKE lower(concat('%', :keyword, '%'))")
     List<Product> searchProductByName(@Param("keyword") String keyword);

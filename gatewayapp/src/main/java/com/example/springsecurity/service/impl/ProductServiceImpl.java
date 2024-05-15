@@ -74,7 +74,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductDto> findProductsByCategoryId(Long categoryId) {
-        List<Product> products=productRepository.findProductsByCategoryIdWithCategory(categoryId);
+        List<Product> products=productRepository.findProductsByCategoryId(categoryId);
         if (products.isEmpty()) {
             throw new NotFoundException("Products not found for category id: " + categoryId);
         }
@@ -222,7 +222,9 @@ public class ProductServiceImpl implements ProductService {
 
 
 
+
 }
+
 
 
 

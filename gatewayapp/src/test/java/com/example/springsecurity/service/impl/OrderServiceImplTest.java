@@ -17,6 +17,7 @@ import com.example.springsecurity.service.ProductService;
 import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -41,14 +42,12 @@ class OrderServiceImplTest {
     @Spy
     private OrderServiceImpl orderService;
 
-    @Mock
-    private  ProductRepository productRepository;
+
 
     @Mock
     private ProductService productService;
 
-    @Mock
-    private OrderProductRepository orderProductRepository;
+
 
     @Mock
     private OrderRepository orderRepository;
@@ -77,6 +76,11 @@ class OrderServiceImplTest {
     private OrderProductService orderProductService;
     @Mock
     private CustomerBalanceService customerBalanceService;
+
+//    @BeforeEach
+//    void setUp() {
+//        MockitoAnnotations.openMocks(this);
+//    }
 
 
 
@@ -472,22 +476,65 @@ class OrderServiceImplTest {
         product.setPrice(new BigDecimal("100.00"));
         product.setQuantity(3);
 
-
         Customer customer = new Customer();
         customer.setBalance(BigDecimal.valueOf(10.0));
-        when(productService.findProductById(productId)).thenReturn(product);
-        when(customerService.findCustomerById(customerId)).thenReturn(customer);
+
         BigDecimal totalAmount = new BigDecimal("100");
+        when(productService.findProductById(productId)).thenReturn(product);
         when(orderService.calculateTotalAmount(orderRequest)).thenReturn(totalAmount);
-        doThrow(new InsufficientBalanceException("Insufficient funds on the card")).when(customerBalanceService).validateCustomerBalance(customer, totalAmount);
+
+        when(customerService.findCustomerById(customerId)).thenReturn(customer);
+
+        doThrow(new InsufficientBalanceException("Insufficient funds on the card"))
+                .when(customerBalanceService)
+                .validateCustomerBalance(customer, totalAmount);
 
 
         assertThrows(InsufficientBalanceException.class, () -> orderService.makeOrder(customerId, orderRequest));
-
-
-
     }
 
+    @Test
+    void makeOrder_InsufficientProductQuantity() {
+        // Arrange
+        Long customerId = 1L;
+        OrderRequest orderRequest = new OrderRequest();
+        Map<Long, Integer> productQuantities = new HashMap<>();
+
+        Product product1 = new Product();
+        product1.setId(1L);
+        product1.setPrice(BigDecimal.valueOf(1000.0));
+        product1.setQuantity(3);
+        productQuantities.put(product1.getId(), 5);
+
+        orderRequest.setProductQuantities(productQuantities);
+
+        Customer customer = new Customer();
+        customer.setId(customerId);
+
+        when(productService.findProductById(product1.getId())).thenReturn(product1);
+        //здесь перехватываем exception потому что он в другом методе
+        when(productInventoryService.getProductQuantities(productQuantities)).thenAnswer(invocation -> {
+            Map<Long, Integer> requestedQuantities = invocation.getArgument(0);
+            Map<Product, Integer> availableProducts = new HashMap<>();
+            for (Map.Entry<Long, Integer> entry : requestedQuantities.entrySet()) {
+                Long productId = entry.getKey();
+                Integer requestedQuantity = entry.getValue();
+                Product product = productService.findProductById(productId);
+                if (product.getQuantity() < requestedQuantity) {
+                    throw new InsufficientQuantityException("Insufficient quantity for product: " + product.getName());
+                }
+                availableProducts.put(product, product.getQuantity());
+            }
+            return availableProducts;
+        });
+        when(customerService.findCustomerById(customerId)).thenReturn(customer);
+
+        // Act & Assert
+        assertThrows(InsufficientQuantityException.class, () -> {
+            orderService.makeOrder(customerId, orderRequest);
+        });
+
+    }
     @Test
     public void scheduleOrderPaymentCheck_Test() {
         //sozdayem mock obyekta  OrderServiceImpl

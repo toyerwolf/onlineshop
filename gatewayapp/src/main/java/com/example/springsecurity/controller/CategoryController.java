@@ -2,9 +2,11 @@ package com.example.springsecurity.controller;
 
 import com.example.springsecurity.dto.CategoryDto;
 import com.example.springsecurity.dto.CategoryDtoForClient;
+import com.example.springsecurity.dto.ProductDto;
 import com.example.springsecurity.entity.Category;
 import com.example.springsecurity.req.CategoryReq;
 import com.example.springsecurity.service.CategoryService;
+import com.example.springsecurity.service.ProductService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,8 @@ import java.util.Optional;
 public class CategoryController {
 
     private final CategoryService categoryService;
+
+    private final ProductService productService;
 
     @GetMapping
     public ResponseEntity<List<CategoryDto>> getAllCategories() {
@@ -58,9 +62,15 @@ public class CategoryController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{categoryId}/with-products")
-    public CategoryDto getCategoryByIdWithProducts(@PathVariable Long categoryId) {
-        return categoryService.getCategoryByIdWithProducts(categoryId);
+//    @GetMapping("/{categoryId}/with-products")
+//    public CategoryDto getCategoryByIdWithProducts(@PathVariable Long categoryId) {
+//        return categoryService.getCategoryByIdWithProducts(categoryId);
+//    }
+
+    @GetMapping("/{categoryId}/products")
+    public ResponseEntity<List<ProductDto>> getProductsByCategoryId(@PathVariable Long categoryId) {
+        List<ProductDto> products = productService.findProductsByCategoryId(categoryId);
+        return ResponseEntity.ok(products);
     }
 
 }

@@ -39,9 +39,6 @@ class PaymentServiceImplTest {
     private CustomerBalanceService customerBalanceService;
 
     @Mock
-    private OrderServiceImpl orderService;
-
-    @Mock
     private  OrderRepository orderRepository;
 
 
@@ -58,67 +55,72 @@ class PaymentServiceImplTest {
 
 
 
+
+
     @Test
     void processPaymentWithCard_Success() {
-        // Создание тестовых данных
+        // Arrange
+        Long customerId = 1L;
+        Long cardId = 1L;
+        Long orderId = 1L;
+
         PaymentRequest paymentRequest = new PaymentRequest();
-        paymentRequest.setCustomerId(1L);
-        paymentRequest.setCardId(1L);
-        paymentRequest.setOrderId(1L);
+        paymentRequest.setCustomerId(customerId);
+        paymentRequest.setCardId(cardId);
+        paymentRequest.setOrderId(orderId);
 
         Customer customer = new Customer();
-        customer.setId(1L);
+        customer.setId(customerId);
 
         CustomerCardDetails card = new CustomerCardDetails();
-        card.setId(1L);
+        card.setId(cardId);
 
         Order order = new Order();
-        order.setId(1L);
+        order.setId(orderId);
         order.setTotalAmount(BigDecimal.valueOf(100.00));
 
+        when(customerService.findCustomerById(customerId)).thenReturn(customer);
+        when(customerService.getCustomerCardById(customer, cardId)).thenReturn(card);
+        when(orderServiceImpl.getOrderOrThrow(orderId)).thenReturn(order);
 
-        when(customerService.findCustomerById(anyLong())).thenReturn(customer);
-        when(customerService.getCustomerCardById(customer, paymentRequest.getCardId())).thenReturn(card);
-        when(orderService.getOrderOrThrow(paymentRequest.getOrderId())).thenReturn(order);
-
-        // Вызов тестируемого метода
+        // Act
         paymentService.processPaymentWithCard(paymentRequest);
 
-        verify(customerService).findCustomerById(1L);
-        verify(customerService).getCustomerCardById(customer, 1L);
-        verify(orderService).getOrderOrThrow(1L);
-        verify(orderService).validateOrderBelongsToCustomer(order, customer);
-        verify(orderService).validateOrder(order);
-        verify(cardService).decreaseFromCardBalance(card, BigDecimal.valueOf(100.00));
-        verify(paymentService).saveCreditCardPayment(order, customer, BigDecimal.valueOf(100.00));
-        verify(orderService).updateOrderStatus(order);
+        // Assert
+        verify(customerService).findCustomerById(customerId);
+        verify(customerService).getCustomerCardById(customer, cardId);
+        verify(orderServiceImpl).getOrderOrThrow(orderId);
+        verify(orderServiceImpl).validateOrderBelongsToCustomer(order, customer);
+        verify(orderServiceImpl).validateOrder(order);
+        verify(cardService).decreaseFromCardBalance(card, order.getTotalAmount());
+        verify(paymentService).saveCreditCardPayment(order, customer, order.getTotalAmount());
+        verify(orderServiceImpl).updateOrderStatus(order);
     }
 
     @Test
-    @Transactional
-    void processPaymentWithPayPal_Success() {
-        // Prepare test data
+    void testProcessPaymentWithPayPal() {
+        // Arrange
         Long customerId = 1L;
-        Long orderId = 1L;
-        Customer customer = new Customer();
+        Long orderId = 100L;
         Order order = new Order();
-        BigDecimal totalAmount = BigDecimal.valueOf(100.00);
-        order.setTotalAmount(totalAmount);
+        order.setId(orderId);
+        order.setTotalAmount(BigDecimal.valueOf(50.0));
+        Customer customer = new Customer();
+        customer.setId(customerId);
 
-        // Mock the dependencies
-        when(orderService.getOrderOrThrow(orderId)).thenReturn(order);
+        // Mocking methods
+        when(orderServiceImpl.getOrderOrThrow(orderId)).thenReturn(order);
         when(customerService.findCustomerById(customerId)).thenReturn(customer);
 
-        // Call the method under test
+        // Act
         paymentService.processPaymentWithPayPal(customerId, orderId);
 
-        // Verify interactions
-        verify(orderService).validateOrderBelongsToCustomer(order, customer);
-        verify(orderService).validateOrder(order);
-        verify(customerBalanceService).decreaseBalance(customerId, totalAmount);
+        // Assert
+        verify(orderServiceImpl).validateOrderBelongsToCustomer(order, customer);
+        verify(orderServiceImpl).validateOrder(order);
+        verify(customerBalanceService).decreaseBalance(customerId, order.getTotalAmount());
         verify(orderRepository).save(order);
-        verify(paymentService).savePayPalPayment(order, customer, totalAmount);
-        verify(orderService).updateOrderStatus(order);
+        verify(orderServiceImpl).updateOrderStatus(order);
     }
 
 

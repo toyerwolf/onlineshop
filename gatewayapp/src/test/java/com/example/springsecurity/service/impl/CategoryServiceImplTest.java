@@ -152,59 +152,59 @@ class CategoryServiceImplTest {
         verify(categoryRepository, never()).save(any());
     }
 
-    @Test
-    void testGetCategoryByIdWithProducts() {
-        // Подготовка тестовых данных
-        Long categoryId = 1L;
-        Category category = new Category();
-        category.setCategoryId(categoryId);
-        category.setName("Test Category");
-        category.setDescription("Description for test category");
-
-        List<ProductDto> products = new ArrayList<>();
-
-
-        ProductDto product1 = new ProductDto();
-        product1.setId(1L);
-        product1.setName("Product 1");
-        product1.setDescription("Description for product 1");
-
-        ProductDto product2 = new ProductDto();
-        product2.setId(2L);
-        product2.setName("Product 2");
-        product2.setDescription("Description for product 2");
-
-
-        products.add(product1);
-        products.add(product2);
-
-        // Создание заглушки для методов findById и findProductsByCategoryId
-        when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
-        when(productService.findProductsByCategoryId(categoryId)).thenReturn(products);
-
-        // Вызов метода, который тестируем
-        CategoryService categoryService = new CategoryServiceImpl(categoryRepository, productService);
-        CategoryDto result = categoryService.getCategoryByIdWithProducts(categoryId);
-
-        // Проверка, что результат содержит ожидаемые данные
-        assertNotNull(result);
-        assertEquals(categoryId, result.getCategoryId());
-        assertEquals("Test Category", result.getName());
-        assertEquals("Description for test category", result.getDescription());
-        assertEquals(2, result.getProductDtoList().size());
-    }
-
-    @Test
-    void testGetCategoryByIdWithProducts_NotFound() {
-
-        Long categoryId = 1L;
-
-
-        when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
-        assertThrows(NotFoundException.class, () -> {
-            categoryService.getCategoryByIdWithProducts(categoryId);
-        });
-    }
+//    @Test
+//    void testGetCategoryByIdWithProducts() {
+//        // Подготовка тестовых данных
+//        Long categoryId = 1L;
+//        Category category = new Category();
+//        category.setCategoryId(categoryId);
+//        category.setName("Test Category");
+//        category.setDescription("Description for test category");
+//
+//        List<ProductDto> products = new ArrayList<>();
+//
+//
+//        ProductDto product1 = new ProductDto();
+//        product1.setId(1L);
+//        product1.setName("Product 1");
+//        product1.setDescription("Description for product 1");
+//
+//        ProductDto product2 = new ProductDto();
+//        product2.setId(2L);
+//        product2.setName("Product 2");
+//        product2.setDescription("Description for product 2");
+//
+//
+//        products.add(product1);
+//        products.add(product2);
+//
+//        // Создание заглушки для методов findById и findProductsByCategoryId
+//        when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
+//        when(productService.findProductsByCategoryId(categoryId)).thenReturn(products);
+//
+//        // Вызов метода, который тестируем
+//        CategoryService categoryService = new CategoryServiceImpl(categoryRepository, productService);
+//        CategoryDto result = categoryService.getCategoryByIdWithProducts(categoryId);
+//
+//        // Проверка, что результат содержит ожидаемые данные
+//        assertNotNull(result);
+//        assertEquals(categoryId, result.getCategoryId());
+//        assertEquals("Test Category", result.getName());
+//        assertEquals("Description for test category", result.getDescription());
+//        assertEquals(2, result.getProductDtoList().size());
+//    }
+//
+//    @Test
+//    void testGetCategoryByIdWithProducts_NotFound() {
+//
+//        Long categoryId = 1L;
+//
+//
+//        when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
+//        assertThrows(NotFoundException.class, () -> {
+//            categoryService.getCategoryByIdWithProducts(categoryId);
+//        });
+//    }
 
 
 

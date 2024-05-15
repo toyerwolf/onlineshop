@@ -73,16 +73,15 @@ public class CategoryServiceImpl implements CategoryService {
         });
     }
 
-    @Override
-    public CategoryDto getCategoryByIdWithProducts(Long categoryId) {
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new NotFoundException("Category not found for id: " + categoryId));
-        List<ProductDto> productsInCategory = productService.findProductsByCategoryId(categoryId);
-        CategoryDto categoryDto = CategoryMapper.INSTANCE.categoryToCategoryDTO(category);
-        categoryDto.setProductDtoList(productsInCategory);
-
-        return categoryDto;
-    }
+//    @Override
+//    public CategoryDto getCategoryByIdWithProducts(Long categoryId) {
+//        Category category = categoryRepository.findById(categoryId)
+//                .orElseThrow(() -> new NotFoundException("Category not found for id: " + categoryId));
+//        List<ProductDto> productsInCategory = productService.findProductsByCategoryId(categoryId);
+//        CategoryDto categoryDto = CategoryMapper.INSTANCE.categoryToCategoryDTO(category);
+//        categoryDto.setProductDtoList(productsInCategory);
+//        return categoryDto;
+//    }
 
 
 

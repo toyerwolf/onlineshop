@@ -19,8 +19,8 @@ public class Category {
     private String name;
 
     private String description;
-    @OneToMany(mappedBy = "category",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
 
+    @OneToMany(mappedBy = "category",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Product> products=new ArrayList<>();
 
     private boolean isDeleted;

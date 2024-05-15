@@ -121,7 +121,7 @@ class ProductServiceImplTest {
         products.add(product1);
         products.add(product2);
 
-        when(productRepository.findProductsByCategoryIdWithCategory(categoryId)).thenReturn(products);
+        when(productRepository.findProductsByCategoryId(categoryId)).thenReturn(products);
 
         // Act
         List<ProductDto> result = productService.findProductsByCategoryId(categoryId);
@@ -142,7 +142,7 @@ class ProductServiceImplTest {
     void testFindProductsByCategoryId_EmptyList() {
         // Arrange
         Long categoryId = 1L;
-        when(productRepository.findProductsByCategoryIdWithCategory(categoryId)).thenReturn(Collections.emptyList());
+        when(productRepository.findProductsByCategoryId(categoryId)).thenReturn(Collections.emptyList());
 
         // Act and Assert
         assertThrows(NotFoundException.class, () -> productService.findProductsByCategoryId(categoryId));
@@ -396,6 +396,10 @@ class ProductServiceImplTest {
     void testGetProductDto() {
         // Arrange
         Product product = new Product();
+
+        Category category = new Category();
+        category.setCategoryId(1L);
+        category.setName("Test Category");
         product.setId(1L);
         product.setName("Test Product");
         product.setDescription("Description of test product");
@@ -405,6 +409,7 @@ class ProductServiceImplTest {
         product.setUpdatedAt(LocalDateTime.now());
         product.setDeleted(false);
         product.setImageUrl("test_product.jpg");
+        product.setCategory(category);
 
         // Act
         ProductDto productDto = ProductServiceImpl.getProductDto(product);
@@ -420,6 +425,7 @@ class ProductServiceImplTest {
         assertEquals(product.getUpdatedAt(), productDto.getUpdatedAt());
         assertEquals(product.isDeleted(), productDto.isDeleted());
         assertEquals(product.getImageUrl(), productDto.getImageUrl());
+        assertEquals(category.getName(), productDto.getCategoryName());
     }
 
     @Test

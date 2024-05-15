@@ -50,10 +50,6 @@ public class OrderController {
         return ResponseEntity.ok(orders);
     }
 
-    @GetMapping("/customer/{customerId}")
-    public List<OrderDto> getOrdersByCustomerId(@PathVariable Long customerId) {
-        return orderService.findOrdersByCustomerID(customerId);
-    }
 
     @PostMapping("/{customerId}/{cardId}")
     public ResponseEntity<OrderResponse> makeOrderWithCard(@PathVariable Long customerId,

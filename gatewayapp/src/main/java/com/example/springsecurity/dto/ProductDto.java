@@ -24,7 +24,7 @@ public class ProductDto {
     private boolean isDeleted;
     private String imageUrl;
     private String categoryName;
-    private boolean isPaid;
+//    private boolean isPaid;
 
 
 }

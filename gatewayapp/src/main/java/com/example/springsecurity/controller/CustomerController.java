@@ -2,7 +2,9 @@ package com.example.springsecurity.controller;
 
 
 import com.example.springsecurity.dto.CustomerDto;
+import com.example.springsecurity.dto.OrderDto;
 import com.example.springsecurity.service.CustomerService;
+import com.example.springsecurity.service.OrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -17,14 +19,14 @@ import java.util.List;
 public class CustomerController {
 
     private final CustomerService customerService;
+    private final OrderService orderService;
 
     @GetMapping("/{customerId}")
     public ResponseEntity<CustomerDto> getCustomerById(@PathVariable Long customerId) {
         CustomerDto customerDto = customerService.getCustomerById(customerId);
         return ResponseEntity.ok(customerDto);
 
-
-}
+    }
 
 
     @Secured("ADMIN")
@@ -41,6 +43,12 @@ public class CustomerController {
     @GetMapping("/searching")
     public List<CustomerDto> searchCustomers(@RequestParam String keyword) {
         return customerService.searchCustomers(keyword);
+    }
+
+
+    @GetMapping("{customerId}/orders")
+    public List<OrderDto> getOrdersByCustomerId(@PathVariable Long customerId) {
+        return orderService.findOrdersByCustomerID(customerId);
     }
 
 }

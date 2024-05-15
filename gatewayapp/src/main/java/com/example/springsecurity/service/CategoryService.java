@@ -21,6 +21,6 @@ public interface CategoryService {
 
     void deleteCategory(Long categoryId);
 
-    CategoryDto getCategoryByIdWithProducts(Long categoryId);
+//    CategoryDto getCategoryByIdWithProducts(Long categoryId);
 
 }
