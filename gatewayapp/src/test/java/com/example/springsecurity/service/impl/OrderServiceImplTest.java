@@ -386,6 +386,54 @@ class OrderServiceImplTest {
     }
 
     @Test
+    void testMakeOrderWithCard_InsufficientProductQuantity() {
+        // Подготовка данных для теста
+        Long customerId = 1L;
+        Long cardId = 1L;
+        Long productId = 1L;
+
+        OrderRequest orderRequest = new OrderRequest();
+        Map<Long, Integer> productQuantities = new HashMap<>();
+        productQuantities.put(productId, 5); // Запрошено 5 продуктов
+
+        orderRequest.setProductQuantities(productQuantities);
+
+        Product product = new Product();
+        product.setId(productId);
+        product.setPrice(new BigDecimal("100.00"));
+        product.setQuantity(3);
+
+        Customer customer = new Customer();
+        customer.setId(customerId);
+
+        CustomerCardDetails card = new CustomerCardDetails();
+        card.setId(cardId);
+        card.setExpirationDate(LocalDate.now().plusMonths(1));
+
+        when(customerService.findCustomerById(customerId)).thenReturn(customer);
+        when(customerService.getCustomerCardById(customer, cardId)).thenReturn(card);
+        when(cardService.isCardExpired(card.getExpirationDate())).thenReturn(false);
+        when(productService.findProductById(productId)).thenReturn(product);
+
+        when(productInventoryService.getProductQuantities(productQuantities)).thenAnswer(invocation -> {
+            Map<Long, Integer> requestedQuantities = invocation.getArgument(0);
+            Map<Product, Integer> availableProducts = new HashMap<>();
+            for (Map.Entry<Long, Integer> entry : requestedQuantities.entrySet()) {
+                Long productIdEntry = entry.getKey();
+                Integer requestedQuantity = entry.getValue();
+                Product productEntry = productService.findProductById(productIdEntry);
+                if (productEntry.getQuantity() < requestedQuantity) {
+                    throw new InsufficientQuantityException("Insufficient quantity for product: " + productEntry.getName());
+                }
+                availableProducts.put(productEntry, productEntry.getQuantity());
+            }
+            return availableProducts;
+        });
+
+        assertThrows(InsufficientQuantityException.class, () -> orderService.makeOrderWithCard(customerId, orderRequest, cardId));
+    }
+
+    @Test
     @Transactional
     void testMakeOrder() {
         // Arrange

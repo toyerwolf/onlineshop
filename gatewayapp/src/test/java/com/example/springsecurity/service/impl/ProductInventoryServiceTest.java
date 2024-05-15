@@ -40,7 +40,7 @@ class ProductInventoryServiceTest {
         Map<Product, Integer> productQuantities = new HashMap<>();
 
         Product product1 = new Product();
-        product1.setId(1L); // Set the ID for the product
+        product1.setId(1L);
         product1.setName("Product 1");
         product1.setQuantity(20);
 
