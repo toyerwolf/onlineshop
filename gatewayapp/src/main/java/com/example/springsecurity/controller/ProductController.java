@@ -34,10 +34,10 @@ public class ProductController {
         return ResponseEntity.ok("Product added to category successfully");
     }
 
-    @GetMapping("/category/{categoryId}")
-    public List<ProductDto> findProductsByCategoryId(@PathVariable Long categoryId) {
-        return productService.findProductsByCategoryId(categoryId);
-    }
+//    @GetMapping("/category/{categoryId}")
+//    public List<ProductDto> findProductsByCategoryId(@PathVariable Long categoryId) {
+//        return productService.findProductsByCategoryId(categoryId);
+//    }
 
     @Secured("ADMIN")
     @PatchMapping("/{productId}/images")
