@@ -7,7 +7,7 @@ import com.example.springsecurity.entity.User;
 import com.example.springsecurity.exception.NotFoundException;
 import com.example.springsecurity.repository.CustomerRepository;
 import com.example.springsecurity.repository.UserRepository;
-import com.example.springsecurity.securiy.UserPrincipal;
+import com.example.springsecurity.security.UserPrincipal;
 import com.example.springsecurity.service.CustomerService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

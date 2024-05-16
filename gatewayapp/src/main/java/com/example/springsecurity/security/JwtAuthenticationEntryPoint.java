@@ -1,4 +1,4 @@
-package com.example.springsecurity.securiy;
+package com.example.springsecurity.security;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

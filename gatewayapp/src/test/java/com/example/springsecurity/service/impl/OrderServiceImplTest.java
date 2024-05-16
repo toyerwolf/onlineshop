@@ -77,10 +77,6 @@ class OrderServiceImplTest {
     @Mock
     private CustomerBalanceService customerBalanceService;
 
-//    @BeforeEach
-//    void setUp() {
-//        MockitoAnnotations.openMocks(this);
-//    }
 
 
 
@@ -300,13 +296,12 @@ class OrderServiceImplTest {
         when(orderService.createOrder(customer, new BigDecimal("200.00"))).thenReturn(order);
         List<OrderProductDto> orderProductDtos = getOrderProductDtos();
 
-        // Вызов метода сервиса для получения OrderProductDto
+
         when(orderProductService.findOrderProductsByOrderId(order.getId())).thenReturn(orderProductDtos);
 
-        // Act
+
         OrderResponse orderResponse = orderService.makeOrderWithCard(1L, orderRequest, 1L);
 
-        // Assert
         assertNotNull(orderResponse);
         assertNotNull(orderResponse.getId());
         assertNotNull(orderResponse.getCreatedAt());

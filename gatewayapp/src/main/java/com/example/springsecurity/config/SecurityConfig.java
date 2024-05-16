@@ -1,8 +1,8 @@
 package com.example.springsecurity.config;
 
-import com.example.springsecurity.securiy.JwtAuthenticationEntryPoint;
+import com.example.springsecurity.security.JwtAuthenticationEntryPoint;
 
-import com.example.springsecurity.securiy.JwtAuthenticationFilter;
+import com.example.springsecurity.security.JwtAuthenticationFilter;
 import com.example.springsecurity.service.impl.CustomerUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -76,10 +76,11 @@ public class SecurityConfig {
                     return corsConfiguration;
                 }))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll().
-                        requestMatchers("/users/**").permitAll().
-                        requestMatchers("/categories/**").permitAll()
-                        .anyRequest().authenticated()
+//                        .requestMatchers("/auth/**").permitAll().
+//                        requestMatchers("/users/**").permitAll().
+//                        requestMatchers("/categories/**").permitAll()
+                        .anyRequest().permitAll()
+
                 )
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
                 .httpBasic(basic -> basic.authenticationEntryPoint(jwtAuthenticationEntryPoint))

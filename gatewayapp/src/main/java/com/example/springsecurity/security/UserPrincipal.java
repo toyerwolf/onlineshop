@@ -1,4 +1,4 @@
-package com.example.springsecurity.securiy;
+package com.example.springsecurity.security;
 
 import com.example.springsecurity.entity.Role;
 import lombok.AllArgsConstructor;

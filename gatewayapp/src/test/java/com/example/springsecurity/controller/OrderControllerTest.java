@@ -40,14 +40,14 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles(profiles = "integration")
 @EnableConfigurationProperties
 @EnableAutoConfiguration
-@ComponentScan(basePackages = {"com.example.springsecurity.service.impl", "com.example.springsecurity.config"})
+@ComponentScan(basePackages = {"com.example.springsecurity.service.impl"})
 class OrderControllerTest {
 
 
 
     @LocalServerPort
     private int port;
-    String token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE1NTkxNDk1LCJleHAiOjE3MTU1OTUwOTV9.S633b5MMBEgl1gxSjERlKOtZPXuxCP7eKC7sAnh0_1A";
+    String token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE1ODM5NzY3LCJleHAiOjE3MTU4NDMzNjd9.VlOUGt9phn-pFvm886xO5yzP-_gwKnYaX-zcbxYwJQs";
 
 
 

@@ -34,16 +34,18 @@ public class CategoryController {
     @GetMapping("/{categoryId}")
     public ResponseEntity<CategoryDtoForClient> getCategoryById(@PathVariable Long categoryId) {
         return categoryService.getCategoryById(categoryId)
-                .map(ResponseEntity::ok)
+                .map(category -> new ResponseEntity<>(category, HttpStatus.OK))
                 .orElse(ResponseEntity.notFound().build());
     }
+
 
 
     @Secured("ADMIN")
     @PostMapping
     public ResponseEntity<String> createCategory(@RequestBody CategoryReq categoryReq) {
         categoryService.createCategory(categoryReq);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        String message = "Category created successfully";
+        return ResponseEntity.status(HttpStatus.CREATED).body(message);
     }
 
 
@@ -51,7 +53,7 @@ public class CategoryController {
     @PutMapping("/{categoryId}")
     public ResponseEntity<String> updateCategory(@PathVariable Long categoryId, @RequestBody CategoryDto updatedCategoryDTO) {
         categoryService.updateCategory(categoryId, updatedCategoryDTO);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Updated successfully");
     }
 
 

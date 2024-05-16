@@ -25,7 +25,7 @@ class PaymentControllerTest {
 
     @LocalServerPort
     private int port;
-    String token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE1NTMwOTEwLCJleHAiOjE3MTU1MzQ1MTB9.e8dUNQJxX3HzIVEljBkD3uA0ulynA7FVikXfA1QMAjI";
+    String token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE1ODM5NzY3LCJleHAiOjE3MTU4NDMzNjd9.VlOUGt9phn-pFvm886xO5yzP-_gwKnYaX-zcbxYwJQs";
 
     @Test
     @Sql(scripts = {"classpath:sql/customerainsert.sql",
@@ -34,7 +34,6 @@ class PaymentControllerTest {
               "classpath:sql/card-add.sql"  })
 
     void processPayment_ValidRequest_ReturnsCreated() {
-
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", token);
         PaymentRequest paymentRequest = new PaymentRequest();
@@ -48,7 +47,6 @@ class PaymentControllerTest {
                 requestEntity,
                 String.class
         );
-
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals("Order with card created", response.getBody());
     }

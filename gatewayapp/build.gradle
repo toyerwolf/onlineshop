@@ -52,6 +52,7 @@ dependencies {
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.17.1'
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.17.1'
 	implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 
 
 

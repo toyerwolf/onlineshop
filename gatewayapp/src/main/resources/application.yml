@@ -8,11 +8,15 @@ spring:
     allow-bean-definition-overriding: true
   mvc:
     static-path-pattern: /static/**
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
   web:
     resources:
       static-locations: classpath:/static/
-
-
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
 logging:
   level:
@@ -35,6 +39,3 @@ file:
   allowed-extensions: ${allowed-file-extension}
 
 image-url-prefix: /static/
-
-
-

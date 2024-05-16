@@ -2,8 +2,8 @@ package com.example.springsecurity.service.impl;
 
 import com.example.springsecurity.dto.JwtResponse;
 import com.example.springsecurity.dto.LoginDto;
-import com.example.springsecurity.securiy.JwtTokenProvider;
-import com.example.springsecurity.securiy.UserPrincipal;
+import com.example.springsecurity.security.JwtTokenProvider;
+import com.example.springsecurity.security.UserPrincipal;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
