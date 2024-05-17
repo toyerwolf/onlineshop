@@ -40,7 +40,7 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
 
 
     @Query(value = "SELECT " +
-            "   EXTRACT(YEAR FROM o.created_at) AS year, " +
+            "   o.created_at AS saleYear, " +
             "   SUM(opq.quantity * COALESCE(p.discount_price, p.price)) AS totalRevenue " +
             "FROM " +
             "   order_test o " +
@@ -51,9 +51,9 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
             "WHERE " +
             "   o.status = 'PAID' " + // условие на статус заказа
             "GROUP BY " +
-            "   EXTRACT(YEAR FROM o.created_at) " +
+            "   o.created_at " +
             "ORDER BY " +
-            "   year ASC",
+            "   saleYear ASC",
             nativeQuery = true)
     List<Object[]> getSoldProductSalesStatistics();
 

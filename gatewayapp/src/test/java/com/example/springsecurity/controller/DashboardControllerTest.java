@@ -12,6 +12,8 @@ import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -38,7 +40,7 @@ class DashboardControllerTest {
             "classpath:sql/v1/ordersinsert.sql",
             "classpath:sql/v1/order-product.sql"
     }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void testGetProductSalesStatistics() {
+    public void testGetProductSalesStatisticsPerYear() {
         int year = 2023;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -78,7 +80,7 @@ class DashboardControllerTest {
             "classpath:sql/v1/ordersinsert.sql",
             "classpath:sql/v1/order-product.sql"
     }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void testGetProductSalesStatistics_AdminRole_Success() {
+    public void testGetProductSalesStatisticsSuccess() {
         // Arrange
         int expectedYear = 2023;
 
@@ -92,14 +94,48 @@ class DashboardControllerTest {
                 createURLWithPort("/dashboard/product-sales-statistic"),
                 HttpMethod.GET, requestEntity, new ParameterizedTypeReference<>() {});
 
-        // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
         Map<Integer, Integer> salesByYear = response.getBody();
         assertNotNull(salesByYear);
         assertFalse(salesByYear.isEmpty());
         assertTrue(salesByYear.containsKey(expectedYear));
-        // Добавьте здесь дополнительные проверки для убеждения в правильности данных
+
     }
+
+    @Test
+    @Sql(scripts = {
+            "classpath:sql/v1/categoryinsert.sql",
+            "classpath:sql/v1/usersinsert.sql",
+            "classpath:sql/v1/productsinsert.sql",
+            "classpath:sql/v1/customersinsert.sql",
+            "classpath:sql/v1/ordersinsert.sql",
+            "classpath:sql/v1/order-product.sql"
+    }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    public void testGetTotalProductSalesRevenue_AdminRole_Success() {
+        int expectedYear = 2023;
+        Map<Integer, BigDecimal> expectedTotalRevenueByYear = new HashMap<>();
+        expectedTotalRevenueByYear.put(2023, new BigDecimal("100.00"));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", token);
+        HttpEntity<?> requestEntity = new HttpEntity<>(headers);
+
+        // Act
+        ResponseEntity<Map<Integer, BigDecimal>> response = restTemplate.exchange(createURLWithPort("/dashboard/totalRevenueByYear"),
+                HttpMethod.GET, requestEntity,
+                new ParameterizedTypeReference<>() {
+                });
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        Map<Integer, BigDecimal> actualTotalRevenueByYear = response.getBody();
+        assertNotNull(actualTotalRevenueByYear);
+        assertEquals(expectedTotalRevenueByYear.size(), actualTotalRevenueByYear.size());
+        assertEquals(expectedTotalRevenueByYear.get(expectedYear), actualTotalRevenueByYear.get(expectedYear));
+    }
+
 
 
 

@@ -210,16 +210,20 @@ public Map<String, Integer> countSoldProductsByYear(int year) {
         return salesByYear;
     }
 
+
+    //
     @Override
     public Map<Integer, BigDecimal> getTotalProductSalesRevenueByYear() {
-        List<Object[]> salesData = productRepository.getSoldProductSalesStatistics();
-        Map<Integer, BigDecimal> totalRevenueByYear = new HashMap<>();
-        for (Object[] row : salesData) {
-            int year = ((Number) row[0]).intValue();
-            BigDecimal totalRevenue = (BigDecimal) row[1];
-            totalRevenueByYear.put(year, totalRevenue);
+        List<Object[]> results = productRepository.getSoldProductSalesStatistics();
+        Map<Integer, BigDecimal> salesByYear = new HashMap<>();
+        for (Object[] row : results) {
+            Timestamp timestamp = (Timestamp) row[0];
+            LocalDateTime saleYear = timestamp.toLocalDateTime();
+            int yearValue = saleYear.getYear();
+            BigDecimal totalRevenue = (BigDecimal) row[1]; // Предположим, что это тип BigDecimal
+            salesByYear.put(yearValue, totalRevenue);
         }
-        return totalRevenueByYear;
+        return salesByYear;
     }
 
 

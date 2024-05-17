@@ -543,19 +543,19 @@ class ProductServiceImplTest {
     void testGetTotalProductSalesRevenueByYear() {
         // Arrange
         List<Object[]> data = new ArrayList<>();
-        data.add(new Object[]{2020, new BigDecimal("1500.75")});
-        data.add(new Object[]{2021, new BigDecimal("2000.50")});
-
+        data.add(new Object[]{Timestamp.valueOf("2020-01-01 00:00:00"), new BigDecimal("1500.75")});
+        data.add(new Object[]{Timestamp.valueOf("2021-01-01 00:00:00"), new BigDecimal("2000.50")});
 
         when(productRepository.getSoldProductSalesStatistics()).thenReturn(data);
+
+        // Act
         Map<Integer, BigDecimal> totalRevenueByYear = productService.getTotalProductSalesRevenueByYear();
 
-
+        // Assert
         assertEquals(2, totalRevenueByYear.size());
         assertEquals(new BigDecimal("1500.75"), totalRevenueByYear.get(2020));
         assertEquals(new BigDecimal("2000.50"), totalRevenueByYear.get(2021));
     }
-
 
 
 
