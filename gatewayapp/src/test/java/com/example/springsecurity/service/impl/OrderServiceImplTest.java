@@ -85,28 +85,27 @@ class OrderServiceImplTest {
     void testCalculateTotalAmount() {
         // Act
         Map<Long, Integer> productQuantities = new HashMap<>();
-        productQuantities.put(1L, 2); // Продукт с id = 1 в количестве 2
-        productQuantities.put(2L, 1); // Продукт с id = 2 в количестве 1
+        productQuantities.put(1L, 2);
+        productQuantities.put(2L, 1);
         OrderRequest orderRequest = new OrderRequest();
         orderRequest.setProductQuantities(productQuantities);
 
-        // Мокируем productService.findProductById для каждого продукта
+
         Product product1 = new Product();
         product1.setId(1L);
-        product1.setPrice(BigDecimal.TEN); // Устанавливаем цену продукта
+        product1.setPrice(BigDecimal.TEN);
         when(productService.findProductById(1L)).thenReturn(product1);
 
         Product product2 = new Product();
         product2.setId(2L);
-        product2.setDiscountPrice(BigDecimal.valueOf(8)); // Устанавливаем скидочную цену продукта
+        product2.setDiscountPrice(BigDecimal.valueOf(8));
         when(productService.findProductById(2L)).thenReturn(product2);
 
-        // Вызываем метод, который тестируем
+
         BigDecimal totalAmount = orderService.calculateTotalAmount(orderRequest);
 
         BigDecimal expectedTotalAmount = BigDecimal.valueOf(28);
 
-        // Проверяем, что результат соответствует ожидаемому значению
         assertEquals(expectedTotalAmount, totalAmount);
     }
 
@@ -143,7 +142,7 @@ class OrderServiceImplTest {
 
         Order order = orderService.createOrder(customer, totalAmount);
 
-        // Assert
+
         assertNotNull(order);
         assertEquals(customer, order.getCustomer());
         assertEquals(totalAmount, order.getTotalAmount());

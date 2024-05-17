@@ -5,20 +5,21 @@ import com.example.springsecurity.entity.Customer;
 import com.example.springsecurity.entity.CustomerCardDetails;
 import com.example.springsecurity.exception.InsufficientBalanceException;
 import com.example.springsecurity.exception.NotFoundException;
+import com.example.springsecurity.mapper.CustomerMapper;
 import com.example.springsecurity.repository.CustomerRepository;
 import com.example.springsecurity.service.CustomerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -30,6 +31,9 @@ private CustomerRepository customerRepository;
 
     @Mock
     Customer customer;
+
+    @Mock
+    private CustomerMapper customerMapper;
 
 
 
@@ -201,7 +205,45 @@ private CustomerRepository customerRepository;
 
         assertThrows(NotFoundException.class, () -> customerService.getCustomerCardById(customer, cardId));
     }
+
+    @Test
+    void testGetAllCustomer() {
+
+        CustomerRepository customerRepository = mock(CustomerRepository.class);
+        CustomerService customerService = new CustomerServiceImpl(customerRepository);
+
+        Sort sort = Sort.unsorted();
+        int pageNumber = 1;
+        int pageSize = 10;
+
+        Pageable pageable = PageRequest.of(0, pageSize, sort);
+        List<Customer> customerList = new ArrayList<>();
+        for (int i = 0; i < pageSize; i++) {
+            Customer customer = new Customer();
+            customer.setId((long) (i + 1));
+            customer.setName("Customer " + (i + 1));
+            customer.setSurname("Surname " + (i + 1));
+            customerList.add(customer);
+        }
+        Page<Customer> customersPage = new PageImpl<>(customerList, pageable, customerList.size());
+        when(customerRepository.findAll(pageable)).thenReturn(customersPage);
+
+        List<CustomerDto> customerDtoPage = customerService.getAllCustomer(pageNumber, pageSize);
+
+
+        assertEquals(pageSize, customerDtoPage.size());
+        for (int i = 0; i < pageSize; i++) {
+            CustomerDto customerDto = customerDtoPage.get(i);
+            Customer customer = customerList.get(i);
+            assertEquals(customer.getId(), customerDto.getId());
+            assertEquals(customer.getName(), customerDto.getName());
+            assertEquals(customer.getSurname(), customerDto.getSurname());
+        }
+    }
 }
+
+
+
 
 
 

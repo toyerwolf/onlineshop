@@ -46,11 +46,10 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Page<CustomerDto> getAllCustomer(int pageNumber, int pageSize) {
-        Pageable pageable= PageRequest.of(pageNumber-1,pageSize);
-        Page<Customer> customers=customerRepository.findAll(pageable);
-        List<CustomerDto> customerDtos = customerMapper.toDtoList(customers.getContent());
-        return new PageImpl<>(customerDtos, pageable, customers.getTotalElements());
+    public List<CustomerDto> getAllCustomer(int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+        Page<Customer> customers = customerRepository.findAll(pageable);
+        return customerMapper.toDtoList(customers.getContent());
     }
 
 

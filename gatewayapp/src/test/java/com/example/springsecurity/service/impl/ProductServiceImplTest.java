@@ -464,7 +464,6 @@ class ProductServiceImplTest {
         for (int i = 0; i < expectedProducts.size(); i++) {
             Product expectedProduct = expectedProducts.get(i);
             ProductDto actualProductDto = actualProductDtos.get(i);
-
             assertEquals(expectedProduct.getId(), actualProductDto.getId());
             assertEquals(expectedProduct.getName(), actualProductDto.getName());
             assertEquals(expectedProduct.getDescription(), actualProductDto.getDescription());

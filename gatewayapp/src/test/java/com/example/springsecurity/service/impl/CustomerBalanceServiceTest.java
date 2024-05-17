@@ -32,8 +32,6 @@ class CustomerBalanceServiceTest {
 
         Customer customer = mock(Customer.class);
         when(customer.getBalance()).thenReturn(customerBalance);
-
-
         CustomerRepository customerRepository = mock(CustomerRepository.class);
         CustomerBalanceService customerBalanceService = new CustomerBalanceService(customerRepository);
 

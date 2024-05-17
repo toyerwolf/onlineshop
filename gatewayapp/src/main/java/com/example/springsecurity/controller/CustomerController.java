@@ -31,10 +31,10 @@ public class CustomerController {
 
     @Secured("ADMIN")
     @GetMapping()
-    public ResponseEntity<Page<CustomerDto>> getAllCustomers(
+    public ResponseEntity<List<CustomerDto>> getAllCustomers(
             @RequestParam int pageNumber,
             @RequestParam int pageSize) {
-        Page<CustomerDto> customersPage = customerService.getAllCustomer(pageNumber, pageSize);
+        List<CustomerDto> customersPage = customerService.getAllCustomer(pageNumber, pageSize);
         return ResponseEntity.ok(customersPage);
     }
 

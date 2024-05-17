@@ -2,6 +2,7 @@ package com.example.springsecurity.controller;
 
 import com.example.springsecurity.dto.CategoryDto;
 import com.example.springsecurity.dto.CategoryDtoForClient;
+import com.example.springsecurity.dto.ProductDto;
 import com.example.springsecurity.req.CategoryReq;
 import com.example.springsecurity.req.CustomerCardReq;
 import org.junit.jupiter.api.Test;
@@ -149,6 +150,35 @@ class CategoryControllerTest {
 
         assertEquals(HttpStatus.NO_CONTENT, responseEntity.getStatusCode());
         assertNull(responseEntity.getBody());
+    }
+
+
+    @Test
+    @Sql(scripts = {"classpath:sql/category-add.sql",
+            "classpath:sql/customerainsert.sql",
+            "classpath:sql/userinsert.sql",
+             "classpath:sql/productadd.sql"   },executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void testGetProductsByCategoryId(){
+        long categoryId = 1L;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization",token);
+        HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
+
+
+        ResponseEntity<List<ProductDto>> responseEntity = restTemplate.exchange(
+                createURLWithPort("/categories/" + categoryId + "/products"),
+                HttpMethod.GET,
+                httpEntity,
+                new ParameterizedTypeReference<>() {
+                });
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+        List<ProductDto> products = responseEntity.getBody();
+        assertNotNull(products);
+        assertEquals(2, products.size());
+
     }
 
 

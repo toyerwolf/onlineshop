@@ -121,50 +121,5 @@ class CustomerUserDetailsServiceTest {
         );
     }
 
-
-
-//    Метод правильно извлекает страницу клиентов из репозитория с правильными параметрами pageNumber и pageSize,
-//    Метод правильно преобразует каждого клиента в объект CustomerDto c помощью for.
-//     Метод корректно создает объект Page<CustomerDto> с правильными значениями.
-    @Test
-    void testGetAllCustomer() {
-        // Подготовка данных для теста
-        int pageNumber = 1;
-        int pageSize = 10;
-        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        List<Customer> customerList = new ArrayList<>();
-        for (int i = 0; i < pageSize; i++) {
-            Customer customer = new Customer();
-            customer.setId((long) (i + 1));
-            customer.setName("Customer " + (i + 1));
-            customer.setSurname("Surname " + (i + 1));
-            customerList.add(customer);
-        }
-        Page<Customer> customersPage = new PageImpl<>(customerList, pageable, customerList.size());
-
-        when(customerRepository.findAll(any(Pageable.class))).thenReturn(customersPage);
-
-        // Создание сервиса
-        CustomerService customerService = new CustomerServiceImpl(customerRepository);
-
-        // Вызов метода, который тестируем
-        Page<CustomerDto> customerDtoPage = customerService.getAllCustomer(pageNumber, pageSize);
-
-        // Проверка корректности преобразования клиентов в CustomerDto
-        List<CustomerDto> customerDtoList = customerDtoPage.getContent();
-        assertEquals(pageSize, customerDtoList.size());
-        for (int i = 0; i < pageSize; i++) {
-            CustomerDto customerDto = customerDtoList.get(i);
-            Customer customer = customerList.get(i);
-            assertEquals(customer.getId(), customerDto.getId());
-            assertEquals(customer.getName(), customerDto.getName());
-            assertEquals(customer.getSurname(), customerDto.getSurname());
-
-        }
-
-        // Проверка корректности создания объекта Page<CustomerDto>
-        assertEquals(pageable, customerDtoPage.getPageable());
-        assertEquals(customerList.size(), customerDtoPage.getTotalElements());
-    }
-
 }
+

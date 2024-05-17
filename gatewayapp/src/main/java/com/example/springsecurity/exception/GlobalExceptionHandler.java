@@ -1,5 +1,6 @@
 package com.example.springsecurity.exception;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +34,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleMethodArgumentNotValidException(ConstraintViolationException e){
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(HttpStatus.FORBIDDEN,e.getMessage()));
     }
+
+
+
 
 
 }

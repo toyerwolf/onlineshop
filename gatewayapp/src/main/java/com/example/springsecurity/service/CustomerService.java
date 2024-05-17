@@ -17,7 +17,7 @@ public interface CustomerService {
 
     Customer findCustomerById(Long customerId);
 
-    Page<CustomerDto> getAllCustomer(int pageNumber,int pageSize);
+    List<CustomerDto> getAllCustomer(int pageNumber,int pageSize);
 
     Map<Integer, Long> getCustomerRegistrationsByYear();
 
