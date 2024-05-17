@@ -7,10 +7,7 @@ import com.example.springsecurity.service.ProductService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -26,6 +23,7 @@ private final CustomerService customerService;
 
     @Secured("ADMIN")
     @GetMapping("products/total-sold")
+    @ResponseBody
     public Map<String, Integer> getSoldProductCountsByYear(@RequestParam int year) {
         return productService.countSoldProductsByYear(year);
     }

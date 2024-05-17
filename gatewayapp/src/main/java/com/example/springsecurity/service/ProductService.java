@@ -1,6 +1,7 @@
 package com.example.springsecurity.service;
 
 import com.example.springsecurity.dto.ProductDto;
+import com.example.springsecurity.dto.SoldProductsResponse;
 import com.example.springsecurity.entity.Product;
 import com.example.springsecurity.req.ProductRequest;
 import org.springframework.data.domain.Page;
@@ -33,7 +34,7 @@ public interface ProductService {
      Product findProductById(Long productId);
      List<ProductDto> findProductsByOrderId(Long orderId);
 
-    Map<String, Integer> countSoldProductsByYear(int year);
+    public Map<String, Integer> countSoldProductsByYear(int year);
 
     Map<Integer, Integer> getProductSalesStatistics();
 

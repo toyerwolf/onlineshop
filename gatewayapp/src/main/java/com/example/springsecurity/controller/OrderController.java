@@ -38,6 +38,8 @@ public class OrderController {
         return ResponseEntity.ok("Order marked as delivered successfully.");
     }
 
+
+    @Secured("USER")
     @GetMapping("/{orderId}/products")
     public ResponseEntity<List<ProductDto>> getProductsByOrderId(@PathVariable Long orderId) {
         List<ProductDto> products = productService.findProductsByOrderId(orderId);

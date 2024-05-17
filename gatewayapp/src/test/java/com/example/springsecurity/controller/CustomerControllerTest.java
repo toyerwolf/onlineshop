@@ -122,8 +122,7 @@ void testGetCustomerById(){
     @Sql(scripts = {"classpath:sql/customerainsert.sql",
             "classpath:sql/userinsert.sql",
             "classpath:sql/orderinsert.sql",
-
-    }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    },executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void testGetOrdersByCustomerId() {
         Long customerId = 2L;
 

@@ -1,12 +1,12 @@
 package com.example.springsecurity.repository;
 
-import com.example.springsecurity.dto.ProductDto;
+import com.example.springsecurity.dto.SoldProductsResponse;
 import com.example.springsecurity.entity.Product;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product,Long> {
@@ -25,16 +25,16 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
             "FROM order_product op " +
             "JOIN order_test o ON op.order_id = o.id " +
             "JOIN product_test p ON op.product_id = p.id " +
-            "WHERE EXTRACT(YEAR FROM o.created_at) = :year " +
+            "WHERE o.created_at BETWEEN :startDate AND :endDate " +
             "AND o.status = 'PAID' " +
             "GROUP BY p.name, op.product_id", nativeQuery = true)
-    List<Object[]> countSoldProductsByYear(@Param("year") int year);
+    List<Object[]> countSoldProductsByYear(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
-    @Query(value = "SELECT EXTRACT(YEAR FROM o.created_at) AS year, SUM(op.quantity) AS totalSold " +
+    @Query(value = "SELECT o.created_at AS sales_year, SUM(op.quantity) AS totalSold " +
             "FROM order_test o " +
             "JOIN order_product op ON o.id = op.order_id " +
-            "WHERE o.status = 'PAID' " + // Добавляем условие на статус заказа
-            "GROUP BY EXTRACT(YEAR FROM o.created_at)", nativeQuery = true)
+            "WHERE o.status = 'PAID' " +
+            "GROUP BY o.created_at", nativeQuery = true)
     List<Object[]> getProductSalesStatistics();
 
 

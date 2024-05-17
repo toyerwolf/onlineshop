@@ -1,9 +1,8 @@
 package com.example.springsecurity.service.impl;
 
 import com.example.springsecurity.dto.ProductDto;
+import com.example.springsecurity.dto.SoldProductsResponse;
 import com.example.springsecurity.entity.Category;
-import com.example.springsecurity.entity.Order;
-import com.example.springsecurity.entity.OrderProduct;
 import com.example.springsecurity.entity.Product;
 import com.example.springsecurity.exception.InsufficientQuantityException;
 import com.example.springsecurity.exception.NotFoundException;
@@ -27,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -182,31 +182,33 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public Map<String, Integer> countSoldProductsByYear(int year) {
-        List<Object[]> results = productRepository.countSoldProductsByYear(year);
-        Map<String, Integer> soldProductsByYear = new HashMap<>();
-        for (Object[] result : results) {
-            String productName = (String) result[2];
-            Integer totalSold = ((Number) result[1]).intValue();
-            soldProductsByYear.put(productName, totalSold);
-        }
-        return soldProductsByYear;
+//    @Override
+public Map<String, Integer> countSoldProductsByYear(int year) {
+    LocalDateTime startDate = LocalDateTime.of(year, 1, 1, 0, 0);
+    LocalDateTime endDate = LocalDateTime.of(year, 12, 31, 23, 59, 59);
+
+    List<Object[]> results = productRepository.countSoldProductsByYear(startDate, endDate);
+    Map<String, Integer> soldProductCounts = new HashMap<>();
+    for (Object[] row : results) {
+        String productName = (String) row[2];
+        Integer totalSold = ((Number) row[1]).intValue();
+        soldProductCounts.put(productName, totalSold);
     }
-
-
+    return soldProductCounts;
+}
     @Override
     public Map<Integer, Integer> getProductSalesStatistics() {
-        List<Object[]> salesData = productRepository.getProductSalesStatistics();
+        List<Object[]> results = productRepository.getProductSalesStatistics();
         Map<Integer, Integer> salesByYear = new HashMap<>();
-        for (Object[] row : salesData) {
-            int year = ((Number) row[0]).intValue();
+        for (Object[] row : results) {
+            Timestamp timestamp = (Timestamp) row[0];
+            LocalDateTime year = timestamp.toLocalDateTime();
+            int yearValue = year.getYear();
             int totalSold = ((Number) row[1]).intValue();
-            salesByYear.put(year, totalSold);
+            salesByYear.put(yearValue, totalSold);
         }
         return salesByYear;
     }
-
 
     @Override
     public Map<Integer, BigDecimal> getTotalProductSalesRevenueByYear() {

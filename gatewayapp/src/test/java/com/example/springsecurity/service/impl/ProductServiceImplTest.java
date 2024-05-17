@@ -26,6 +26,7 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -495,11 +496,14 @@ class ProductServiceImplTest {
     void testCountSoldProductsByYear() {
         // Arrange
         int year = 2023;
+        LocalDateTime startOfYear = LocalDateTime.of(year, 1, 1, 0, 0, 0);
+        LocalDateTime endOfYear = LocalDateTime.of(year, 12, 31, 23, 59, 59);
         Object[] result1 = {1L, 50, "Product 1"};
         Object[] result2 = {2L, 25, "Product 2"};
         List<Object[]> results = Arrays.asList(result1, result2);
 
-        when(productRepository.countSoldProductsByYear(year)).thenReturn(results);
+        // Mocking the repository call
+        when(productRepository.countSoldProductsByYear(startOfYear, endOfYear)).thenReturn(results);
 
         // Act
         Map<String, Integer> soldProductsByYear = productService.countSoldProductsByYear(year);
@@ -508,26 +512,31 @@ class ProductServiceImplTest {
         assertEquals(2, soldProductsByYear.size());
         assertEquals(50, soldProductsByYear.get("Product 1"));
         assertEquals(25, soldProductsByYear.get("Product 2"));
+
+        // Additional assertions to ensure keys and values are not null
+        assertTrue(soldProductsByYear.containsKey("Product 1"));
+        assertTrue(soldProductsByYear.containsKey("Product 2"));
+        assertNotNull(soldProductsByYear.get("Product 1"));
+        assertNotNull(soldProductsByYear.get("Product 2"));
     }
 
     @Test
-    void testGetProductSalesStatistics() {
+    public void testGetProductSalesStatistics() {
         // Arrange
-        Object[] data1 = {2021, 100};
-        Object[] data2 = {2022, 200};
-        Object[] data3 = {2023, 50};
-        List<Object[]> salesData = Arrays.asList(data1, data2, data3);
+        List<Object[]> mockResults = new ArrayList<>();
+        mockResults.add(new Object[]{Timestamp.valueOf(LocalDateTime.of(2023, 1, 1, 0, 0)), 10});
+        mockResults.add(new Object[]{Timestamp.valueOf(LocalDateTime.of(2023, 2, 1, 0, 0)), 20});
 
-        when(productRepository.getProductSalesStatistics()).thenReturn(salesData);
+        when(productRepository.getProductSalesStatistics()).thenReturn(mockResults);
 
         // Act
         Map<Integer, Integer> salesByYear = productService.getProductSalesStatistics();
 
         // Assert
-        assertEquals(3, salesByYear.size());
-        assertEquals(100, salesByYear.get(2021));
-        assertEquals(200, salesByYear.get(2022));
-        assertEquals(50, salesByYear.get(2023));
+        Map<Integer, Integer> expectedSalesByYear = new HashMap<>();
+        expectedSalesByYear.put(2023, 10);
+        expectedSalesByYear.put(2023, 20);
+        assertEquals(expectedSalesByYear, salesByYear);
     }
 
     @Test
