@@ -1,6 +1,6 @@
 package com.example.springsecurity.repository;
 
-import com.example.springsecurity.dto.SoldProductsResponse;
+
 import com.example.springsecurity.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

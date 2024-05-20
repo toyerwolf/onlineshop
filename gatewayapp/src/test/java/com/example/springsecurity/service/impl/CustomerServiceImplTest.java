@@ -1,6 +1,8 @@
 package com.example.springsecurity.service.impl;
 
 import com.example.springsecurity.dto.CustomerDto;
+import com.example.springsecurity.dto.CustomerRegistrationDTO;
+import com.example.springsecurity.dto.CustomerRegistrationsByYearResponseDTO;
 import com.example.springsecurity.entity.Customer;
 import com.example.springsecurity.entity.CustomerCardDetails;
 import com.example.springsecurity.exception.InsufficientBalanceException;
@@ -18,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -117,24 +120,32 @@ private CustomerRepository customerRepository;
     void testGetCustomerRegistrationsByYear() {
 
         List<Object[]> registrationData = new ArrayList<>();
-        registrationData.add(new Object[]{2021, 100L});
-        registrationData.add(new Object[]{2022, 150L});
-        registrationData.add(new Object[]{2023, 200L});
+        registrationData.add(new Object[]{Timestamp.valueOf("2021-01-01 00:00:00"), 100L});
+        registrationData.add(new Object[]{Timestamp.valueOf("2022-01-01 00:00:00"), 150L});
+        registrationData.add(new Object[]{Timestamp.valueOf("2023-01-01 00:00:00"), 200L});
 
-
+        CustomerRepository customerRepository = mock(CustomerRepository.class);
         when(customerRepository.getCustomerRegistrationsByYear()).thenReturn(registrationData);
-
 
         CustomerService customerService = new CustomerServiceImpl(customerRepository);
 
 
-        Map<Integer, Long> result = customerService.getCustomerRegistrationsByYear();
+        CustomerRegistrationsByYearResponseDTO responseDTO = customerService.getCustomerRegistrationsByYear();
 
 
-        assertEquals(3, result.size());
-        assertEquals(100L, result.get(2021));
-        assertEquals(150L, result.get(2022));
-        assertEquals(200L, result.get(2023));
+        assertNotNull(responseDTO);
+        List<CustomerRegistrationDTO> registrationsByYear = responseDTO.getRegistrationsByYear();
+        assertNotNull(registrationsByYear);
+        assertFalse(registrationsByYear.isEmpty());
+        assertEquals(3, registrationsByYear.size());
+
+
+        assertEquals(100L, registrationsByYear.get(0).getRegistrations());
+        assertEquals(150L, registrationsByYear.get(1).getRegistrations());
+        assertEquals(200L, registrationsByYear.get(2).getRegistrations());
+        assertEquals(2021, registrationsByYear.get(0).getYear());
+        assertEquals(2022, registrationsByYear.get(1).getYear());
+        assertEquals(2023, registrationsByYear.get(2).getYear());
     }
 
     @Test

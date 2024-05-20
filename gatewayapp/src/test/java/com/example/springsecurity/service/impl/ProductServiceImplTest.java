@@ -1,6 +1,6 @@
 package com.example.springsecurity.service.impl;
 
-import com.example.springsecurity.dto.ProductDto;
+import com.example.springsecurity.dto.*;
 import com.example.springsecurity.entity.Category;
 import com.example.springsecurity.entity.Product;
 import com.example.springsecurity.exception.InsufficientQuantityException;
@@ -506,18 +506,28 @@ class ProductServiceImplTest {
         when(productRepository.countSoldProductsByYear(startOfYear, endOfYear)).thenReturn(results);
 
         // Act
-        Map<String, Integer> soldProductsByYear = productService.countSoldProductsByYear(year);
+        ProductSalesResponseDto productSalesResponseDto = productService.countSoldProductsByYear(year);
 
         // Assert
+        assertNotNull(productSalesResponseDto);
+        List<ProductSoldCountDTO> soldProductsByYear = productSalesResponseDto.getProductSoldCounts();
+        assertNotNull(soldProductsByYear);
         assertEquals(2, soldProductsByYear.size());
-        assertEquals(50, soldProductsByYear.get("Product 1"));
-        assertEquals(25, soldProductsByYear.get("Product 2"));
 
-        // Additional assertions to ensure keys and values are not null
-        assertTrue(soldProductsByYear.containsKey("Product 1"));
-        assertTrue(soldProductsByYear.containsKey("Product 2"));
-        assertNotNull(soldProductsByYear.get("Product 1"));
-        assertNotNull(soldProductsByYear.get("Product 2"));
+        Map<String, Integer> expectedSales = new HashMap<>();
+        expectedSales.put("Product 1", 50);
+        expectedSales.put("Product 2", 25);
+
+        for (ProductSoldCountDTO productSoldCountDTO : soldProductsByYear) {
+            String productName = productSoldCountDTO.getProductName();
+            Integer totalSold = productSoldCountDTO.getSoldCount();
+            assertNotNull(productName);
+            assertNotNull(totalSold);
+
+            if (expectedSales.containsKey(productName)) {
+                assertEquals(expectedSales.get(productName).intValue(), totalSold.intValue());
+            }
+        }
     }
 
     @Test
@@ -528,16 +538,21 @@ class ProductServiceImplTest {
         mockResults.add(new Object[]{Timestamp.valueOf(LocalDateTime.of(2023, 2, 1, 0, 0)), 20});
 
         when(productRepository.getProductSalesStatistics()).thenReturn(mockResults);
-
         // Act
-        Map<Integer, Integer> salesByYear = productService.getProductSalesStatistics();
+        YearlySalesResponseDto salesResponseDto = productService.getProductSalesStatistics();
 
         // Assert
-        Map<Integer, Integer> expectedSalesByYear = new HashMap<>();
-        expectedSalesByYear.put(2023, 10);
-        expectedSalesByYear.put(2023, 20);
-        assertEquals(expectedSalesByYear, salesByYear);
+        List<YearlyProductSalesDTO> yearlySales = salesResponseDto.getYearlySales();
+        assertEquals(2, yearlySales.size());
+
+        assertEquals(2023, yearlySales.get(0).getYear());
+        assertEquals(10, yearlySales.get(0).getTotalSold());
+
+        assertEquals(2023, yearlySales.get(1).getYear());
+        assertEquals(20, yearlySales.get(1).getTotalSold());
     }
+
+
 
     @Test
     void testGetTotalProductSalesRevenueByYear() {
@@ -549,12 +564,20 @@ class ProductServiceImplTest {
         when(productRepository.getSoldProductSalesStatistics()).thenReturn(data);
 
         // Act
-        Map<Integer, BigDecimal> totalRevenueByYear = productService.getTotalProductSalesRevenueByYear();
+        YearlySalesRevenueResponseDTO responseDTO = productService.getTotalProductSalesRevenueByYear();
 
         // Assert
-        assertEquals(2, totalRevenueByYear.size());
-        assertEquals(new BigDecimal("1500.75"), totalRevenueByYear.get(2020));
-        assertEquals(new BigDecimal("2000.50"), totalRevenueByYear.get(2021));
+        assertNotNull(responseDTO);
+        List<YearlySalesRevenueDTO> salesByYear = responseDTO.getYearlySales();
+        assertNotNull(salesByYear);
+        assertEquals(2, salesByYear.size());
+
+        // Check each YearlySalesRevenueDTO
+        assertEquals(2020, salesByYear.get(0).getYear());
+        assertEquals(new BigDecimal("1500.75"), salesByYear.get(0).getTotalRevenue());
+
+        assertEquals(2021, salesByYear.get(1).getYear());
+        assertEquals(new BigDecimal("2000.50"), salesByYear.get(1).getTotalRevenue());
     }
 
 

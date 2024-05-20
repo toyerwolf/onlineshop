@@ -1,6 +1,6 @@
 package com.example.springsecurity.controller;
 
-import com.example.springsecurity.dto.SalesStaticDto;
+import com.example.springsecurity.dto.*;
 import com.example.springsecurity.service.CustomerService;
 import com.example.springsecurity.service.OrderService;
 import com.example.springsecurity.service.ProductService;
@@ -22,9 +22,9 @@ public class DashboardController {
 private final CustomerService customerService;
 
     @Secured("ADMIN")
-    @GetMapping("products/total-sold")
+    @GetMapping("/products/total-sold")
     @ResponseBody
-    public Map<String, Integer> getSoldProductCountsByYear(@RequestParam int year) {
+    public ProductSalesResponseDto getSoldProductCountsByYear(@RequestParam int year) {
         return productService.countSoldProductsByYear(year);
     }
 
@@ -32,26 +32,26 @@ private final CustomerService customerService;
 
 
     @Secured("ADMIN")
-    @GetMapping("/product-sales-statistic")
-    public ResponseEntity<Map<Integer, Integer>> getProductSalesStatistics() {
-        Map<Integer, Integer> salesByYear = productService.getProductSalesStatistics();
-        return ResponseEntity.ok(salesByYear);
+    @GetMapping("/products/sales-statistics")
+    @ResponseBody
+    public YearlySalesResponseDto getProductSalesStatistics() {
+        return productService.getProductSalesStatistics();
     }
+
 
 
     @Secured("ADMIN")
     @GetMapping("/totalRevenueByYear")
-    public ResponseEntity<Map<Integer, BigDecimal>> getTotalProductSalesRevenue() {
-        Map<Integer, BigDecimal> totalRevenueByYear = productService.getTotalProductSalesRevenueByYear();
-        return ResponseEntity.ok(totalRevenueByYear);
+    public ResponseEntity<YearlySalesRevenueResponseDTO> getTotalProductSalesRevenueByYear() {
+        YearlySalesRevenueResponseDTO responseDTO = productService.getTotalProductSalesRevenueByYear();
+        return ResponseEntity.ok(responseDTO);
     }
 
 
-    @Secured("ADMIN")
-    @GetMapping("/customer-registrations")
-    public ResponseEntity<Map<Integer, Long>> getCustomerRegistrationsByYear() {
-        Map<Integer, Long> customerRegistrationsByYear = customerService.getCustomerRegistrationsByYear();
-        return ResponseEntity.ok(customerRegistrationsByYear);
+    @GetMapping("customer/registrations")
+    public ResponseEntity<CustomerRegistrationsByYearResponseDTO> getCustomerRegistrationsByYear() {
+        CustomerRegistrationsByYearResponseDTO responseDTO = customerService.getCustomerRegistrationsByYear();
+        return ResponseEntity.ok(responseDTO);
     }
 
 

@@ -82,7 +82,7 @@ class AuthControllerTest {
     public void testRefreshToken() {
 
         JwtRequest jwtRequest = new JwtRequest();
-        jwtRequest.setRefreshToken("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE1ODM1NDQzLCJleHAiOjE3MTU4MzkwNDN9.23JTZrjUeMCAODjZ7fwUVNrnxvNK6FZDySaPkfJT52w");
+        jwtRequest.setRefreshToken("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE2MTgxMTU3LCJleHAiOjE3MTYxODQ3NTd9.k7kZ8EfzfnSgcseo7410G4mi8o4FjuWivu_K2tC6AmI");
 
 
         HttpHeaders headers = new HttpHeaders();
@@ -93,7 +93,7 @@ class AuthControllerTest {
                 request,
                 JwtResponse.class);
 
-        // Проверка успешности обновления токена
+
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         JwtResponse jwtResponse = responseEntity.getBody();
         assertNotNull(jwtResponse);

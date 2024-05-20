@@ -28,14 +28,14 @@ public interface CustomerRepository extends JpaRepository<Customer,Long> {
 
     //Object potomu chto vozrashayets dva znacheniya
     @Query(value = "SELECT " +
-            "   EXTRACT(YEAR FROM c.registered_at) AS year, " +
+            "   c.registered_at, " +
             "   COUNT(*) AS customer_registrations " +
             "FROM " +
             "   customer c " +
             "GROUP BY " +
-            "   EXTRACT(YEAR FROM c.registered_at) " +
+            "   c.registered_at " +
             "ORDER BY " +
-            "   year ASC",
+            "   c.registered_at ASC",
             nativeQuery = true)
     List<Object[]> getCustomerRegistrationsByYear();
 

@@ -2,6 +2,8 @@ package com.example.springsecurity.service.impl;
 
 import com.example.springsecurity.dto.CustomerDto;
 
+import com.example.springsecurity.dto.CustomerRegistrationDTO;
+import com.example.springsecurity.dto.CustomerRegistrationsByYearResponseDTO;
 import com.example.springsecurity.entity.Customer;
 import com.example.springsecurity.entity.CustomerCardDetails;
 import com.example.springsecurity.exception.InsufficientBalanceException;
@@ -17,6 +19,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,19 +59,26 @@ public class CustomerServiceImpl implements CustomerService {
 
     //berem dannie iz repository
     @Override
-    public Map<Integer, Long> getCustomerRegistrationsByYear() {
-        //poluchayem dannie registracii customer-ov
+    public CustomerRegistrationsByYearResponseDTO getCustomerRegistrationsByYear() {
         List<Object[]> registrationData = customerRepository.getCustomerRegistrationsByYear();
-        Map<Integer, Long> customerRegistrationsByYear = new HashMap<>();
+        Map<Integer, Long> totalRegistrationsByYear = new HashMap<>();
 
-        //proxodimsa po kajdoy stroke dannix o registracii
+        // Проходим по каждой строке данных о регистрации
         for (Object[] row : registrationData) {
-            //izvlekayem qod i kolichestvo i pomeshayem v customerRegistrationsByYear
-            int year = ((Number) row[0]).intValue();
+            // Извлекаем Timestamp и преобразуем в год
+            Timestamp timestamp = (Timestamp) row[0];
+            int year = timestamp.toLocalDateTime().getYear();
+            // Извлекаем количество регистраций
             long customerRegistrations = ((Number) row[1]).longValue();
-            customerRegistrationsByYear.put(year, customerRegistrations);
+            // Добавляем количество регистраций в существующее значение для данного года
+            totalRegistrationsByYear.merge(year, customerRegistrations, Long::sum);
         }
-        return customerRegistrationsByYear;
+        List<CustomerRegistrationDTO> registrationsByYear = new ArrayList<>();
+
+        totalRegistrationsByYear.forEach((year, registrations) -> registrationsByYear.add(new CustomerRegistrationDTO(year, registrations)));
+        CustomerRegistrationsByYearResponseDTO responseDTO = new CustomerRegistrationsByYearResponseDTO();
+        responseDTO.setRegistrationsByYear(registrationsByYear);
+        return responseDTO;
     }
 
     @Override

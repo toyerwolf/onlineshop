@@ -47,7 +47,7 @@ class OrderControllerTest {
 
     @LocalServerPort
     private int port;
-    String token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE1ODM5NzY3LCJleHAiOjE3MTU4NDMzNjd9.VlOUGt9phn-pFvm886xO5yzP-_gwKnYaX-zcbxYwJQs";
+    String token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE2MTg1MjY4LCJleHAiOjE3MTYxODg4Njh9.4MOrfZxgiNIB7sCHJVufEbqjUKUktaXGP60nNQxu67A";
 
 
 
@@ -124,6 +124,30 @@ class OrderControllerTest {
         assertNotNull(orderResponse.getTotalAmount());
         assertNotNull(orderResponse.getCreatedAt());
         assertNotNull(orderResponse.getStatus());
+
+    }
+
+    @Test
+    @Sql(scripts = {
+            "classpath:sql/customerainsert.sql",
+            "classpath:sql/orderinsert.sql",
+            "classpath:sql/userinsert.sql",
+    }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    public void testMarkOrderAsDelivered(){
+        long orderId=1L;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", token);
+        HttpEntity<Void> httpEntity=new HttpEntity<>(headers);
+
+        ResponseEntity<String> response=restTemplate.exchange(createURLWithPort("/orders/"+orderId+"/"+"deliver"),
+                HttpMethod.PATCH,
+                httpEntity,String.class);
+
+        assertEquals(HttpStatus.OK,response.getStatusCode());
+        assertEquals("Order marked as delivered successfully.",response.getBody());
+
+
 
     }
 

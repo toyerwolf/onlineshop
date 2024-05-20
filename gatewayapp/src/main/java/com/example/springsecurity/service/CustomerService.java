@@ -1,6 +1,7 @@
 package com.example.springsecurity.service;
 
 import com.example.springsecurity.dto.CustomerDto;
+import com.example.springsecurity.dto.CustomerRegistrationsByYearResponseDTO;
 import com.example.springsecurity.entity.Customer;
 import com.example.springsecurity.entity.CustomerCardDetails;
 import org.springframework.data.domain.Page;
@@ -19,7 +20,7 @@ public interface CustomerService {
 
     List<CustomerDto> getAllCustomer(int pageNumber,int pageSize);
 
-    Map<Integer, Long> getCustomerRegistrationsByYear();
+   CustomerRegistrationsByYearResponseDTO getCustomerRegistrationsByYear();
 
      List<CustomerDto> searchCustomers(String keyword);
 

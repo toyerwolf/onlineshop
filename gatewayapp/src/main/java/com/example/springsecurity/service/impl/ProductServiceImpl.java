@@ -1,7 +1,6 @@
 package com.example.springsecurity.service.impl;
 
-import com.example.springsecurity.dto.ProductDto;
-import com.example.springsecurity.dto.SoldProductsResponse;
+import com.example.springsecurity.dto.*;
 import com.example.springsecurity.entity.Category;
 import com.example.springsecurity.entity.Product;
 import com.example.springsecurity.exception.InsufficientQuantityException;
@@ -183,47 +182,52 @@ public class ProductServiceImpl implements ProductService {
     }
 
 //    @Override
-public Map<String, Integer> countSoldProductsByYear(int year) {
+public ProductSalesResponseDto countSoldProductsByYear(int year) {
     LocalDateTime startDate = LocalDateTime.of(year, 1, 1, 0, 0);
     LocalDateTime endDate = LocalDateTime.of(year, 12, 31, 23, 59, 59);
 
     List<Object[]> results = productRepository.countSoldProductsByYear(startDate, endDate);
-    Map<String, Integer> soldProductCounts = new HashMap<>();
+    List<ProductSoldCountDTO> productSoldCounts = new ArrayList<>();
     for (Object[] row : results) {
         String productName = (String) row[2];
-        Integer totalSold = ((Number) row[1]).intValue();
-        soldProductCounts.put(productName, totalSold);
+        int totalSold = ((Number) row[1]).intValue();
+        ProductSoldCountDTO productSoldCount = new ProductSoldCountDTO(productName, totalSold);
+        productSoldCounts.add(productSoldCount);
     }
-    return soldProductCounts;
+    return new ProductSalesResponseDto(productSoldCounts);
 }
     @Override
-    public Map<Integer, Integer> getProductSalesStatistics() {
+    public YearlySalesResponseDto getProductSalesStatistics() {
         List<Object[]> results = productRepository.getProductSalesStatistics();
-        Map<Integer, Integer> salesByYear = new HashMap<>();
+        List<YearlyProductSalesDTO> yearlySales = new ArrayList<>();
         for (Object[] row : results) {
             Timestamp timestamp = (Timestamp) row[0];
             LocalDateTime year = timestamp.toLocalDateTime();
             int yearValue = year.getYear();
             int totalSold = ((Number) row[1]).intValue();
-            salesByYear.put(yearValue, totalSold);
+            YearlyProductSalesDTO yearlyProductSalesDTO = new YearlyProductSalesDTO(yearValue, totalSold);
+            yearlySales.add(yearlyProductSalesDTO);
         }
-        return salesByYear;
+        return new YearlySalesResponseDto(yearlySales);
     }
 
 
     //
     @Override
-    public Map<Integer, BigDecimal> getTotalProductSalesRevenueByYear() {
+    public YearlySalesRevenueResponseDTO getTotalProductSalesRevenueByYear() {
         List<Object[]> results = productRepository.getSoldProductSalesStatistics();
-        Map<Integer, BigDecimal> salesByYear = new HashMap<>();
+        List<YearlySalesRevenueDTO> salesByYear = new ArrayList<>();
         for (Object[] row : results) {
             Timestamp timestamp = (Timestamp) row[0];
             LocalDateTime saleYear = timestamp.toLocalDateTime();
             int yearValue = saleYear.getYear();
             BigDecimal totalRevenue = (BigDecimal) row[1]; // Предположим, что это тип BigDecimal
-            salesByYear.put(yearValue, totalRevenue);
+            YearlySalesRevenueDTO yearlySalesRevenueDTO = new YearlySalesRevenueDTO(yearValue, totalRevenue);
+            salesByYear.add(yearlySalesRevenueDTO);
         }
-        return salesByYear;
+        YearlySalesRevenueResponseDTO responseDTO = new YearlySalesRevenueResponseDTO();
+        responseDTO.setYearlySales(salesByYear);
+        return responseDTO;
     }
 
 

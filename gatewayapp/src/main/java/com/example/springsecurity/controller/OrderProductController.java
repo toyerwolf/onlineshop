@@ -1,6 +1,7 @@
 package com.example.springsecurity.controller;
 
 import com.example.springsecurity.dto.OrderProductDto;
+import com.example.springsecurity.dto.OrderProductsResponse;
 import com.example.springsecurity.dto.ProductDto;
 import com.example.springsecurity.service.OrderProductService;
 import lombok.AllArgsConstructor;
@@ -19,10 +20,11 @@ public class OrderProductController {
 
     private final OrderProductService orderProductService;
 
+
     @GetMapping("/{orderId}/products")
-    public ResponseEntity<List<OrderProductDto>> findOrderProductsByOrderId(@PathVariable Long orderId) {
+    public ResponseEntity<OrderProductsResponse> findOrderProductsByOrderId(@PathVariable Long orderId) {
         List<OrderProductDto> products = orderProductService.findOrderProductsByOrderId(orderId);
-        return ResponseEntity.ok(products);
+        return ResponseEntity.ok(new OrderProductsResponse(products));
     }
 
 }
