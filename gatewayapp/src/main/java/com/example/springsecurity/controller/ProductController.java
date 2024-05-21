@@ -55,9 +55,9 @@ public class ProductController {
 
     @Secured("ADMIN")
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateProduct(@PathVariable Long id, @RequestBody ProductRequest productRequest) {
+    public ResponseEntity<String> updateProduct(@PathVariable Long id, @RequestBody ProductRequest productRequest) {
         productService.updateProduct(id, productRequest);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Updated success");
     }
 
 
@@ -82,12 +82,12 @@ public class ProductController {
         return productService.searchProductByName(keyword);
 }
 
-    @Secured("ADMIN")
-    @PatchMapping("/{productId}/decrease-count")
-    public ResponseEntity<String> decreaseCount(@PathVariable Long productId,@RequestParam int quantity){
-        productService.decreaseCount(productId, quantity);
-        return ResponseEntity.ok("Product count decreased successfully");
-    }
+//    @Secured("ADMIN")
+//    @PatchMapping("/{productId}/decrease-count")
+//    public ResponseEntity<String> decreaseCount(@PathVariable Long productId,@RequestParam int quantity){
+//        productService.decreaseCount(productId, quantity);
+//        return ResponseEntity.ok("Product count decreased successfully");
+//    }
 
 //    @GetMapping("/{orderId}/products")
 //    public ResponseEntity<List<ProductDto>> getProductsByOrderId(@PathVariable Long orderId) {

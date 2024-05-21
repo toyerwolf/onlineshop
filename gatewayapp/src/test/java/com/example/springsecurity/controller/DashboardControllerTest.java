@@ -10,6 +10,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -32,9 +33,10 @@ class DashboardControllerTest {
     private TestRestTemplate restTemplate;
 
 
-    String token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE2MjA2NjA3LCJleHAiOjE3MTYyMTAyMDd9.qcBNwPdG7bF9d02m9RtWlA2QbyyHAXZmA32hjnC3TQM";
+    String token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE2MjY1NjM1LCJleHAiOjE3MTYyNjkyMzV9.Cnt58dadNX9jIr8Fm6ExKSpxG3FKFB0gm3AqrssW3HE";
 
     @Test
+    @WithMockUser(username = "john", roles = {"ADMIN"})
     @Sql(scripts = {
             "classpath:sql/v1/categoryinsert.sql",
             "classpath:sql/v1/usersinsert.sql",
@@ -80,6 +82,7 @@ class DashboardControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "john", roles = {"ADMIN"})
     @Sql(scripts = {
             "classpath:sql/v1/categoryinsert.sql",
             "classpath:sql/v1/usersinsert.sql",
@@ -122,6 +125,7 @@ class DashboardControllerTest {
 
 
     @Test
+    @WithMockUser(username = "john", roles = {"ADMIN"})
     @Sql(scripts = {
             "classpath:sql/v1/categoryinsert.sql",
             "classpath:sql/v1/usersinsert.sql",
@@ -182,7 +186,6 @@ class DashboardControllerTest {
 
         Map<Integer, Long> expectedRegistrationsByYear = new HashMap<>();
         expectedRegistrationsByYear.put(2023, 2L);
-
         for (CustomerRegistrationDTO registrationDTO : registrationsByYear) {
             int year = registrationDTO.getYear();
             long registrations = registrationDTO.getRegistrations();
