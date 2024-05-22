@@ -21,7 +21,7 @@ jobs:
 
       - name: Build online-shopping app with Gradle
         run: gradle build -x test bootJar
-        working-directory: ./gatewayapp
+        working-directory: ./spring-security
 
       - name: Archive build artifacts
         uses: actions/upload-artifact@v2
