@@ -1,5 +1,4 @@
 name: CI/CD Pipeline
-
 on:
   push:
     branches:
@@ -27,7 +26,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: app-jar
-          path: spring-security/gatewayapp/build/libs/*.jar
+          path: gatewayapp/build/libs/*.jar
 
   test:
     name: Test
