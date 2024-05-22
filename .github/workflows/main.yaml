@@ -1,13 +1,16 @@
 name: CI/CD Pipeline
+
 on:
   push:
     branches:
       - main
 
 jobs:
+
   build:
     name: Build
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -16,10 +19,10 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '17'
-          distribution: adopt
+          distribution: amazon
 
       - name: Build online-shopping app with Gradle
-        run: gradle build -x test bootJar
+        run: gradle build -x test bootJar -Dorg.gradle.jvmargs="-Xmx4096m"
         working-directory: ./spring-security/gatewayapp
 
       - name: Archive build artifacts
@@ -32,6 +35,7 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     needs: build
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -40,7 +44,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '17'
-          distribution: adopt
+          distribution: amazon
 
       - name: Initialize Gradle build
         run: gradle init
@@ -53,6 +57,7 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     needs: test
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
