@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8098:8080"
+      - "8099:8080"
     depends_on:
       - db
     environment:
