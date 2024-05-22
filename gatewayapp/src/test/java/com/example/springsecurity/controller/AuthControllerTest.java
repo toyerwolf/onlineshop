@@ -3,6 +3,7 @@ package com.example.springsecurity.controller;
 import com.example.springsecurity.dto.JwtRequest;
 import com.example.springsecurity.dto.JwtResponse;
 import com.example.springsecurity.dto.LoginDto;
+import com.example.springsecurity.security.JwtTestUtil;
 import com.example.springsecurity.security.JwtTokenProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -24,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @EnableConfigurationProperties
 @EnableAutoConfiguration
 @ComponentScan(basePackages = {"com.example.springsecurity.security","com.example.springsecurity.config"})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class AuthControllerTest {
 
 
@@ -37,11 +40,14 @@ class AuthControllerTest {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
+    @Autowired
+    private JwtTestUtil jwtTestUtil;
 
 
-    @Sql(scripts = {
-            "classpath:sql/customerainsert.sql",
-            "classpath:sql/userinsert.sql",
+
+    @Sql(scripts = {"classpath:sql/userinsert.sql",
+            "classpath:sql/customerainsert.sql"
+            ,
     }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 
     @Test
@@ -73,11 +79,17 @@ class AuthControllerTest {
         assertTrue(jwtTokenProvider.validateToken(token));
     }
 
-    @Test
-    public void testRefreshToken() {
-        JwtRequest jwtRequest = new JwtRequest();
-        jwtRequest.setRefreshToken("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE2MzY0MDA3LCJleHAiOjE3MTYzNjc2MDd9.mdiEQShUsN3txOX5utXc0XG60t2wj6QZ-c1AwvxC9yY");
 
+    @Test
+    @Sql(scripts = {"classpath:sql/userinsert.sql",
+            "classpath:sql/customerainsert.sql"
+    }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    public void testRefreshToken() {
+        Long userId = 1L;
+        String refreshToken = jwtTestUtil.generateRefreshToken(userId);
+
+        JwtRequest jwtRequest = new JwtRequest();
+        jwtRequest.setRefreshToken(refreshToken);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -87,13 +99,13 @@ class AuthControllerTest {
                 request,
                 JwtResponse.class);
 
-
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         JwtResponse jwtResponse = responseEntity.getBody();
         assertNotNull(jwtResponse);
         assertNotNull(jwtResponse.getToken());
         assertNotNull(jwtResponse.getRefreshToken());
     }
+
 
 
     private String createURLWithPort(String uri) {

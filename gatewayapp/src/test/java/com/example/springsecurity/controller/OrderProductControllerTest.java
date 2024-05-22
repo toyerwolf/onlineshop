@@ -1,9 +1,11 @@
 package com.example.springsecurity.controller;
 import com.example.springsecurity.dto.OrderProductDto;
 import com.example.springsecurity.dto.OrderProductsResponse;
+import com.example.springsecurity.security.JwtTestUtil;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -13,6 +15,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -25,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles(profiles = "integration")
 @EnableConfigurationProperties
 @EnableAutoConfiguration
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class OrderProductControllerTest {
 
     @LocalServerPort
@@ -33,12 +37,21 @@ class OrderProductControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    String token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzE2MzU3MDkzLCJleHAiOjE3MTYzNjA2OTN9.kOyZlTX-R_nL-RxmZfk3S0i4NqyFdT2RDb4pxPQ_kF4";
+    private String userToken;
+
+
+    @Autowired
+    private JwtTestUtil jwtTestUtil;
+
+    @BeforeEach
+    void setUp() {
+        userToken = "Bearer " + jwtTestUtil.generateToken(2L, "USER");
+
+    }
 
     @Test
-    @Sql(scripts = {
+    @Sql(scripts = {"classpath:sql/v1/usersinsert.sql",
             "classpath:sql/v1/customersinsert.sql",
-            "classpath:sql/v1/usersinsert.sql",
             "classpath:sql/v1/ordersinsert.sql",
             "classpath:sql/v1/categoryinsert.sql",
             "classpath:sql/v1/productsinsert.sql",
@@ -47,7 +60,7 @@ class OrderProductControllerTest {
     public void testFindOrderProductsByOrderId() {
         long orderId = 1L;
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", token);
+        headers.set("Authorization", userToken);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<Void> httpEntity = new HttpEntity<>(headers);

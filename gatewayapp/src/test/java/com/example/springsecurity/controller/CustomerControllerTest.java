@@ -2,6 +2,7 @@ package com.example.springsecurity.controller;
 
 import com.example.springsecurity.dto.CustomerDto;
 import com.example.springsecurity.dto.OrderDto;
+import com.example.springsecurity.security.JwtTestUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.*;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.util.LinkedMultiValueMap;
@@ -28,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles(profiles = "integration")
 @EnableConfigurationProperties
 @EnableAutoConfiguration
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class CustomerControllerTest {
 
     @Autowired
@@ -36,45 +39,45 @@ class CustomerControllerTest {
     private String userToken;
     private String adminToken;
 
+    @Autowired
+    private JwtTestUtil jwtTestUtil;
+
     @BeforeEach
     void setUp() {
-
-        userToken = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzE2MzU2MTc0LCJleHAiOjE3MTYzNTk3NzR9.r-dJEFmGU0ACx_HOYzpZ0olUBnwBjUDCC5aAQnkKdnw";
-        adminToken = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE2MzU2MTU2LCJleHAiOjE3MTYzNTk3NTZ9.NkANt0Pwcpd5fUtW5VvofGcBWOhkpCGrSL0w87Nq26o";
+        userToken = "Bearer " + jwtTestUtil.generateToken(2L, "USER");
+        adminToken = "Bearer " + jwtTestUtil.generateToken(1L, "ADMIN");
     }
-
 
     @LocalServerPort
     private int port;
 
 
-@Test
-@Sql(scripts = {
-        "classpath:sql/customerainsert.sql",
-        "classpath:sql/userinsert.sql"
-}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-void testGetCustomerById(){
-    long customerId=2L;
-    HttpHeaders headers=new HttpHeaders();
-    headers.set("Authorization",userToken);
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    HttpEntity<Void> request=new HttpEntity<>(headers);
-    ResponseEntity<CustomerDto> response=restTemplate.
-            exchange(createURLWithPort("/customers/"+customerId),
-                    HttpMethod.GET,
-                    request,
-                    CustomerDto.class);
-    assertEquals(HttpStatus.OK,response.getStatusCode());
-    assertNotNull(response);
-
-}
+    @Test
+    @Sql(scripts = {
+            "classpath:sql/userinsert.sql",
+            "classpath:sql/customerainsert.sql"
+    }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void testGetCustomerById() {
+        long customerId = 2L;
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", userToken);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+        ResponseEntity<CustomerDto> response = restTemplate.exchange(
+                createURLWithPort("/customers/" + customerId),
+                HttpMethod.GET,
+                request,
+                CustomerDto.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response);
+    }
 
     @Test
     @Sql(scripts = {
-            "classpath:sql/customerainsert.sql",
-            "classpath:sql/userinsert.sql"
+            "classpath:sql/userinsert.sql",
+            "classpath:sql/customerainsert.sql"
+
     }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @WithMockUser(username = "huseyn",roles = "ADMIN")
     void testGetAllCustomers() {
         int pageNumber = 1;
         int pageSize = 1;
@@ -102,10 +105,9 @@ void testGetCustomerById(){
 
 
     @Test
-    @WithMockUser(roles = "ADMIN")
-    @Sql(scripts = {
+    @Sql(scripts = {"classpath:sql/userinsert.sql",
             "classpath:sql/customerainsert.sql",
-            "classpath:sql/userinsert.sql"
+
     }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void testSearchCustomers() {
     String keyword="John";
@@ -128,8 +130,8 @@ void testGetCustomerById(){
     }
 
     @Test
-    @Sql(scripts = {"classpath:sql/customerainsert.sql",
-            "classpath:sql/userinsert.sql",
+    @Sql(scripts = {"classpath:sql/userinsert.sql",
+            "classpath:sql/customerainsert.sql",
             "classpath:sql/orderinsert.sql",
     },executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void testGetOrdersByCustomerId() {

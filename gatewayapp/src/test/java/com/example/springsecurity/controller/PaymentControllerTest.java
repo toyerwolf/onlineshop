@@ -1,6 +1,8 @@
 package com.example.springsecurity.controller;
 
 import com.example.springsecurity.req.PaymentRequest;
+import com.example.springsecurity.security.JwtTestUtil;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -9,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.*;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -17,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles(profiles = "integration")
 @EnableConfigurationProperties
 @EnableAutoConfiguration
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 
 class PaymentControllerTest {
 
@@ -25,17 +29,31 @@ class PaymentControllerTest {
 
     @LocalServerPort
     private int port;
-    String token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzE2MzU3MzM4LCJleHAiOjE3MTYzNjA5Mzh9.ugUNsbcRYE9q938t4UMq1qEcND1HLfGyVc-cfoea2uM";
+    private String userToken;
+
+
+    @Autowired
+    private JwtTestUtil jwtTestUtil;
+
+
+    @BeforeEach
+    void setUp() {
+        userToken = "Bearer " + jwtTestUtil.generateToken(2L, "USER");
+
+    }
+
 
     @Test
-    @Sql(scripts = {"classpath:sql/customerainsert.sql",
-            "classpath:sql/orderinsert.sql",
+    @Sql(scripts = {
             "classpath:sql/userinsert.sql",
+            "classpath:sql/customerainsert.sql",
+            "classpath:sql/orderinsert.sql",
+
               "classpath:sql/card-add.sql"  })
 
     void processPayment_ValidRequest_ReturnsCreated() {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", token);
+        headers.set("Authorization", userToken);
         PaymentRequest paymentRequest = new PaymentRequest();
         paymentRequest.setOrderId(1L);
         paymentRequest.setCustomerId(2L);
@@ -53,16 +71,17 @@ class PaymentControllerTest {
 
     @Test
     @Sql(scripts = {
+            "classpath:sql/userinsert.sql",
             "classpath:sql/customerainsert.sql",
             "classpath:sql/orderinsert.sql",
-            "classpath:sql/userinsert.sql"
+
     }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void processPaymentWithPayPal_ValidRequest_ReturnsOk() {
         long customerId = 2L;
         long orderId = 1L;
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", token);
+        headers.set("Authorization", userToken);
         HttpEntity<?> requestEntity = new HttpEntity<>(headers);
 
         ResponseEntity<String> response = restTemplate.exchange(

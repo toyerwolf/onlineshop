@@ -3,8 +3,10 @@ package com.example.springsecurity.controller;
 import com.example.springsecurity.dto.CategoryDto;
 import com.example.springsecurity.dto.CategoryDtoForClient;
 import com.example.springsecurity.dto.ProductDto;
+import com.example.springsecurity.dto.ProductDtoContainer;
 import com.example.springsecurity.req.CategoryReq;
 import com.example.springsecurity.req.CustomerCardReq;
+import com.example.springsecurity.security.JwtTestUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -27,6 +30,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles(profiles = "integration")
 @EnableConfigurationProperties
 @EnableAutoConfiguration
+//nujen dlya toqo chtobi pri zapuske vsex testov ne bilo konfliktov
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class CategoryControllerTest {
 
     @LocalServerPort
@@ -35,11 +40,16 @@ class CategoryControllerTest {
     private String userToken;
     private String adminToken;
 
+    @Autowired
+    private JwtTestUtil jwtTestUtil;
+
     @BeforeEach
-    void setUp() {
-        // Генерация mock-токенов с использованием JwtTestUtil
-        userToken = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzE2MzUyNDg0LCJleHAiOjE3MTYzNTYwODR9.9m2MVO_dZkeWO-6mPAbGT0QlgUy3zhZhVwRXrQfgKQU";
-        adminToken = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE2MzUyNDA2LCJleHAiOjE3MTYzNTYwMDZ9.x5ZfE5bLBvISKZMD5eQZy1wVLgE-3w00LH30Td-zWyQ";
+    public void setUp() {
+
+        adminToken = "Bearer " + jwtTestUtil.generateToken(1L, "ADMIN");
+
+
+        userToken = "Bearer " + jwtTestUtil.generateToken(2L, "USER");
     }
 
 
@@ -76,7 +86,6 @@ class CategoryControllerTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
-
         ResponseEntity<CategoryDtoForClient> responseEntity = restTemplate.exchange(
                 createURLWithPort("/categories/" + categoryId),
                 HttpMethod.GET,
@@ -89,36 +98,37 @@ class CategoryControllerTest {
     }
 
     @Test
-    @Sql(scripts = {
-            "classpath:sql/customerainsert.sql",
-            "classpath:sql/userinsert.sql"
-    }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @WithMockUser(username = "huseyn",roles = "ADMIN")
-    void testCreateCategory(){
-        CategoryReq categoryReq =new CategoryReq();
+    @Sql(scripts = {"classpath:sql/userinsert.sql",
+            "classpath:sql/customerainsert.sql"},
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void testCreateCategory() {
+        CategoryReq categoryReq = new CategoryReq();
         categoryReq.setCategoryId(2L);
         categoryReq.setName("Test");
         categoryReq.setDescription("Testov");
 
-        HttpHeaders headers=new HttpHeaders();
+        HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", adminToken);
 
-        HttpEntity<CategoryReq> httpEntity=new HttpEntity<>(categoryReq,headers);
+        HttpEntity<CategoryReq> httpEntity = new HttpEntity<>(categoryReq, headers);
 
-        ResponseEntity<String> responseEntity=restTemplate.
-                exchange(createURLWithPort("/categories"),
-                        HttpMethod.POST,httpEntity,
-                        String.class);
-        assertEquals(HttpStatus.CREATED,responseEntity.getStatusCode());
-        assertEquals("Category created successfully",responseEntity.getBody());
+        ResponseEntity<String> responseEntity = restTemplate.exchange(
+                createURLWithPort("/categories"),
+                HttpMethod.POST,
+                httpEntity,
+                String.class);
 
+        assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
+        assertEquals("Category created successfully", responseEntity.getBody());
     }
+
 
     @Test
     @Sql(scripts = {"classpath:sql/category-add.sql",
-            "classpath:sql/customerainsert.sql",
-            "classpath:sql/userinsert.sql"},executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+            "classpath:sql/userinsert.sql",
+            "classpath:sql/customerainsert.sql"},
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void testUpdateCategory() {
         long categoryId = 1L;
         CategoryDto updatedCategory = new CategoryDto();
@@ -131,21 +141,24 @@ class CategoryControllerTest {
 
         HttpEntity<CategoryDto> request = new HttpEntity<>(updatedCategory, headers);
 
-        ResponseEntity<String> responseEntity = restTemplate.exchange("/categories/" + categoryId,
+        ResponseEntity<String> responseEntity = restTemplate.exchange(
+                createURLWithPort("/categories/" + categoryId),
                 HttpMethod.PUT,
                 request,
                 String.class);
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertEquals("Updated successfully",responseEntity.getBody());
+        assertEquals("Updated successfully", responseEntity.getBody());
         assertNotNull(responseEntity.getBody());
     }
 
 
     @Test
     @Sql(scripts = {"classpath:sql/category-add.sql",
+            "classpath:sql/userinsert.sql",
             "classpath:sql/customerainsert.sql",
-            "classpath:sql/userinsert.sql"},executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+
+    },executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void testDeleteCategory() {
         long categoryId = 1L;
 
@@ -154,7 +167,8 @@ class CategoryControllerTest {
 
         HttpEntity<Void> request = new HttpEntity<>(headers);
 
-        ResponseEntity<Void> responseEntity = restTemplate.exchange("/categories/" + categoryId,
+        ResponseEntity<Void> responseEntity = restTemplate.exchange(
+                createURLWithPort("/categories/" + categoryId),
                 HttpMethod.DELETE,
                 request,
                 Void.class);
@@ -162,33 +176,32 @@ class CategoryControllerTest {
         assertEquals(HttpStatus.NO_CONTENT, responseEntity.getStatusCode());
         assertNull(responseEntity.getBody());
     }
-
-
     @Test
     @Sql(scripts = {"classpath:sql/category-add.sql",
-            "classpath:sql/customerainsert.sql",
             "classpath:sql/userinsert.sql",
-             "classpath:sql/productadd.sql"   },executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+            "classpath:sql/customerainsert.sql",
+            "classpath:sql/productadd.sql"},
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void testGetProductsByCategoryId(){
         long categoryId = 1L;
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization",userToken);
+        headers.set("Authorization", userToken);
         HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
 
-
-        ResponseEntity<List<ProductDto>> responseEntity = restTemplate.exchange(
+        ResponseEntity<ProductDtoContainer> responseEntity = restTemplate.exchange(
                 createURLWithPort("/categories/" + categoryId + "/products"),
                 HttpMethod.GET,
                 httpEntity,
-                new ParameterizedTypeReference<>() {
-                });
+                ProductDtoContainer.class);
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        List<ProductDto> products = responseEntity.getBody();
+        ProductDtoContainer container = responseEntity.getBody();
+        assertNotNull(container);
+        List<ProductDto> products = container.getProducts();
         assertNotNull(products);
         assertEquals(2, products.size());
-
     }
+
 
 
 

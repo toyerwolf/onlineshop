@@ -1,6 +1,8 @@
 package com.example.springsecurity.controller;
 
 import com.example.springsecurity.dto.*;
+import com.example.springsecurity.security.JwtTestUtil;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -11,6 +13,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -25,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles(profiles = "integration")
 @EnableConfigurationProperties
 @EnableAutoConfiguration
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class DashboardControllerTest {
     @LocalServerPort
     private int port;
@@ -33,15 +37,25 @@ class DashboardControllerTest {
     private TestRestTemplate restTemplate;
 
 
-    String adminToken = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzE2MzU2MzQwLCJleHAiOjE3MTYzNTk5NDB9.YcC068pFZ32r4JBqRuvUlYPANXxdVLdk4CoSM9hmKxQ";
+    @Autowired
+    private JwtTestUtil jwtTestUtil;
+
+    private String userToken;
+    private String adminToken;
+
+    @BeforeEach
+    void setUp() {
+        userToken = "Bearer " + jwtTestUtil.generateToken(2L, "USER");
+        adminToken = "Bearer " + jwtTestUtil.generateToken(1L, "ADMIN");
+    }
 
     @Test
     @WithMockUser(username = "john", roles = {"ADMIN"})
     @Sql(scripts = {
-            "classpath:sql/v1/categoryinsert.sql",
             "classpath:sql/v1/usersinsert.sql",
-            "classpath:sql/v1/productsinsert.sql",
             "classpath:sql/v1/customersinsert.sql",
+            "classpath:sql/v1/categoryinsert.sql",
+            "classpath:sql/v1/productsinsert.sql",
             "classpath:sql/v1/ordersinsert.sql",
             "classpath:sql/v1/order-product.sql"
     }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
@@ -86,8 +100,8 @@ class DashboardControllerTest {
     @Sql(scripts = {
             "classpath:sql/v1/categoryinsert.sql",
             "classpath:sql/v1/usersinsert.sql",
-            "classpath:sql/v1/productsinsert.sql",
             "classpath:sql/v1/customersinsert.sql",
+            "classpath:sql/v1/productsinsert.sql",
             "classpath:sql/v1/ordersinsert.sql",
             "classpath:sql/v1/order-product.sql"
     }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
@@ -160,9 +174,9 @@ class DashboardControllerTest {
     }
 
     @Test
-    @Sql(scripts = {
-            "classpath:sql/v1/customersinsert.sql",
-            "classpath:sql/v1/usersinsert.sql",
+    @Sql(scripts = {"classpath:sql/v1/usersinsert.sql",
+            "classpath:sql/v1/customersinsert.sql"
+            ,
     }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void testGetCustomerRegistrationsByYear() {
         HttpHeaders headers = new HttpHeaders();

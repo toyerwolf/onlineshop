@@ -3,6 +3,7 @@ package com.example.springsecurity.controller;
 import com.example.springsecurity.dto.CategoryDto;
 import com.example.springsecurity.dto.CategoryDtoForClient;
 import com.example.springsecurity.dto.ProductDto;
+import com.example.springsecurity.dto.ProductDtoContainer;
 import com.example.springsecurity.entity.Category;
 import com.example.springsecurity.req.CategoryReq;
 import com.example.springsecurity.service.CategoryService;
@@ -70,11 +71,13 @@ public class CategoryController {
 //    }
 
 
-    @Secured({"USER","ADMIN"})
+    @Secured({"USER"})
     @GetMapping("/{categoryId}/products")
-    public ResponseEntity<List<ProductDto>> getProductsByCategoryId(@PathVariable Long categoryId) {
+    public ResponseEntity<ProductDtoContainer> getProductsByCategoryId(@PathVariable Long categoryId) {
         List<ProductDto> products = productService.findProductsByCategoryId(categoryId);
-        return ResponseEntity.ok(products);
+        ProductDtoContainer container = new ProductDtoContainer();
+        container.setProducts(products);
+        return ResponseEntity.ok(container);
     }
 
 }

@@ -2,6 +2,8 @@ package com.example.springsecurity.controller;
 
 import com.example.springsecurity.dto.ProductDto;
 import com.example.springsecurity.req.ProductRequest;
+import com.example.springsecurity.security.JwtTestUtil;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -17,6 +19,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.*;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.util.LinkedMultiValueMap;
@@ -36,9 +39,20 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles(profiles = "integration")
 @EnableConfigurationProperties
 @EnableAutoConfiguration
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class ProductControllerTest {
 
-    String adminToken = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE2MzYyMDczLCJleHAiOjE3MTYzNjU2NzN9.u3FkmtUuXEBhwqiSr-LX1nvC5gTUxHRQrEYRkFGgXzU";
+    @Autowired
+    private JwtTestUtil jwtTestUtil;
+
+    private String userToken;
+    private String adminToken;
+
+    @BeforeEach
+    void setUp() {
+        userToken = "Bearer " + jwtTestUtil.generateToken(2L, "USER");
+        adminToken = "Bearer " + jwtTestUtil.generateToken(1L, "ADMIN");
+    }
 
     @LocalServerPort
     private int port;
@@ -47,7 +61,6 @@ class ProductControllerTest {
     private TestRestTemplate restTemplate;
 
     @Test
-    @WithMockUser(username = "huseyn", roles = {"ADMIN"})
     @Sql(scripts = {
             "classpath:sql/category-add.sql",
             "classpath:sql/userinsert.sql",
@@ -123,7 +136,6 @@ class ProductControllerTest {
             "classpath:sql/userinsert.sql",
             "classpath:sql/customerainsert.sql"
     }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @WithMockUser(username = "huseyn", roles = {"ADMIN"})
     public void testChangeProductImages()  {
         long productId = 1L;
         String url = createURLWithPort("/products/" + productId + "/images") ;
@@ -164,7 +176,6 @@ class ProductControllerTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         String url = createURLWithPort("/products/" + productId) ;
-
         HttpEntity<Void> httpEntity=new HttpEntity<>(headers);
         ResponseEntity<ProductDto> response = restTemplate.exchange(url,
                 HttpMethod.GET,

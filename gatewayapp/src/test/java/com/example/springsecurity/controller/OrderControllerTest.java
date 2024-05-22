@@ -11,6 +11,7 @@ import com.example.springsecurity.entity.Product;
 import com.example.springsecurity.repository.OrderRepository;
 
 import com.example.springsecurity.req.OrderRequest;
+import com.example.springsecurity.security.JwtTestUtil;
 import com.example.springsecurity.service.impl.ProductInventoryService;
 import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +26,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -45,6 +47,7 @@ import static org.mockito.Mockito.when;
 @EnableConfigurationProperties
 @EnableAutoConfiguration
 @ComponentScan(basePackages = {"com.example.springsecurity.service.impl"})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class OrderControllerTest {
 
 
@@ -52,13 +55,16 @@ class OrderControllerTest {
     @LocalServerPort
     private int port;
 
+    @Autowired
+    private JwtTestUtil jwtTestUtil;
+
     private String userToken;
     private String adminToken;
+
     @BeforeEach
     void setUp() {
-
-        userToken = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzE2MzU2MTc0LCJleHAiOjE3MTYzNTk3NzR9.r-dJEFmGU0ACx_HOYzpZ0olUBnwBjUDCC5aAQnkKdnw";
-        adminToken = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE2MzU2MTU2LCJleHAiOjE3MTYzNTk3NTZ9.NkANt0Pwcpd5fUtW5VvofGcBWOhkpCGrSL0w87Nq26o";
+        userToken = "Bearer " + jwtTestUtil.generateToken(2L, "USER");
+        adminToken = "Bearer " + jwtTestUtil.generateToken(1L, "ADMIN");
     }
 
 
@@ -69,10 +75,11 @@ class OrderControllerTest {
     private TestRestTemplate restTemplate;
 
     @Sql(scripts = {
+            "classpath:sql/userinsert.sql",
             "classpath:sql/customerainsert.sql",
             "classpath:sql/category-add.sql",
             "classpath:sql/productadd.sql",
-            "classpath:sql/userinsert.sql",
+
     }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Test
     public void testMakeOrder_Success() {
@@ -102,11 +109,11 @@ class OrderControllerTest {
         assertNotNull(orderResponse.getStatus());
     }
 
-    @Sql(scripts = {
+    @Sql(scripts = {"classpath:sql/userinsert.sql",
             "classpath:sql/customerainsert.sql",
             "classpath:sql/category-add.sql",
             "classpath:sql/productadd.sql",
-            "classpath:sql/userinsert.sql",
+
             "classpath:sql/card-add.sql"
     }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 
@@ -140,10 +147,10 @@ class OrderControllerTest {
     }
 
     @Test
-    @Sql(scripts = {
+    @Sql(scripts = {"classpath:sql/userinsert.sql",
             "classpath:sql/customerainsert.sql",
             "classpath:sql/orderinsert.sql",
-            "classpath:sql/userinsert.sql",
+
     }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void testMarkOrderAsDelivered(){
         long orderId=1L;
@@ -161,10 +168,10 @@ class OrderControllerTest {
     }
 
     @Test
-    @Sql(scripts = {
+    @Sql(scripts = { "classpath:sql/userinsert.sql",
             "classpath:sql/customerainsert.sql",
-            "classpath:sql/orderinsert.sql",
-            "classpath:sql/userinsert.sql",
+            "classpath:sql/orderinsert.sql"
+           ,
     }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void testGetAllOrders() {
         HttpHeaders headers = new HttpHeaders();
