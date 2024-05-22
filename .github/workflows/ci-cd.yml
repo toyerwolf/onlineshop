@@ -21,13 +21,13 @@ jobs:
 
       - name: Build online-shopping app with Gradle
         run: gradle build -x test bootJar
-        working-directory: ./spring-security
+        working-directory: ./spring-security/gatewayapp
 
       - name: Archive build artifacts
         uses: actions/upload-artifact@v2
         with:
           name: app-jar
-          path: gatewayapp/build/libs/*.jar
+          path: spring-security/gatewayapp/build/libs/*.jar
 
   test:
     name: Test
@@ -48,7 +48,7 @@ jobs:
 
       - name: Run tests with Gradle
         run: gradle test
-        working-directory: ./gatewayapp
+        working-directory: ./spring-security/gatewayapp
 
   deploy:
     name: Deploy
@@ -68,7 +68,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: app-jar
-          path: gatewayapp/build/libs/
+          path: spring-security/gatewayapp/build/libs/
 
       - name: Build and push Docker image
         run: |
