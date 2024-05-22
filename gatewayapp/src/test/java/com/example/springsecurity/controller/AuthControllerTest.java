@@ -38,11 +38,6 @@ class AuthControllerTest {
     private JwtTokenProvider jwtTokenProvider;
 
 
-//    @Autowired
-//    private PasswordEncoder passwordEncoder;
-
-
-
 
     @Sql(scripts = {
             "classpath:sql/customerainsert.sql",
@@ -80,9 +75,8 @@ class AuthControllerTest {
 
     @Test
     public void testRefreshToken() {
-
         JwtRequest jwtRequest = new JwtRequest();
-        jwtRequest.setRefreshToken("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE2MTgxMTU3LCJleHAiOjE3MTYxODQ3NTd9.k7kZ8EfzfnSgcseo7410G4mi8o4FjuWivu_K2tC6AmI");
+        jwtRequest.setRefreshToken("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE2MzY0MDA3LCJleHAiOjE3MTYzNjc2MDd9.mdiEQShUsN3txOX5utXc0XG60t2wj6QZ-c1AwvxC9yY");
 
 
         HttpHeaders headers = new HttpHeaders();

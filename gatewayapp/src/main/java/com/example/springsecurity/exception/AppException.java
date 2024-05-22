@@ -2,6 +2,7 @@ package com.example.springsecurity.exception;
 
 import lombok.Data;
 import org.springframework.http.HttpStatus;
+
 @Data
 public class AppException extends RuntimeException{
 

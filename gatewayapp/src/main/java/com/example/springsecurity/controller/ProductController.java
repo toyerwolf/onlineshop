@@ -76,7 +76,6 @@ public class ProductController {
     }
 
 
-    @Secured("ADMIN")
     @GetMapping("/search")
     public List<ProductDto> searchProductByName(@RequestParam String keyword) {
         return productService.searchProductByName(keyword);

@@ -24,6 +24,8 @@ public class OrderController {
     private final OrderService orderService;
     private final ProductService productService;
 
+
+    @Secured("USER")
     @PostMapping("{customerId}")
     public ResponseEntity<OrderResponse> makeOrder(@PathVariable("customerId")Long customerId,@Valid @RequestBody OrderRequest orderRequest) {
         OrderResponse orderResponse=orderService.makeOrder(customerId,orderRequest);
@@ -46,6 +48,8 @@ public class OrderController {
         return ResponseEntity.ok(products);
     }
 
+
+    @Secured("ADMIN")
     @GetMapping()
     public ResponseEntity<List<OrderDto>> getAllOrders() {
         List<OrderDto> orders = orderService.getAllOrders();

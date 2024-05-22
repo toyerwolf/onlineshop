@@ -5,6 +5,7 @@ import com.example.springsecurity.service.PaymentService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,12 +17,15 @@ public class PaymentController {
     private final PaymentService paymentService;
 
 
+    @Secured("USER")
     @PostMapping
     public ResponseEntity<String> processPayment(@RequestBody PaymentRequest paymentRequest) {
         paymentService.processPaymentWithCard(paymentRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body("Order with card created");
     }
 
+
+    @Secured("USER")
     @PostMapping("/paypal/{customerId}/{orderId}")
     public ResponseEntity<String> processPaymentWithPayPal(@PathVariable Long customerId, @PathVariable Long orderId) {
         paymentService.processPaymentWithPayPal(customerId, orderId);

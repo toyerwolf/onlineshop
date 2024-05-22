@@ -5,6 +5,7 @@ import com.example.springsecurity.dto.CategoryDtoForClient;
 import com.example.springsecurity.dto.ProductDto;
 import com.example.springsecurity.req.CategoryReq;
 import com.example.springsecurity.req.CustomerCardReq;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -14,6 +15,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -30,7 +32,17 @@ class CategoryControllerTest {
     @LocalServerPort
     private int port;
 
-    String token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE1ODUxMTYxLCJleHAiOjE3MTU4NTQ3NjF9.FaPtQ3j9wwuYdxFU3XsWz2XOq18zK3VqbMJnhs490aY";
+    private String userToken;
+    private String adminToken;
+
+    @BeforeEach
+    void setUp() {
+        // Генерация mock-токенов с использованием JwtTestUtil
+        userToken = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzE2MzUyNDg0LCJleHAiOjE3MTYzNTYwODR9.9m2MVO_dZkeWO-6mPAbGT0QlgUy3zhZhVwRXrQfgKQU";
+        adminToken = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE2MzUyNDA2LCJleHAiOjE3MTYzNTYwMDZ9.x5ZfE5bLBvISKZMD5eQZy1wVLgE-3w00LH30Td-zWyQ";
+    }
+
+
 
 
     @Autowired
@@ -41,7 +53,6 @@ class CategoryControllerTest {
     void testGetAllCategories() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", token);
         HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
 
         ResponseEntity<List<CategoryDto>> responseEntity = restTemplate.exchange(
@@ -64,7 +75,6 @@ class CategoryControllerTest {
         long categoryId = 1L;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", token);
         HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
 
         ResponseEntity<CategoryDtoForClient> responseEntity = restTemplate.exchange(
@@ -83,6 +93,7 @@ class CategoryControllerTest {
             "classpath:sql/customerainsert.sql",
             "classpath:sql/userinsert.sql"
     }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @WithMockUser(username = "huseyn",roles = "ADMIN")
     void testCreateCategory(){
         CategoryReq categoryReq =new CategoryReq();
         categoryReq.setCategoryId(2L);
@@ -91,7 +102,7 @@ class CategoryControllerTest {
 
         HttpHeaders headers=new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", token);
+        headers.set("Authorization", adminToken);
 
         HttpEntity<CategoryReq> httpEntity=new HttpEntity<>(categoryReq,headers);
 
@@ -116,7 +127,7 @@ class CategoryControllerTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", token);
+        headers.set("Authorization", adminToken);
 
         HttpEntity<CategoryDto> request = new HttpEntity<>(updatedCategory, headers);
 
@@ -139,7 +150,7 @@ class CategoryControllerTest {
         long categoryId = 1L;
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", token);
+        headers.set("Authorization", adminToken);
 
         HttpEntity<Void> request = new HttpEntity<>(headers);
 
@@ -160,9 +171,8 @@ class CategoryControllerTest {
              "classpath:sql/productadd.sql"   },executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void testGetProductsByCategoryId(){
         long categoryId = 1L;
-
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization",token);
+        headers.set("Authorization",userToken);
         HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
 
 
@@ -174,7 +184,6 @@ class CategoryControllerTest {
                 });
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-
         List<ProductDto> products = responseEntity.getBody();
         assertNotNull(products);
         assertEquals(2, products.size());

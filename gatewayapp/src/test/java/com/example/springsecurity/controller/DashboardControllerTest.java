@@ -33,7 +33,7 @@ class DashboardControllerTest {
     private TestRestTemplate restTemplate;
 
 
-    String token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE2MjY1NjM1LCJleHAiOjE3MTYyNjkyMzV9.Cnt58dadNX9jIr8Fm6ExKSpxG3FKFB0gm3AqrssW3HE";
+    String adminToken = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzE2MzU2MzQwLCJleHAiOjE3MTYzNTk5NDB9.YcC068pFZ32r4JBqRuvUlYPANXxdVLdk4CoSM9hmKxQ";
 
     @Test
     @WithMockUser(username = "john", roles = {"ADMIN"})
@@ -49,7 +49,7 @@ class DashboardControllerTest {
         int year = 2023;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", token);
+        headers.set("Authorization", adminToken);
 
         HttpEntity<?> requestEntity = new HttpEntity<>(headers);
 
@@ -94,7 +94,7 @@ class DashboardControllerTest {
     public void testGetProductSalesStatistics() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", token);
+        headers.set("Authorization", adminToken);
 
         HttpEntity<?> requestEntity = new HttpEntity<>(headers);
 
@@ -138,7 +138,7 @@ class DashboardControllerTest {
         // Arrange
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", token);
+        headers.set("Authorization", adminToken);
         HttpEntity<?> requestEntity = new HttpEntity<>(headers);
 
         // Act
@@ -166,7 +166,7 @@ class DashboardControllerTest {
     }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void testGetCustomerRegistrationsByYear() {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", token);
+        headers.set("Authorization", adminToken);
 
         HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
 

@@ -21,6 +21,8 @@ public class CustomerController {
     private final CustomerService customerService;
     private final OrderService orderService;
 
+
+    @Secured({"USER"})
     @GetMapping("/{customerId}")
     public ResponseEntity<CustomerDto> getCustomerById(@PathVariable Long customerId) {
         CustomerDto customerDto = customerService.getCustomerById(customerId);
@@ -46,6 +48,7 @@ public class CustomerController {
     }
 
 
+    @Secured({"USER"})
     @GetMapping("{customerId}/orders")
     public List<OrderDto> getOrdersByCustomerId(@PathVariable Long customerId) {
         return orderService.findOrdersByCustomerID(customerId);

@@ -2,6 +2,7 @@ package com.example.springsecurity.controller;
 
 import com.example.springsecurity.dto.CustomerDto;
 import com.example.springsecurity.dto.OrderDto;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -32,7 +33,16 @@ class CustomerControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    String token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE1OTIxNzI5LCJleHAiOjE3MTU5MjUzMjl9.kI3CsfYev4MGXUYXs5DqFxAkN6EvYwwEcxcaiyOJ7sQ";
+    private String userToken;
+    private String adminToken;
+
+    @BeforeEach
+    void setUp() {
+
+        userToken = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzE2MzU2MTc0LCJleHAiOjE3MTYzNTk3NzR9.r-dJEFmGU0ACx_HOYzpZ0olUBnwBjUDCC5aAQnkKdnw";
+        adminToken = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE2MzU2MTU2LCJleHAiOjE3MTYzNTk3NTZ9.NkANt0Pwcpd5fUtW5VvofGcBWOhkpCGrSL0w87Nq26o";
+    }
+
 
     @LocalServerPort
     private int port;
@@ -46,7 +56,7 @@ class CustomerControllerTest {
 void testGetCustomerById(){
     long customerId=2L;
     HttpHeaders headers=new HttpHeaders();
-    headers.set("Authorization",token);
+    headers.set("Authorization",userToken);
     headers.setContentType(MediaType.APPLICATION_JSON);
     HttpEntity<Void> request=new HttpEntity<>(headers);
     ResponseEntity<CustomerDto> response=restTemplate.
@@ -64,13 +74,14 @@ void testGetCustomerById(){
             "classpath:sql/customerainsert.sql",
             "classpath:sql/userinsert.sql"
     }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @WithMockUser(username = "huseyn",roles = "ADMIN")
     void testGetAllCustomers() {
         int pageNumber = 1;
         int pageSize = 1;
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", token);
+        headers.set("Authorization", adminToken);
 
         HttpEntity<?> requestEntity = new HttpEntity<>(headers);
 
@@ -98,10 +109,8 @@ void testGetCustomerById(){
     }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void testSearchCustomers() {
     String keyword="John";
-
-
     HttpHeaders headers=new HttpHeaders();
-    headers.set("Authorization",token);
+    headers.set("Authorization",adminToken);
     headers.setContentType(MediaType.APPLICATION_JSON);
     HttpEntity<Void> httpEntity=new HttpEntity<>(headers);
 
@@ -125,9 +134,8 @@ void testGetCustomerById(){
     },executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void testGetOrdersByCustomerId() {
         Long customerId = 2L;
-
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization",token);
+        headers.set("Authorization",userToken);
         HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
 
         ResponseEntity<List<OrderDto>> response = restTemplate.exchange(

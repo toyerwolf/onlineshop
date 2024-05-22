@@ -26,7 +26,7 @@ public class User {
 
     private boolean locked;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL,fetch = FetchType.LAZY,orphanRemoval = true)
     private Customer customer;
 
     @Enumerated(EnumType.STRING)

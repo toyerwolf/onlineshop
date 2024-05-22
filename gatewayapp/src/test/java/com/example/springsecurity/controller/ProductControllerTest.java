@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @EnableAutoConfiguration
 class ProductControllerTest {
 
-    String token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE2MjY5ODQ1LCJleHAiOjE3MTYyNzM0NDV9.cTrr-H2_QmriKcZD_o3URYuRmEkScm3G1SJjs9EMNJA";
+    String adminToken = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE2MzYyMDczLCJleHAiOjE3MTYzNjU2NzN9.u3FkmtUuXEBhwqiSr-LX1nvC5gTUxHRQrEYRkFGgXzU";
 
     @LocalServerPort
     private int port;
@@ -65,7 +65,7 @@ class ProductControllerTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        headers.set("Authorization", token);
+        headers.set("Authorization", adminToken);
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("name", productName);
@@ -101,9 +101,7 @@ class ProductControllerTest {
         String url = "http://localhost:" + port + "/products?page=" + page + "&pageSize=" + pageSize;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", token);
         HttpEntity<Void> httpEntity=new HttpEntity<>(headers);
-
         ResponseEntity<RestResponsePage<ProductDto>> response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
@@ -132,7 +130,7 @@ class ProductControllerTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        headers.set("Authorization", token);
+        headers.set("Authorization", adminToken);
 
         Resource image = new ClassPathResource("static/6348.jpg");
         //предоставляет структуру данных, позволяющую хранить несколько значений для одного ключа.
@@ -165,7 +163,6 @@ class ProductControllerTest {
         Long productId = 1L;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", token);
         String url = createURLWithPort("/products/" + productId) ;
 
         HttpEntity<Void> httpEntity=new HttpEntity<>(headers);
@@ -211,7 +208,7 @@ class ProductControllerTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", token);
+        headers.set("Authorization", adminToken);
 
         HttpEntity<ProductRequest> requestEntity = new HttpEntity<>(updatedProductRequest, headers);
 
@@ -236,7 +233,7 @@ class ProductControllerTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", token);
+        headers.set("Authorization", adminToken);
 
         HttpEntity<ProductRequest> requestEntity = new HttpEntity<>(headers);
 
@@ -260,7 +257,6 @@ class ProductControllerTest {
     public void testSearchProductByName() {
         String keyword = "samsung";
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", token);
         HttpEntity<String> entity = new HttpEntity<>( headers);
 
         ResponseEntity<List<ProductDto>> response = restTemplate.exchange(

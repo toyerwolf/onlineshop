@@ -4,6 +4,7 @@ package com.example.springsecurity.controller;
 
 
 
+import com.example.springsecurity.dto.OrderDto;
 import com.example.springsecurity.dto.OrderResponse;
 import com.example.springsecurity.entity.Order;
 import com.example.springsecurity.entity.Product;
@@ -12,6 +13,7 @@ import com.example.springsecurity.repository.OrderRepository;
 import com.example.springsecurity.req.OrderRequest;
 import com.example.springsecurity.service.impl.ProductInventoryService;
 import lombok.AllArgsConstructor;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -20,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
@@ -27,6 +30,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,7 +51,15 @@ class OrderControllerTest {
 
     @LocalServerPort
     private int port;
-    String token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE2MTg1MjY4LCJleHAiOjE3MTYxODg4Njh9.4MOrfZxgiNIB7sCHJVufEbqjUKUktaXGP60nNQxu67A";
+
+    private String userToken;
+    private String adminToken;
+    @BeforeEach
+    void setUp() {
+
+        userToken = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzE2MzU2MTc0LCJleHAiOjE3MTYzNTk3NzR9.r-dJEFmGU0ACx_HOYzpZ0olUBnwBjUDCC5aAQnkKdnw";
+        adminToken = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE2MzU2MTU2LCJleHAiOjE3MTYzNTk3NTZ9.NkANt0Pwcpd5fUtW5VvofGcBWOhkpCGrSL0w87Nq26o";
+    }
 
 
 
@@ -72,7 +84,7 @@ class OrderControllerTest {
         orderRequest.setProductQuantities(productQuantities);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", token);
+        headers.set("Authorization", userToken);
         HttpEntity<OrderRequest> requestEntity = new HttpEntity<>(orderRequest, headers);
         ResponseEntity<OrderResponse> response = restTemplate.exchange(
                 createURLWithPort("/orders/" + customerId),
@@ -110,7 +122,7 @@ class OrderControllerTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", token);
+        headers.set("Authorization", userToken);
         HttpEntity<OrderRequest> requestEntity = new HttpEntity<>(orderRequest, headers);
         ResponseEntity<OrderResponse> response = restTemplate.exchange(
                 createURLWithPort("/orders/" + customerId + "/" + cardId),
@@ -137,7 +149,7 @@ class OrderControllerTest {
         long orderId=1L;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", token);
+        headers.set("Authorization", adminToken);
         HttpEntity<Void> httpEntity=new HttpEntity<>(headers);
 
         ResponseEntity<String> response=restTemplate.exchange(createURLWithPort("/orders/"+orderId+"/"+"deliver"),
@@ -146,8 +158,30 @@ class OrderControllerTest {
 
         assertEquals(HttpStatus.OK,response.getStatusCode());
         assertEquals("Order marked as delivered successfully.",response.getBody());
+    }
+
+    @Test
+    @Sql(scripts = {
+            "classpath:sql/customerainsert.sql",
+            "classpath:sql/orderinsert.sql",
+            "classpath:sql/userinsert.sql",
+    }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void testGetAllOrders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", adminToken);
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+        ResponseEntity<List<OrderDto>> responseEntity = restTemplate.exchange(
+                createURLWithPort("/orders"),
+                HttpMethod.GET,
+                request,
+                new ParameterizedTypeReference<>() {});
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
 
+        List<OrderDto> orders = responseEntity.getBody();
+        assertNotNull(orders);
 
     }
 

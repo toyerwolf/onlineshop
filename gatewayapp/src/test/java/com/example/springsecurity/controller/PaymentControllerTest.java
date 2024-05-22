@@ -25,7 +25,7 @@ class PaymentControllerTest {
 
     @LocalServerPort
     private int port;
-    String token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE1ODM5NzY3LCJleHAiOjE3MTU4NDMzNjd9.VlOUGt9phn-pFvm886xO5yzP-_gwKnYaX-zcbxYwJQs";
+    String token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzE2MzU3MzM4LCJleHAiOjE3MTYzNjA5Mzh9.ugUNsbcRYE9q938t4UMq1qEcND1HLfGyVc-cfoea2uM";
 
     @Test
     @Sql(scripts = {"classpath:sql/customerainsert.sql",

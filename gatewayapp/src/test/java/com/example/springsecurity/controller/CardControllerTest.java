@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.*;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -30,7 +31,7 @@ class CardControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    String token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE1ODM2ODA0LCJleHAiOjE3MTU4NDA0MDR9.Og6oDicSX-l8Ha_hs14-rVerQqhFU63UXGfAyNvMm5c";
+    String token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzE2MzUyMDk5LCJleHAiOjE3MTYzNTU2OTl9.Br2-Mt6AjOdrjHQC0FLqCReNdibNVNWYMl-Suerez7k";
 
 
     @Test
@@ -38,6 +39,7 @@ class CardControllerTest {
             "classpath:sql/customerainsert.sql",
             "classpath:sql/userinsert.sql",
     }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @WithMockUser(username = "huseyn1",roles = {"USER"})
     public void testAddCardToCustomer() {
         long customerId=2L;
         CustomerCardReq customerCardReq = new CustomerCardReq();

@@ -69,6 +69,8 @@ public class CategoryController {
 //        return categoryService.getCategoryByIdWithProducts(categoryId);
 //    }
 
+
+    @Secured({"USER","ADMIN"})
     @GetMapping("/{categoryId}/products")
     public ResponseEntity<List<ProductDto>> getProductsByCategoryId(@PathVariable Long categoryId) {
         List<ProductDto> products = productService.findProductsByCategoryId(categoryId);

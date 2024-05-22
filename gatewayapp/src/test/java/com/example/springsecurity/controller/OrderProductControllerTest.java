@@ -33,7 +33,7 @@ class OrderProductControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    String token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE2MTg4MjMwLCJleHAiOjE3MTYxOTE4MzB9.Ney51uXixE5xBNAe693e4T0d-n4UyLqfxzv3jmQlXac";
+    String token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzE2MzU3MDkzLCJleHAiOjE3MTYzNjA2OTN9.kOyZlTX-R_nL-RxmZfk3S0i4NqyFdT2RDb4pxPQ_kF4";
 
     @Test
     @Sql(scripts = {
