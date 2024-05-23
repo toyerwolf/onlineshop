@@ -19,14 +19,6 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-
-      # Копирование статических файлов из исходной директории в директорию сборки
-      - name: Prepare Static Resources
-        run: |
-          mkdir -p gatewayapp/build/resources/static
-          cp -r gatewayapp/src/main/resources/static/* gatewayapp/build/resources/static/
-        shell: sh
-
       - name: Build online-shopping with Gradle
         run: gradle build -x test bootJar
         shell: sh
@@ -97,6 +89,11 @@ jobs:
         with:
           name: app-jar
           path: build/libs/
+      - name: Download static resources
+        uses: actions/download-artifact@v2
+        with:
+          name: static-resources
+          path: gatewayapp/build/resources/static
       - name: Generate and submit dependency graph
         uses: gradle/actions/dependency-submission@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
       - name: Build and push Docker image
