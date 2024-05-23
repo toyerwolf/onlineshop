@@ -37,16 +37,14 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v2
-      - name: Build with Gradle Wrapper
-        shell: sh
-        run: gradle test
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
           java-version: '17'
           distribution: adopt
-      - name: Initialize Gradle build
-        run: gradle init
+      - name: Build with Gradle Wrapper
+        shell: sh
+        run: ./gradlew test
 
   deploy:
     name: Deploy
