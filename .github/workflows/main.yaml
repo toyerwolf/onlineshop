@@ -31,6 +31,13 @@ jobs:
           name: app-jar
           path: gatewayapp/build/libs/*.jar
 
+      # Добавляем блок для архивации статических ресурсов
+      - name: Archive Static Resources
+        uses: actions/upload-artifact@v2
+        with:
+          name: static-resources
+          path: gatewayapp/build/resources/static
+
   test:
     name: Test
     runs-on: ubuntu-latest
