@@ -19,6 +19,14 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+
+      # Добавляем шаг для создания необходимых директорий и копирования статических файлов
+      - name: Prepare Static Resources
+        run: |
+          mkdir -p gatewayapp/build/resources/static
+          cp -r path/to/static/files/* gatewayapp/build/resources/static/
+        shell: sh
+
       - name: Build online-shopping with Gradle
         run: gradle build -x test bootJar
         shell: sh
@@ -30,8 +38,6 @@ jobs:
         with:
           name: app-jar
           path: gatewayapp/build/libs/*.jar
-
-      # Добавляем блок для архивации статических ресурсов
       - name: Archive Static Resources
         uses: actions/upload-artifact@v2
         with:
@@ -49,6 +55,20 @@ jobs:
         with:
           java-version: '17'
           distribution: adopt
+
+      # Скачиваем артефакты перед тестами
+      - name: Download build artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: app-jar
+          path: gatewayapp/build/libs/
+
+      - name: Download static resources
+        uses: actions/download-artifact@v2
+        with:
+          name: static-resources
+          path: gatewayapp/build/resources/static
+
       - name: Build with Gradle Wrapper
         shell: sh
         run: gradle test
