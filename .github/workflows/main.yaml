@@ -79,10 +79,6 @@ jobs:
           name: app-jar
           path: build/libs/
 
-      - name: Generate and submit dependency graph
-        run: gradle generateDependencyGraph
-        working-directory: ./gatewayapp
-
       - name: Build and push Docker image
         run: |
           docker build -t huseyn047/spring-security-app:latest .
