@@ -85,5 +85,5 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t huseyn047/spring-security-app:latest -f gatewayapp/dockerfile .
+          docker build -t huseyn047/spring-security-app:latest .
           docker push huseyn047/spring-security-app
