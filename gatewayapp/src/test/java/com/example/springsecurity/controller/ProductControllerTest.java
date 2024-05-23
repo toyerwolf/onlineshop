@@ -87,7 +87,7 @@ class ProductControllerTest {
         body.add("quantity", productQuantity);
         body.add("discountPrice", productDiscountPrice);
         body.add("discount", productDiscount);
-        body.add("image", new FileSystemResource("build/resources/main/static/6348.jpg"));
+        body.add("image", new FileSystemResource("src/main/resources/static/6348.jpg"));
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
@@ -144,7 +144,7 @@ class ProductControllerTest {
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         headers.set("Authorization", adminToken);
 
-        Resource image = new ClassPathResource("static/6348.jpg");
+        Resource image = new FileSystemResource("src/main/resources/static/6348.jpg");
         //предоставляет структуру данных, позволяющую хранить несколько значений для одного ключа.
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("image", image);
