@@ -39,7 +39,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build with Gradle Wrapper
         shell: sh
-        run: gradle test
+        run: gradlew test
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
