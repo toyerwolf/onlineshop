@@ -67,6 +67,10 @@ jobs:
         with:
           gradle-version: '7.5.1'
 
+      - name: Build the project
+        run: gradle build
+        working-directory: ./gatewayapp
+
       - name: Set up Docker
         uses: docker/setup-buildx-action@v1
 
@@ -77,9 +81,9 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: app-jar
-          path: build/libs/
+          path: gatewayapp/build/libs/
 
       - name: Build and push Docker image
         run: |
-          docker build -t huseyn047/spring-security-app:latest .
+          docker build -t huseyn047/spring-security-app:latest -f gatewayapp/Dockerfile .
           docker push huseyn047/spring-security-app
