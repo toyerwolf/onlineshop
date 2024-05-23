@@ -34,7 +34,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: static-resources
-          path: gatewayapp/build/resources/static
+          path: gatewayapp/build/resources/main/static
 
   test:
     name: Test
@@ -59,7 +59,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: static-resources
-          path: gatewayapp/build/resources/static
+          path: gatewayapp/build/resources/main/static
 
       - name: Build with Gradle Wrapper
         shell: sh
