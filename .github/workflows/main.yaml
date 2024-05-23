@@ -28,7 +28,7 @@ jobs:
 
       # Проверим, что статические файлы существуют после сборки
       - name: List static resources
-        run: ls -R gatewayapp/build/resources/static
+        run: ls -R gatewayapp/build/resources/main/static
         shell: sh
 
       - name: Archive build artifacts
@@ -41,7 +41,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: static-resources
-          path: gatewayapp/build/resources/static
+          path: gatewayapp/build/resources/main/static
 
   test:
     name: Test
@@ -66,7 +66,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: static-resources
-          path: gatewayapp/build/resources/static
+          path: gatewayapp/build/resources/main/static
 
       - name: Build with Gradle Wrapper
         shell: sh
@@ -102,7 +102,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: static-resources
-          path: gatewayapp/build/resources/static
+          path: gatewayapp/build/resources/main/static
 
       - name: Generate and submit dependency graph
         uses: gradle/actions/dependency-submission@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
