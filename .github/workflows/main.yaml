@@ -30,10 +30,8 @@ jobs:
         with:
           name: app-jar
           path: gatewayapp/build/libs/*.jar
-      - name: Copy static resources
-        run: |
-          mkdir -p gatewayapp/build/resources/main/static
-          cp -r gatewayapp/build/resources/main/static/* gatewayapp/src/main/resources/static/
+           - name: Static Resources
+            path: gatewayapp/build/resources/static
 
   test:
     name: Test
