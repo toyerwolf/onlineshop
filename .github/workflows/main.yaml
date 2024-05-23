@@ -44,7 +44,7 @@ jobs:
           distribution: adopt
       - name: Build with Gradle Wrapper
         shell: sh
-        run: ./gradlew test
+        run: gradlew test
 
   deploy:
     name: Deploy
