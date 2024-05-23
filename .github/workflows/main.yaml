@@ -21,11 +21,11 @@ jobs:
 
       - name: Build with Gradle
         run: gradle build -x test bootJar -Dorg.gradle.jvmargs="-Xmx4096m"
-        working-directory: ./your-project-directory
+        working-directory: ./gatewayapp
 
       - name: Run tests
         run: gradle test
-        working-directory: ./your-project-directory
+        working-directory: ./gatewayapp
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
