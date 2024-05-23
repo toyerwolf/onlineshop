@@ -33,7 +33,7 @@ jobs:
       - name: Copy static resources
         run: |
           mkdir -p gatewayapp/build/resources/main/static
-          cp -r path/to/static/files/* gatewayapp/build/resources/main/static
+          cp -r gatewayapp/build/resources/main/static/* gatewayapp/src/main/resources/static/
 
   test:
     name: Test
