@@ -25,18 +25,11 @@ jobs:
         working-directory: ./gatewayapp
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
-
-      # Проверим, что статические файлы существуют после сборки
-      - name: List static resources
-        run: ls -R gatewayapp/build/resources/main/static
-        shell: sh
-
       - name: Archive build artifacts
         uses: actions/upload-artifact@v2
         with:
           name: app-jar
           path: gatewayapp/build/libs/*.jar
-
       - name: Archive Static Resources
         uses: actions/upload-artifact@v2
         with:
@@ -91,22 +84,18 @@ jobs:
         uses: docker/setup-buildx-action@v1
       - name: Login to DockerHub
         run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-
       - name: Pull build artifacts
         uses: actions/download-artifact@v2
         with:
           name: app-jar
           path: build/libs/
-
       - name: Download static resources
         uses: actions/download-artifact@v2
         with:
           name: static-resources
-          path: gatewayapp/build/resources/main/static
-
+          path: gatewayapp/build/resources/static
       - name: Generate and submit dependency graph
         uses: gradle/actions/dependency-submission@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
-
       - name: Build and push Docker image
         run: |
           docker build -t spring-security-app:latest .
