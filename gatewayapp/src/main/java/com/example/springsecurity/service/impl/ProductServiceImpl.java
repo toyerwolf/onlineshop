@@ -13,6 +13,7 @@ import com.example.springsecurity.req.ProductRequest;
 import com.example.springsecurity.service.ImageService;
 import com.example.springsecurity.service.ProductService;
 import jakarta.transaction.Transactional;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,22 +21,34 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ImageService imageService;
+
+    private final Long categoryId = 1L;
+
+    @Setter
+    private BigDecimal discountPercentage = BigDecimal.valueOf(20);
+
+
+
+
+
+
 
     public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository, ImageService imageService, OrderRepository orderRepository) {
         this.productRepository = productRepository;
@@ -48,6 +61,8 @@ public class ProductServiceImpl implements ProductService {
    @Value("${image-url-prefix}")
    @Setter
    private String imageUrlPrefix;
+
+
 
     @Override
     @Transactional
@@ -231,6 +246,47 @@ public ProductSalesResponseDto countSoldProductsByYear(int year) {
     }
 
 
+
+    @Override
+    @Scheduled(cron = "0 0 0 1 1 ?")
+    public void applyNewYearDiscount() {
+        List<Product> products = productRepository.findProductsByCategoryId(categoryId);
+        for (Product product : products) {
+            if (checkIfDiscountCanBeApplied(product)) {
+                applyDiscount(product);
+                productRepository.save(product);
+            }
+        }
+    }
+
+    // Удаление новогодней скидки через 5 минут после запуска
+    @Override
+    @Scheduled(cron = "0 0 0 8 1 ?")
+    public void removeNewYearDiscount() {
+        List<Product> products = productRepository.findProductsByCategoryId(categoryId);
+        for (Product product : products) {
+            removeDiscount(product);
+            productRepository.save(product);
+        }
+    }
+
+    void applyDiscount(Product product) {
+        BigDecimal currentPrice = product.getPrice();
+        BigDecimal discount = currentPrice.multiply(discountPercentage)
+                .divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP);
+        BigDecimal discountedPrice = currentPrice.subtract(discount);
+        product.setDiscount(discountPercentage);
+        product.setDiscountPrice(discountedPrice);
+    }
+
+    void removeDiscount(Product product) {
+        product.setDiscount(null);
+        product.setDiscountPrice(null);
+    }
+
+    boolean checkIfDiscountCanBeApplied(Product product) {
+        return product.getQuantity() > 10;
+    }
 
 
 }

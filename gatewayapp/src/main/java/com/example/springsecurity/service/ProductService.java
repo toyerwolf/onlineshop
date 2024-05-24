@@ -38,6 +38,10 @@ public interface ProductService {
 
     YearlySalesRevenueResponseDTO getTotalProductSalesRevenueByYear();
 
+    void applyNewYearDiscount();
+
+    public void removeNewYearDiscount();
+
 
 
 

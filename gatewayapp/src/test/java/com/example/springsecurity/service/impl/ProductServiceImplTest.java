@@ -9,14 +9,10 @@ import com.example.springsecurity.repository.CategoryRepository;
 import com.example.springsecurity.repository.ProductRepository;
 import com.example.springsecurity.req.ProductRequest;
 import com.example.springsecurity.service.ImageService;
-import com.example.springsecurity.service.ProductService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -26,16 +22,21 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceImplTest {
+
+    private final Long categoryId = 1L;
+    private final BigDecimal discountPercentage = BigDecimal.valueOf(20);
 
     @Mock
     private CategoryRepository categoryRepository;
@@ -580,9 +581,152 @@ class ProductServiceImplTest {
         assertEquals(new BigDecimal("2000.50"), salesByYear.get(1).getTotalRevenue());
     }
 
+    @Test
+    void testApplyNewYearDiscount() {
+        // Arrange
+        long categoryId = 1L;
+        List<Product> products = new ArrayList<>();
+        products.add(createProductWithQuantityAndPrice(1L, 20, BigDecimal.valueOf(100)));
+        products.add(createProductWithQuantityAndPrice(2L, 5, BigDecimal.valueOf(200)));
+        when(productRepository.findProductsByCategoryId(categoryId)).thenReturn(products);
+
+        // Act
+        productService.applyNewYearDiscount();
+
+        // Assert
+        verify(productRepository, times(1)).findProductsByCategoryId(categoryId);
+        verify(productRepository, times(1)).save(any(Product.class));
+        verify(productRepository, times(1)).save(products.get(0));
+        verify(productRepository, times(0)).save(products.get(1));// Проверяем, что товар с количеством менее или равным 10 не сохраняется
+    }
+
+    @Test
+    void testRemoveNewYearDiscount() {
+        // Arrange
+        long categoryId = 1L;
+        List<Product> products = new ArrayList<>();
+        // Создаем два продукта, один с скидкой, другой без
+        Product productWithDiscount = createProductWithDiscount(1L, BigDecimal.valueOf(100), BigDecimal.valueOf(90));
+        Product productWithoutDiscount = createProductWithDiscount(2L, BigDecimal.valueOf(200), null);
+        products.add(productWithDiscount);
+        products.add(productWithoutDiscount);
+        // Задаем поведение мокитованным методам
+        when(productRepository.findProductsByCategoryId(categoryId)).thenReturn(products);
+
+        // Act
+        productService.removeNewYearDiscount();
+
+        // Assert
+        // Проверяем, что метод removeDiscount вызывался для каждого продукта
+        verify(productService, times(1)).removeDiscount(productWithDiscount);
+        verify(productService, times(1)).removeDiscount(productWithoutDiscount);
+        // Проверяем, что изменения были сохранены в репозитории
+        verify(productRepository, times(2)).save(any(Product.class));
+        // Проверяем, что скидка была удалена для каждого продукта
+        assertNull(productWithDiscount.getDiscount());
+        assertNull(productWithDiscount.getDiscountPrice());
+        assertNull(productWithoutDiscount.getDiscount());
+        assertNull(productWithoutDiscount.getDiscountPrice());
+    }
+
+    private Product createProductWithDiscount(Long id, BigDecimal price, BigDecimal discountPrice) {
+        Product product = new Product();
+        product.setId(id);
+        product.setPrice(price);
+        product.setDiscountPrice(discountPrice);
+        if (discountPrice != null) {
+            BigDecimal currentPrice = price.subtract(discountPrice);
+            BigDecimal discountPercentage = discountPrice.divide(price, 2, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100));
+            product.setDiscount(discountPercentage);
+        }
+        return product;
+    }
 
 
+    @Test
+    void testDiscountCanBeAppliedWhenQuantityIsGreaterThanTen() {
+        Product product = new Product();
+        product.setQuantity(15);
+        boolean result = productService.checkIfDiscountCanBeApplied(product);
+        assertTrue(result);
+    }
+
+    @Test
+    void testDiscountCannotBeAppliedWhenQuantityIsTen() {
+        Product product = new Product();
+        product.setQuantity(10);
+        boolean result = productService.checkIfDiscountCanBeApplied(product);
+        assertFalse(result);
+    }
+
+    @Test
+    void testDiscountCannotBeAppliedWhenQuantityIsLessThanTen() {
+        Product product = new Product();
+        product.setQuantity(8);
+        boolean result = productService.checkIfDiscountCanBeApplied(product);
+        assertFalse(result);
+    }
+
+    @Test
+    void testApplyDiscount() {
+        // Arrange
+        Product product = new Product();
+        product.setPrice(new BigDecimal("100.00"));
+
+        ProductServiceImpl productService = new ProductServiceImpl(null, null, null,null);
+        productService.setDiscountPercentage(BigDecimal.valueOf(20));
+
+
+        productService.applyDiscount(product);
+        assertThat(product.getDiscount()).isEqualTo(BigDecimal.valueOf(20));
+
+        BigDecimal expectedDiscountAmount = product.getPrice().multiply(BigDecimal.valueOf(20))
+                .divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP);
+        BigDecimal expectedDiscountedPrice = product.getPrice().subtract(expectedDiscountAmount);
+
+        assertThat(product.getDiscountPrice()).isEqualByComparingTo(expectedDiscountedPrice);
+    }
+
+    @Test
+    void testRemoveDiscount() {
+        // Arrange
+        Product product = new Product();
+        product.setPrice(new BigDecimal("100.00"));
+        product.setDiscount(new BigDecimal("20.00"));
+        product.setDiscountPrice(new BigDecimal("80.00"));
+
+        ProductServiceImpl productService = new ProductServiceImpl(null, null, null,null);
+
+        // Act
+        productService.removeDiscount(product);
+
+        // Assert
+        assertThat(product.getDiscount()).isNull();
+        assertThat(product.getDiscountPrice()).isNull();
+    }
+
+
+
+
+
+
+
+
+
+
+
+    private Product createProductWithQuantityAndPrice(Long id, int quantity, BigDecimal price) {
+        Product product = new Product();
+        product.setId(id);
+        product.setQuantity(quantity);
+        product.setPrice(price);
+        return product;
+    }
 }
+
+
+
+
 
 
 
