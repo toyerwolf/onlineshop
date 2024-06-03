@@ -21,25 +21,23 @@ spec:
             - containerPort: 8098
           env:
             - name: SPRING_DATASOURCE_URL
-              value: "jdbc:postgresql://localhost:5433/postgres"
+              value: "jdbc:postgresql://host.docker.internal:5432/postgres"
             - name: SPRING_DATASOURCE_USERNAME
               value: "postgres"
             - name: SPRING_DATASOURCE_PASSWORD
               value: "AAaa123456,./"
           readinessProbe:
             httpGet:
-              path: /actuator/health
+              path:  /products/1
               port: 8098
             initialDelaySeconds: 30
             periodSeconds: 10
-            failureThreshold: 3
           livenessProbe:
             httpGet:
-              path: /actuator/health
+              path:  /products/1
               port: 8098
             initialDelaySeconds: 30
             periodSeconds: 10
-            failureThreshold: 5
 ---
 apiVersion: v1
 kind: Service
@@ -81,18 +79,6 @@ spec:
               value: "postgres"
           ports:
             - containerPort: 5432
-          readinessProbe:
-            exec:
-              command: ["pg_isready", "-U", "postgres"]
-            initialDelaySeconds: 60
-            periodSeconds: 5
-            failureThreshold: 3
-          livenessProbe:
-            exec:
-              command: ["pg_isready", "-U", "postgres"]
-            initialDelaySeconds: 60
-            periodSeconds: 10
-            failureThreshold: 5
 ---
 apiVersion: v1
 kind: Service
@@ -103,5 +89,5 @@ spec:
     app: postgres
   ports:
     - protocol: TCP
-      port: 5433
-      targetPort: 5433
+      port: 5432
+      targetPort: 5432
