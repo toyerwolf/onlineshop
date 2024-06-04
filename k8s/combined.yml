@@ -28,13 +28,13 @@ spec:
               value: "AAaa123456,./"
           readinessProbe:
             httpGet:
-              path:  /categories/1
+              path:  /actuator/health
               port: 8098
             initialDelaySeconds: 30
             periodSeconds: 10
           livenessProbe:
             httpGet:
-              path:  /categories/1
+              path:  /actuator/health
               port: 8098
             initialDelaySeconds: 30
             periodSeconds: 10
