@@ -28,13 +28,13 @@ spec:
               value: "AAaa123456,./"
           readinessProbe:
             httpGet:
-              path:  /products/1
+              path:  /categories/1
               port: 8098
             initialDelaySeconds: 30
             periodSeconds: 10
           livenessProbe:
             httpGet:
-              path:  /products/1
+              path:  /categories/1
               port: 8098
             initialDelaySeconds: 30
             periodSeconds: 10
@@ -50,6 +50,7 @@ spec:
     - protocol: TCP
       port: 8080
       targetPort: 8098
+  type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -91,3 +92,4 @@ spec:
     - protocol: TCP
       port: 5432
       targetPort: 5432
+  type: ClusterIP

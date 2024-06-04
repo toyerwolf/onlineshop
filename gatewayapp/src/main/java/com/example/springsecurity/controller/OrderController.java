@@ -57,6 +57,7 @@ public class OrderController {
     }
 
 
+    @Secured("USER")
     @PostMapping("/{customerId}/{cardId}")
     public ResponseEntity<OrderResponse> makeOrderWithCard(@PathVariable Long customerId,
                                                            @PathVariable Long cardId,

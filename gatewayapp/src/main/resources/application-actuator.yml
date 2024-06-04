@@ -1,0 +1,9 @@
+management:
+  endpoints:
+    web:
+      base-path: "/actuator"   # Устанавливаем базовый путь для всех конечных точек Actuator
+      exposure:
+        include: "*"     # Включаем конечную точку /health
+  endpoint:
+    health:
+      show-details: always  # Показывать подробности в конечной точке /health

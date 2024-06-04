@@ -3,7 +3,7 @@ server:
 
 spring:
   profiles:
-    include: db
+    include: db,actuator
   main:
     allow-bean-definition-overriding: true
   mvc:
@@ -28,14 +28,24 @@ jwtExpirationInMs: 36000
 refreshTokenExpiration: 3600000
 allowed-file-extension: jpg,jpeg,gif,ico,png
 
-# Настройки JWT
+
 jwt:
   secret: ${jwtSecret}
   expirationInMs: ${jwtExpirationInMs}
   refreshTokenExpiration: ${refreshTokenExpiration}
 
-# Настройки загрузки файлов
+
 file:
   allowed-extensions: ${allowed-file-extension}
 
 image-url-prefix: /static/
+
+
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+
