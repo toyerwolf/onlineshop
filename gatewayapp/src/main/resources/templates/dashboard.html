@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <script th:src="@{/webjars/chart.js/3.9.1/dist/chart.min.js}"></script>
+    <script th:src="@{/webjars/react-chartjs-2/5.0.1/dist/react-chartjs-2.min.js}"></script>
+</head>
+<body>
+<h1>Dashboard</h1>
+<div th:replace="${dashboardGraph}"></div>
+</body>
+</html>

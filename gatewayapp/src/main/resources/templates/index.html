@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <style>
+        .product-card {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+            display: inline-block;
+            width: 250px;
+            margin: 10px;
+            vertical-align: top;
+        }
+        .product-card img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+<h1>Welcome to our application!</h1>
+
+<div th:if="${products != null and !products.isEmpty()}">
+    <h2>Featured Products</h2>
+    <div class="product-card" th:each="product : ${products.content}">
+        <img th:src="${product.imageUrl}" alt="Product Image">
+        <h3 th:text="${product.name}"></h3>
+        <p th:text="${product.description}"></p>
+        <p>Price: <span th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 2, 'POINT')}"></span></p>
+        <!-- Другие элементы пользовательского интерфейса для продукта -->
+    </div>
+
+    <div class="pagination">
+        <a th:href="@{/(page=${products.number})}" th:if="${products.hasPrevious()}">Previous</a>
+        <span th:text="${products.number + 1}"></span>/<span th:text="${products.totalPages}"></span>
+        <a th:href="@{/(page=${products.number + 2})}" th:if="${products.hasNext()}">Next</a>
+    </div>
+</div>
+
+<p>
+    <a href="/login">Login</a>
+</p>
+<p>
+    <a href="/register">Register</a>
+</p>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var products = /*[[${products}]]*/ null;
+    /*]]>*/
+</script>
+</body>
+</html>

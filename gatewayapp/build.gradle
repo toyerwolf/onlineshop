@@ -54,6 +54,8 @@ dependencies {
 	implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation group: 'org.webjars.npm', name: 'chart.js', version: '4.4.3'
+	implementation group: 'org.webjars.npm', name: 'react', version: '19.0.0-canary-fd0da3eef-20240404'
 
 
 

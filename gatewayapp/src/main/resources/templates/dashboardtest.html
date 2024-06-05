@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            max-width: 500px;
+            margin: 20px auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
+    </style>
+</head>
+<body>
+<h1>Dashboard</h1>
+
+<div class="chart-container">
+    <canvas id="productSalesChart"></canvas>
+</div>
+
+<div class="chart-container">
+    <canvas id="salesRevenueChart"></canvas>
+</div>
+
+<div class="chart-container">
+    <canvas id="customerRegistrationsChart"></canvas>
+</div>
+
+<script th:inline="javascript">
+    // Data for product sales by year
+    var productSalesData = /*[[${productSalesData}]]*/ {};
+    var productSalesLabels = productSalesData[0];
+    var productSalesValues = productSalesData[1];
+
+    // Data for sales revenue by year
+    var salesRevenueData = /*[[${salesRevenueData}]]*/ {};
+    var salesRevenueLabels = salesRevenueData[0];
+    var salesRevenueValues = salesRevenueData[1];
+
+    // Data for customer registrations by year
+    var customerRegistrationsData = /*[[${customerRegistrationsData}]]*/ {};
+    var customerRegistrationsLabels = customerRegistrationsData[0];
+    var customerRegistrationsValues = customerRegistrationsData[1];
+
+    // Creating charts
+    new Chart(document.getElementById('productSalesChart'), {
+        type: 'bar',
+        data: {
+            labels: productSalesLabels,
+            datasets: [{
+                label: 'Product Sales by Year',
+                data: productSalesValues,
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    new Chart(document.getElementById('salesRevenueChart'), {
+        type: 'line',
+        data: {
+            labels: salesRevenueLabels,
+            datasets: [{
+                label: 'Sales Revenue by Year',
+                data: salesRevenueValues,
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    new Chart(document.getElementById('customerRegistrationsChart'), {
+        type: 'bar',
+        data: {
+            labels: customerRegistrationsLabels,
+            datasets: [{
+                label: 'Customer Registrations by Year',
+                data: customerRegistrationsValues,
+                backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+</body>
+</html>
