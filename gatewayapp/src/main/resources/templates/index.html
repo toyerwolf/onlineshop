@@ -1,55 +1,253 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Online Shopping</title>
     <style>
-        .product-card {
-            border: 1px solid #ccc;
-            padding: 10px;
-            text-align: center;
-            display: inline-block;
-            width: 250px;
-            margin: 10px;
-            vertical-align: top;
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
         }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-links {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .auth-links a {
+            color: #4CAF50;
+            text-decoration: none;
+            margin-left: 10px;
+        }
+
+        .auth-links a:hover {
+            text-decoration: underline;
+        }
+
+        .category-list {
+            display: none;
+            flex-wrap: wrap;
+            justify-content: center;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .category-list.active {
+            display: flex;
+        }
+
+        .category-card {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            width: 250px;
+            margin: 15px;
+        }
+
+        .category-card h3 {
+            margin-top: 10px;
+            margin-bottom: 5px;
+            font-size: 20px;
+        }
+
+        .category-card p {
+            margin-bottom: 10px;
+            color: #666;
+            font-size: 16px;
+        }
+
+        .category-card button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        .category-card button:hover {
+            background-color: #45a049;
+        }
+
+        .product-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .product-card {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            width: 250px;
+            margin: 15px;
+        }
+
         .product-card img {
             max-width: 100%;
             height: auto;
+            border-radius: 5px;
+        }
+
+        .product-card h3 {
+            margin-top: 10px;
+            margin-bottom: 5px;
+            font-size: 18px;
+        }
+
+        .product-card p {
+            margin-bottom: 10px;
+            color: #666;
+            font-size: 16px;
+        }
+
+        .product-card .price {
+            font-weight: bold;
+            color: #4CAF50;
+            font-size: 18px;
+        }
+
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .pagination a {
+            color: #4CAF50;
+            text-decoration: none;
+            padding: 5px 10px;
+            margin: 0 5px;
+            border: 1px solid #4CAF50;
+            border-radius: 3px;
+        }
+
+        .pagination a:hover {
+            background-color: #4CAF50;
+            color: white;
+            border: 1px solid #4CAF50;
         }
     </style>
 </head>
 <body>
-<h1>Welcome to our application!</h1>
-
-<div th:if="${products != null and !products.isEmpty()}">
-    <h2>Featured Products</h2>
-    <div class="product-card" th:each="product : ${products.content}">
-        <img th:src="${product.imageUrl}" alt="Product Image">
-        <h3 th:text="${product.name}"></h3>
-        <p th:text="${product.description}"></p>
-        <p>Price: <span th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 2, 'POINT')}"></span></p>
-        <!-- Другие элементы пользовательского интерфейса для продукта -->
+<div class="container">
+    <div class="auth-links">
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
     </div>
 
-    <div class="pagination">
-        <a th:href="@{/(page=${products.number})}" th:if="${products.hasPrevious()}">Previous</a>
-        <span th:text="${products.number + 1}"></span>/<span th:text="${products.totalPages}"></span>
-        <a th:href="@{/(page=${products.number + 2})}" th:if="${products.hasNext()}">Next</a>
+    <h1>Welcome to our Online Shopping Platform!</h1>
+
+    <button id="all-categories-button">All Categories</button>
+
+    <ul id="categories-section" class="category-list"></ul>
+    <div id="products-section" class="product-list">
+        <h2>Featured Products</h2>
+        <div class="product-card" th:each="product : ${products.content}">
+            <img th:src="${product.imageUrl}" alt="Product Image">
+            <h3 th:text="${product.name}"></h3>
+            <p th:text="${product.description}"></p>
+            <p class="price">Price: <span th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 2, 'POINT')}"></span></p>
+        </div>
+        <div class="pagination">
+            <a th:if="${products.hasPrevious()}" th:href="@{/ (page=${products.number})}">Previous</a>
+            <span th:each="i : ${#numbers.sequence(1, products.totalPages)}" th:if="${i >= products.number - 2 && i <= products.number + 2}">
+                <a th:href="@{/ (page=${i})}" th:text="${i}" th:classappend="${i == products.number + 1} ? 'active' : ''"></a>
+            </span>
+            <a th:if="${products.hasNext()}" th:href="@{/ (page=${products.number + 2})}">Next</a>
+        </div>
     </div>
 </div>
 
-<p>
-    <a href="/login">Login</a>
-</p>
-<p>
-    <a href="/register">Register</a>
-</p>
-
 <script th:inline="javascript">
     /*<![CDATA[*/
-    var products = /*[[${products}]]*/ null;
+    const categoriesSection = document.getElementById('categories-section');
+    const allCategoriesButton = document.getElementById('all-categories-button');
+
+    allCategoriesButton.addEventListener('click', function() {
+        if (categoriesSection.classList.contains('active')) {
+            categoriesSection.classList.remove('active');
+        } else {
+            fetch('home/categories')
+                .then(response => response.json())
+                .then(categories => {
+                    categoriesSection.innerHTML = ''; // Clear the section
+                    categories.forEach(category => {
+                        const categoryItem = document.createElement('li');
+                        categoryItem.className = 'category-card';
+                        categoryItem.innerHTML = `
+                            <h3>${category.categoryName}</h3>
+                            <p>${category.description}</p>
+                            <button onclick="loadProducts(${category.categoryId})">View Products</button>
+                        `;
+                        categoriesSection.appendChild(categoryItem);
+                    });
+                    categoriesSection.classList.add('active'); // Show the categories
+                })
+                .catch(error => console.error('Error loading categories:', error));
+        }
+    });
+
+    function loadProducts(categoryId) {
+        fetch(`/home/${categoryId}/products`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(products => {
+                console.log('Products loaded:', products); // Log loaded products
+                const productsSection = document.getElementById('products-section');
+                productsSection.innerHTML = '';
+
+                if (products.length === 0) {
+                    productsSection.innerHTML = '<p>No products available in this category.</p>';
+                    return;
+                }
+
+                products.forEach(product => {
+                    const productCard = document.createElement('div');
+                    productCard.className = 'product-card';
+                    productCard.innerHTML = `
+                        <img src="${product.imageUrl || 'default-image-url.jpg'}" alt="Product Image">
+                        <h3>${product.name || 'Unnamed'}</h3>
+                        <p>${product.description || 'No description available.'}</p>
+                        <p class="price">Price: ${product.price !== undefined ? product.price : 'N/A'}</p>
+                    `;
+                    productsSection.appendChild(productCard);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading products:', error);
+                const productsSection = document.getElementById('products-section');
+                productsSection.innerHTML = '<p>Error loading products. Please try again later.</p>';
+            });
+    }
     /*]]>*/
 </script>
 </body>

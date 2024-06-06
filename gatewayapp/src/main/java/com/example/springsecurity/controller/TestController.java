@@ -17,17 +17,17 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-@RestController
-@RequestMapping("test")
-@AllArgsConstructor
-public class TestController {
-
-    @GetMapping("/")
-    public String test(){
-        return "OK";
-    }
-
-
-    }
-
+//
+//@RestController
+//@RequestMapping("test")
+//@AllArgsConstructor
+//public class TestController {
+//
+//    @GetMapping("/")
+//    public String test(){
+//        return "OK";
+//    }
+//
+//
+//    }
+//

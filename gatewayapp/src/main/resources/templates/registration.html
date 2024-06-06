@@ -4,21 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .registration-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        input {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-<h1>Registration Page</h1>
-<form action="/register" method="post">
-    <label for="username">Username:</label><br>
-    <input type="text" id="username" name="username"><br>
-    <label for="password">Password:</label><br>
-    <input type="password" id="password" name="password"><br>
-    <label for="name">First Name:</label><br>
-    <input type="text" id="name" name="name"><br>
-    <label for="surname">Last Name:</label><br>
-    <input type="text" id="surname" name="surname"><br>
-    <label for="address">Address:</label><br>
-    <input type="text" id="address" name="address"><br><br>
-    <input type="submit" value="Register">
-</form>
+<div class="registration-container">
+    <h1>Registration Page</h1>
+    <form action="/register" method="post">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password">
+        <label for="name">First Name:</label>
+        <input type="text" id="name" name="name">
+        <label for="surname">Last Name:</label>
+        <input type="text" id="surname" name="surname">
+        <label for="address">Address:</label>
+        <input type="text" id="address" name="address">
+        <button type="submit">Register</button>
+    </form>
+</div>
 </body>
 </html>
