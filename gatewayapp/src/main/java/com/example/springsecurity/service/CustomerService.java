@@ -11,8 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface CustomerService {
-
-
+    CustomerDto getCustomerByUsername(String username);
 
     CustomerDto getCustomerById(Long customerID);
 

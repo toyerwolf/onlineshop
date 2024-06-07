@@ -150,9 +150,15 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductDto> searchProductByName(String keyword) {
         List<Product> products = productRepository.searchProductByName(keyword);
         return products.stream()
-                .map(ProductMapper.INSTANCE::toDto)
+                .map(product -> {
+                    ProductDto productDto = ProductMapper.INSTANCE.toDto(product);
+                    String imageUrl = imageUrlPrefix + product.getImageUrl();
+                    productDto.setImageUrl(imageUrl);
+                    return productDto;
+                })
                 .collect(Collectors.toList());
     }
+
 
     @Override
     public void decreaseCount(Long productId, int quantity) {

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -36,6 +36,27 @@
 
         .auth-links a:hover {
             text-decoration: underline;
+        }
+
+        .search-bar {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .search-bar input[type="text"] {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 200px;
+        }
+
+        .search-bar button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
         }
 
         .category-list {
@@ -156,11 +177,21 @@
 <body>
 <div class="container">
     <div class="auth-links">
-        <a href="/login">Login</a>
-        <a href="/register">Register</a>
+        <div th:if="${customer == null}">
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+        </div>
+        <div th:if="${customer != null}">
+            <span>Welcome, <span th:text="${customer.name}">User</span>!</span>
+        </div>
     </div>
 
     <h1>Welcome to our Online Shopping Platform!</h1>
+
+    <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Search...">
+        <button id="search-button">Search</button>
+    </div>
 
     <button id="all-categories-button">All Categories</button>
 
@@ -172,83 +203,166 @@
             <h3 th:text="${product.name}"></h3>
             <p th:text="${product.description}"></p>
             <p class="price">Price: <span th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 2, 'POINT')}"></span></p>
+            <!-- Добавляем кнопку "Make Order" -->
+            <button class="make-order-button" data-product-id="${product.id}">Make Order</button>
         </div>
         <div class="pagination">
             <a th:if="${products.hasPrevious()}" th:href="@{/ (page=${products.number})}">Previous</a>
             <span th:each="i : ${#numbers.sequence(1, products.totalPages)}" th:if="${i >= products.number - 2 && i <= products.number + 2}">
-                <a th:href="@{/ (page=${i})}" th:text="${i}" th:classappend="${i == products.number + 1} ? 'active' : ''"></a>
-            </span>
+            <a th:href="@{/ (page=${i})}" th:text="${i}" th:classappend="${i == products.number + 1} ? 'active' : ''"></a>
+        </span>
             <a th:if="${products.hasNext()}" th:href="@{/ (page=${products.number + 2})}">Next</a>
         </div>
-    </div>
-</div>
+    </div>/
 
-<script th:inline="javascript">
-    /*<![CDATA[*/
-    const categoriesSection = document.getElementById('categories-section');
-    const allCategoriesButton = document.getElementById('all-categories-button');
+    <script>
+        /*<![CDATA[*/
+        const categoriesSection = document.getElementById('categories-section');
+        const allCategoriesButton = document.getElementById('all-categories-button');
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
 
-    allCategoriesButton.addEventListener('click', function() {
-        if (categoriesSection.classList.contains('active')) {
-            categoriesSection.classList.remove('active');
-        } else {
-            fetch('home/categories')
-                .then(response => response.json())
-                .then(categories => {
-                    categoriesSection.innerHTML = ''; // Clear the section
-                    categories.forEach(category => {
-                        const categoryItem = document.createElement('li');
-                        categoryItem.className = 'category-card';
-                        categoryItem.innerHTML = `
-                            <h3>${category.categoryName}</h3>
-                            <p>${category.description}</p>
+        searchButton.addEventListener('click', function() {
+            const keyword = searchInput.value.trim();
+            if (keyword !== '') {
+                fetch(`/home/search?keyword=${encodeURIComponent(keyword)}`)
+                    .then(response => response.json())
+                    .then(products => {
+                        console.log('Search results:', products); // Log search results
+                        const productsSection = document.getElementById('products-section');
+                        productsSection.innerHTML = '';
+
+                        if (products.length === 0) {
+                            productsSection.innerHTML = '<p>No products found.</p>';
+                            return;
+                        }
+
+                        products.forEach(product => {
+                            const productCard = document.createElement('div');
+                            productCard.className = 'product-card';
+                            productCard.innerHTML = `
+                            <img src="${product.imageUrl || 'default-image-url.jpg'}" alt="Product Image">
+                            <h3>${product.name || 'Unnamed'}</h3>
+                            <p>${product.description || 'No description available.'}</p>
+                            <p class="price">Price: ${product.price !== undefined ? product.price : 'N/A'}</p>
+                            <button onclick="makeOrder(${product.id})">Make Order</button>
+                        `;
+                            productsSection.appendChild(productCard);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error searching products:', error);
+                        const productsSection = document.getElementById('products-section');
+                        productsSection.innerHTML = '<p>Error searching products. Please try again later.</p>';
+                    });
+            }
+        });
+
+        allCategoriesButton.addEventListener('click', function() {
+            if (categoriesSection.classList.contains('active')) {
+                categoriesSection.classList.remove('active');
+            } else {
+                fetch('/home/categories')
+                    .then(response => response.json())
+                    .then(categories => {
+                        categoriesSection.innerHTML = ''; // Clear the section
+                        categories.forEach(category => {
+                            const categoryItem = document.createElement('li');
+                            categoryItem.className = 'category-card';
+                            categoryItem.innerHTML = `
+                            <h3>${category.name}</h3>
                             <button onclick="loadProducts(${category.categoryId})">View Products</button>
                         `;
-                        categoriesSection.appendChild(categoryItem);
-                    });
-                    categoriesSection.classList.add('active'); // Show the categories
+                            categoriesSection.appendChild(categoryItem);
+                        });
+                        categoriesSection.classList.add('active'); // Show the categories
+                    })
+                    .catch(error => console.error('Error loading categories:', error));
+            }
+        });
+
+        function loadProducts(categoryId) {
+            fetch(`/home/${categoryId}/products`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.json();
                 })
-                .catch(error => console.error('Error loading categories:', error));
-        }
-    });
+                .then(products => {
+                    console.log('Products loaded:', products); // Log loaded products
+                    const productsSection = document.getElementById('products-section');
+                    productsSection.innerHTML = '';
 
-    function loadProducts(categoryId) {
-        fetch(`/home/${categoryId}/products`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(products => {
-                console.log('Products loaded:', products); // Log loaded products
-                const productsSection = document.getElementById('products-section');
-                productsSection.innerHTML = '';
+                    if (products.length === 0) {
+                        productsSection.innerHTML = '<p>No products available in this category.</p>';
+                        return;
+                    }
 
-                if (products.length === 0) {
-                    productsSection.innerHTML = '<p>No products available in this category.</p>';
-                    return;
-                }
-
-                products.forEach(product => {
-                    const productCard = document.createElement('div');
-                    productCard.className = 'product-card';
-                    productCard.innerHTML = `
+                    products.forEach(product => {
+                        const productCard = document.createElement('div');
+                        productCard.className = 'product-card';
+                        productCard.innerHTML = `
                         <img src="${product.imageUrl || 'default-image-url.jpg'}" alt="Product Image">
                         <h3>${product.name || 'Unnamed'}</h3>
                         <p>${product.description || 'No description available.'}</p>
                         <p class="price">Price: ${product.price !== undefined ? product.price : 'N/A'}</p>
+                        <button onclick="makeOrder(${product.id})">Make Order</button>
                     `;
-                    productsSection.appendChild(productCard);
+                        productsSection.appendChild(productCard);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading products:', error);
+                    const productsSection = document.getElementById('products-section');
+                    productsSection.innerHTML = '<p>Error loading products. Please try again later.</p>';
                 });
+        }
+
+        function makeOrder(productId) {
+            const customerId = getSessionCustomerId();
+            if (!customerId) {
+                alert('Please login to make an order.');
+                return;
+            }
+
+            const productQuantities = {};
+            productQuantities[productId] = 1; // Устанавливаем количество продукта (в данном случае 1)
+
+            const orderRequest = {
+                productQuantities: productQuantities
+            };
+
+            fetch('/home/makeOrder', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(orderRequest)
             })
-            .catch(error => {
-                console.error('Error loading products:', error);
-                const productsSection = document.getElementById('products-section');
-                productsSection.innerHTML = '<p>Error loading products. Please try again later.</p>';
-            });
-    }
-    /*]]>*/
-</script>
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Order placed successfully:', data);
+                    alert('Order placed successfully!');
+                })
+                .catch(error => {
+                    console.error('Error making order:', error);
+                    alert('Error making order. Please try again later.');
+                });
+        }
+
+        function getSessionCustomerId() {
+            const customerId = sessionStorage.getItem('customerId');
+            console.log('Customer ID from session:', customerId);
+            return customerId;
+        }
+        /*]]>*/
+    </script>
+</div>
 </body>
 </html>

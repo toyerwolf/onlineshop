@@ -10,6 +10,7 @@ import com.example.springsecurity.exception.NotFoundException;
 import com.example.springsecurity.mapper.CustomerMapper;
 import com.example.springsecurity.repository.CustomerRepository;
 import com.example.springsecurity.service.CustomerService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -251,7 +252,41 @@ private CustomerRepository customerRepository;
             assertEquals(customer.getSurname(), customerDto.getSurname());
         }
     }
+
+    @Test
+    void testGetCustomerByUsername_Found() {
+        // Arrange
+        String username = "john_doe";
+        Customer customer = new Customer();
+        customer.setId(1L);
+
+        CustomerService customerService = new CustomerServiceImpl(customerRepository);
+
+        Mockito.when(customerRepository.findByUser_Username(username))
+                .thenReturn(Optional.of(customer));
+
+        // Act
+        CustomerDto customerDto = customerService.getCustomerByUsername(username);
+
+        // Assert
+        Assertions.assertNotNull(customerDto);
+        Assertions.assertEquals(customer.getId(), customerDto.getId());
+
+    }
+
+    @Test
+    void testGetCustomerByUsername_NotFound() {
+        // Arrange
+        String username = "non_existing_user";
+
+        Mockito.when(customerRepository.findByUser_Username(username))
+                .thenReturn(Optional.empty());
+
+        CustomerService customerService = new CustomerServiceImpl(customerRepository);
+        Assertions.assertThrows(NotFoundException.class, () -> customerService.getCustomerByUsername(username));
+    }
 }
+
 
 
 

@@ -35,6 +35,12 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerMapper customerMapper=CustomerMapper.INSTANCE;
 
 
+    @Override
+    public CustomerDto getCustomerByUsername(String username) {
+        Customer customer = customerRepository.findByUser_Username(username)
+                .orElseThrow(() -> new NotFoundException("Customer not found for username: " + username));
+        return CustomerMapper.INSTANCE.toDto(customer);
+    }
 
     @Override
     public CustomerDto getCustomerById(Long customerID) {
