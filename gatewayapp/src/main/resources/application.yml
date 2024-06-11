@@ -24,7 +24,7 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: debug
 
 jwtSecret: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9123saddsaA2sdGgfsa
-jwtExpirationInMs: 36000
+jwtExpirationInMs: 360000
 refreshTokenExpiration: 3600000
 allowed-file-extension: jpg,jpeg,gif,ico,png
 

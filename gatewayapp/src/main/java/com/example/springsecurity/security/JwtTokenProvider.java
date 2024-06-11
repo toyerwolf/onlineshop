@@ -1,6 +1,7 @@
 package com.example.springsecurity.security;
 
 import com.example.springsecurity.dto.JwtResponse;
+import com.example.springsecurity.exception.NotFoundException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
 import org.slf4j.Logger;
@@ -96,6 +97,27 @@ public class JwtTokenProvider {
     }
     public String getUserNameFromJwtToken(String token){
         return Jwts.parserBuilder().setSigningKey(jwtSecret).build().parseClaimsJws(token).getBody().getSubject();
+    }
+
+
+    public Claims getAllClaimsFromToken(String token) {
+        try {
+            return Jwts.parser()
+                    .setSigningKey(jwtSecret.getBytes())
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (SignatureException ex) {
+            logger.error("Invalid JWT signature: {}", ex.getMessage());
+        } catch (MalformedJwtException ex) {
+            logger.error("Invalid JWT token: {}", ex.getMessage());
+        } catch (ExpiredJwtException ex) {
+            logger.error("Expired JWT token: {}", ex.getMessage());
+        } catch (UnsupportedJwtException ex) {
+            logger.error("Unsupported JWT token: {}", ex.getMessage());
+        } catch (IllegalArgumentException ex) {
+            logger.error("JWT claims string is empty: {}", ex.getMessage());
+        }
+        throw new NotFoundException("Invalid JWT token");
     }
 
 }

@@ -72,10 +72,10 @@ class AuthControllerTest {
 
         JwtResponse jwtResponse = responseEntity.getBody();
         assertNotNull(jwtResponse);
-        assertNotNull(jwtResponse.getToken());
+        assertNotNull(jwtResponse.getAccessToken());
         assertNotNull(jwtResponse.getRefreshToken());
 
-        String token = jwtResponse.getToken();
+        String token = jwtResponse.getRefreshToken();
         assertTrue(jwtTokenProvider.validateToken(token));
     }
 
@@ -102,7 +102,7 @@ class AuthControllerTest {
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         JwtResponse jwtResponse = responseEntity.getBody();
         assertNotNull(jwtResponse);
-        assertNotNull(jwtResponse.getToken());
+        assertNotNull(jwtResponse.getAccessToken());
         assertNotNull(jwtResponse.getRefreshToken());
     }
 

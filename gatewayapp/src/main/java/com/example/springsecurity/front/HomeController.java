@@ -6,10 +6,12 @@ import com.example.springsecurity.entity.User;
 import com.example.springsecurity.exception.NotFoundException;
 import com.example.springsecurity.req.OrderRequest;
 import com.example.springsecurity.req.UserRegistrationReq;
+import com.example.springsecurity.security.JwtTokenProvider;
 import com.example.springsecurity.service.*;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
@@ -29,6 +31,9 @@ public class HomeController {
     private final CategoryService categoryService;
     private final CustomerService customerService;
     private final OrderService orderService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final OrderProductService orderProductService;
+    private final PaymentService paymentService;
 
     @GetMapping
     public String home(Model model, @RequestParam(defaultValue = "1") int page, HttpSession session) {
@@ -52,16 +57,9 @@ public class HomeController {
     }
 
     @PostMapping("/login")
-    public String login(@ModelAttribute LoginDto loginDto, Model model, HttpSession session) {
+    public ResponseEntity<JwtResponse> login(@RequestBody LoginDto loginDto) {
         JwtResponse jwtResponse = authService.login(loginDto);
-        session.setAttribute("accessToken", jwtResponse.getToken());
-        session.setAttribute("refreshToken", jwtResponse.getRefreshToken());
-
-        // Получаем пользователя по username
-        CustomerDto customer = customerService.getCustomerByUsername(loginDto.getUsername());
-        session.setAttribute("customerId", customer.getId());
-
-        return "redirect:/";
+        return new ResponseEntity<>(jwtResponse, HttpStatus.OK);
     }
 
     @GetMapping("/register")
@@ -78,7 +76,8 @@ public class HomeController {
 
 
 
-    @GetMapping("home/{categoryId}/products")
+
+    @GetMapping("/home/{categoryId}/products")
     @ResponseBody
     public List<ProductDto> getProductsByCategoryId(@PathVariable Long categoryId) {
         return productService.findProductsByCategoryId(categoryId);
@@ -97,19 +96,13 @@ public class HomeController {
     }
 
     @PostMapping("home/makeOrder")
-    @ResponseBody
-    public OrderResponse makeOrder(HttpSession session, @RequestBody OrderRequest orderRequest) {
-        // Получаем ID клиента из сеанса
-        Long customerId = (Long) session.getAttribute("customerId");
-
-        // Проверяем, получен ли ID клиента из сеанса
-        if (customerId == null) {
-            // Если ID клиента не доступен, вернуть сообщение об ошибке
-            throw new NotFoundException("Ошибка: идентификатор клиента не найден в сеансе.");
-        }
+    public ResponseEntity<OrderResponse> makeOrder(@RequestHeader("Authorization") String authHeader, @RequestBody OrderRequest orderRequest) {
+        String token = authHeader.replace("Bearer ", "");
+        Long customerId = jwtTokenProvider.getUserIdFromJWT(token);
 
         // Вызываем сервис создания заказа, передавая ID клиента и информацию о заказе
-        return orderService.makeOrder(customerId, orderRequest);
+        OrderResponse orderResponse = orderService.makeOrder(customerId, orderRequest);
+        return ResponseEntity.ok(orderResponse);
     }
 
     @PostMapping("home/makeOrderWithCard")
@@ -117,5 +110,36 @@ public class HomeController {
     public OrderResponse makeOrderWithCard(@RequestParam Long customerId, @RequestBody OrderRequest orderRequest, @RequestParam Long cardId) {
         return orderService.makeOrderWithCard(customerId, orderRequest, cardId);
     }
-}
 
+    @GetMapping("/user/me")
+    public ResponseEntity<CustomerDto> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        Long customerId = jwtTokenProvider.getUserIdFromJWT(token);
+        CustomerDto customer = customerService.getCustomerById(customerId);
+        return ResponseEntity.ok(customer);
+    }
+
+    @PostMapping("home/refresh")
+    public ResponseEntity<JwtResponse> refreshToken(@RequestBody JwtRequest jwtRequest) {
+        JwtResponse jwtResponse = authService.refreshAccessTokenAndGenerateNewToken(jwtRequest.getRefreshToken());
+        return new ResponseEntity<>(jwtResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/order-details")
+    public String getOrderDetailsPage() {
+        return "order-details";
+    }
+
+    @GetMapping("/test/{orderId}/products")
+    public ResponseEntity<List<OrderProductDto>> getOrderProducts(@PathVariable Long orderId) {
+        List<OrderProductDto> orderProducts = orderProductService.findOrderProductsByOrderId(orderId);
+        return new ResponseEntity<>(orderProducts, HttpStatus.OK);
+    }
+
+    @PostMapping("/paypal/{customerId}/{orderId}")
+    public ResponseEntity<String> processPaymentWithPayPal(@PathVariable Long customerId, @PathVariable Long orderId) {
+        paymentService.processPaymentWithPayPal(customerId, orderId);
+        return ResponseEntity.ok("Payment with PayPal processed successfully.");
+    }
+
+}

@@ -302,13 +302,13 @@ class OrderServiceImplTest {
         OrderResponse orderResponse = orderService.makeOrderWithCard(1L, orderRequest, 1L);
 
         assertNotNull(orderResponse);
-        assertNotNull(orderResponse.getId());
+        assertNotNull(orderResponse.getOrderId());
         assertNotNull(orderResponse.getCreatedAt());
         assertNotNull(orderResponse.getStatus());
         assertNotNull(orderResponse.getProducts());
 
         assertNotNull(order);
-        assertEquals(order.getId(), orderResponse.getId());
+        assertEquals(order.getId(), orderResponse.getOrderId());
         assertEquals(order.getTotalAmount(), orderResponse.getTotalAmount());
         assertEquals(order.getCreatedAt(), orderResponse.getCreatedAt());
         assertEquals(order.getStatus(), orderResponse.getStatus());
@@ -471,13 +471,13 @@ class OrderServiceImplTest {
 
         // Assert
         assertNotNull(orderResponse);
-        assertNotNull(orderResponse.getId());
+        assertNotNull(orderResponse.getOrderId());
         assertNotNull(orderResponse.getCreatedAt());
         assertNotNull(orderResponse.getStatus());
         assertNotNull(orderResponse.getProducts());
 
         assertNotNull(order);
-        assertEquals(order.getId(), orderResponse.getId());
+        assertEquals(order.getId(), orderResponse.getOrderId());
         assertEquals(order.getTotalAmount(), orderResponse.getTotalAmount());
         assertEquals(order.getCreatedAt(), orderResponse.getCreatedAt());
         assertEquals(order.getStatus(), orderResponse.getStatus());
@@ -775,7 +775,7 @@ class OrderServiceImplTest {
 
         // Assert
         assertNotNull(orderResponse);
-        assertEquals(orderId, orderResponse.getId());
+        assertEquals(orderId, orderResponse.getOrderId());
         assertEquals(totalAmount, orderResponse.getTotalAmount());
         assertEquals(createdAt, orderResponse.getCreatedAt());
         assertEquals(status, orderResponse.getStatus());

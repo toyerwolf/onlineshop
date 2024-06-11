@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class OrderResponse {
 
-    private Long id;
+    private Long orderId;
     private BigDecimal totalAmount;
     private LocalDateTime createdAt;
     private OrderStatus status;

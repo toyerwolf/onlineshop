@@ -74,7 +74,7 @@ public class OrderServiceImpl implements OrderService {
     @NotNull OrderResponse getOrderResponse(Order order) {
         List<OrderProductDto> orderProducts = orderProductService.findOrderProductsByOrderId(order.getId());
         OrderResponse orderResponse = new OrderResponse();
-        orderResponse.setId(order.getId());
+        orderResponse.setOrderId(order.getId());
         orderResponse.setTotalAmount(order.getTotalAmount());
         orderResponse.setCreatedAt(order.getCreatedAt());
         orderResponse.setStatus(order.getStatus());

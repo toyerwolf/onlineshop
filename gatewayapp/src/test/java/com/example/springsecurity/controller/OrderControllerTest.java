@@ -103,7 +103,7 @@ class OrderControllerTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         OrderResponse orderResponse = response.getBody();
         assertNotNull(orderResponse);
-        assertNotNull(orderResponse.getId());
+        assertNotNull(orderResponse.getOrderId());
         assertNotNull(orderResponse.getTotalAmount());
         assertNotNull(orderResponse.getCreatedAt());
         assertNotNull(orderResponse.getStatus());
@@ -139,7 +139,7 @@ class OrderControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         OrderResponse orderResponse = response.getBody();
         assertNotNull(orderResponse);
-        assertNotNull(orderResponse.getId());
+        assertNotNull(orderResponse.getOrderId());
         assertNotNull(orderResponse.getTotalAmount());
         assertNotNull(orderResponse.getCreatedAt());
         assertNotNull(orderResponse.getStatus());

@@ -48,13 +48,52 @@
 <body>
 <div class="login-container">
     <h1>Login Page</h1>
-    <form action="/login" method="post">
+    <form id="loginForm">
         <label for="username">Username:</label>
-        <input type="text" id="username" name="username">
+        <input type="text" id="username" name="username" required>
         <label for="password">Password:</label>
-        <input type="password" id="password" name="password">
+        <input type="password" id="password" name="password" required>
         <button type="submit">Login</button>
     </form>
 </div>
+
+<script>
+
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // предотвращение стандартного действия отправки формы
+        login();
+    });
+
+    function login() {
+        fetch('auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: document.getElementById('username').value,
+                password: document.getElementById('password').value
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                const { accessToken, refreshToken } = data;
+
+                // Установка access токена и его срока действия в 1 минуту
+                sessionStorage.setItem('access_token', accessToken);
+                sessionStorage.setItem('access_token_expiration', (new Date().getTime() + 60000).toString());
+
+                // Установка refresh токена и его срока действия в 5 минут
+                sessionStorage.setItem('refresh_token', refreshToken);
+                sessionStorage.setItem('refresh_token_expiration', (new Date().getTime() + 300000).toString());
+
+                window.location.href = '/';
+            })
+            .catch(error => {
+                console.error('Error during login:', error);
+                alert('Login failed. Please try again.');
+            });
+    }
+</script>
 </body>
 </html>

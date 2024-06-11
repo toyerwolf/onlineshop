@@ -60,7 +60,7 @@ class AuthServiceImplTest {
         JwtResponse response = authService.login(loginDto);
 
 
-        assertEquals(token, response.getToken());
+        assertEquals(token, response.getAccessToken());
         assertEquals(refreshToken, response.getRefreshToken());
 
     }
@@ -82,7 +82,7 @@ class AuthServiceImplTest {
 
         // Assert
         assertNotNull(jwtResponse);
-        assertEquals("new_access_token", jwtResponse.getToken());
+        assertEquals("new_access_token", jwtResponse.getAccessToken());
         assertEquals("new_refresh_token", jwtResponse.getRefreshToken());
         verify(jwtTokenProvider).generateTokenFromUsername(username);
         verify(jwtTokenProvider).generateRefreshTokenFromUsername(username);
