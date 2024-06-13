@@ -14,10 +14,10 @@ public class SortDeserializer extends JsonDeserializer<Sort> {
     @Override
     public Sort deserialize(JsonParser jsonParser, DeserializationContext ctxt) throws IOException, JsonProcessingException {
         JsonNode node = jsonParser.getCodec().readTree(jsonParser);
-        boolean sorted = node.get("sorted").asBoolean();
+        boolean sorted = node.has("sorted") && node.get("sorted").asBoolean();
         if (!sorted) {
             return Sort.unsorted();
         }
-        return Sort.by("id");
+        return Sort.by("id"); // Замените "id" на нужное поле для сортировки
     }
 }
