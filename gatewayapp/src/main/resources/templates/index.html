@@ -281,6 +281,8 @@
         #my-orders-button:hover {
             background-color: #0056b3; /* Темный оттенок для активного состояния */
         }
+
+
     </style>
 </head>
 <body>
@@ -459,7 +461,7 @@
     //     }
     // }
     function checkTokenExpiration() {
-        const refreshTokenExpiration = sessionStorage.getItem('refresh_token_expiration');
+        const refreshTokenExpiration = localStorage.getItem('refresh_token_expiration');
         const currentTime = new Date().getTime() / 1000;
 
         if (refreshTokenExpiration && currentTime > refreshTokenExpiration) {
@@ -535,7 +537,7 @@
     }
 
     // Проверять срок действия токена
-    setInterval(checkTokenExpiration, 30000);
+    setInterval(checkTokenExpiration, 60000);
 
     const categoriesSection = document.getElementById('categories-section');
     const allCategoriesButton = document.getElementById('all-categories-button');
