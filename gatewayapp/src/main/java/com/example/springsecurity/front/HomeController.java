@@ -95,6 +95,7 @@ public class HomeController {
         return productService.searchProductByName(keyword);
     }
 
+    @Secured("USER")
     @PostMapping("home/makeOrder")
     public ResponseEntity<OrderResponse> makeOrder(@RequestHeader("Authorization") String authHeader, @RequestBody OrderRequest orderRequest) {
         String token = authHeader.replace("Bearer ", "");
@@ -130,16 +131,33 @@ public class HomeController {
         return "order-details";
     }
 
+
+
+    @Secured("USER")
     @GetMapping("/test/{orderId}/products")
     public ResponseEntity<List<OrderProductDto>> getOrderProducts(@PathVariable Long orderId) {
         List<OrderProductDto> orderProducts = orderProductService.findOrderProductsByOrderId(orderId);
         return new ResponseEntity<>(orderProducts, HttpStatus.OK);
     }
 
+    @Secured("USER")
     @PostMapping("/paypal/{customerId}/{orderId}")
     public ResponseEntity<String> processPaymentWithPayPal(@PathVariable Long customerId, @PathVariable Long orderId) {
         paymentService.processPaymentWithPayPal(customerId, orderId);
         return ResponseEntity.ok("Payment with PayPal processed successfully.");
     }
+
+    @GetMapping("/payment-success")
+    public String showPaymentSuccessPage() {
+        return "payment-success";
+    }
+
+    @GetMapping("/customer-order.html")
+    public String showCustomerOrdersPage() {
+        return "customer-order";
+    }
+
+
+
 
 }

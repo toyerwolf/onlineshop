@@ -218,9 +218,82 @@
             background-color: #4CAF50;
             color: white;
         }
+
+        .logout-button {
+            background-color: #ff4444; /* Красный цвет */
+            color: white; /* Белый текст */
+            border: none; /* Убираем границу */
+            border-radius: 5px; /* Закругляем края */
+            padding: 10px 20px; /* Отступы внутри кнопки */
+            cursor: pointer; /* При наведении курсора меняем его на указатель */
+            transition: background-color 0.3s; /* Плавное изменение цвета при наведении */
+        }
+
+        .logout-button:hover {
+            background-color: #cc0000; /* Более темный красный при наведении */
+        }
+
+        .weather-container {
+            position: fixed; /* Фиксированная позиция для блока */
+            top: 20px; /* Отступ сверху */
+            left: 20px; /* Отступ слева */
+            padding: 10px; /* Внутренний отступ для контейнера */
+            background-color: #f0f0f0; /* Цвет фона */
+            border: 1px solid #ccc; /* Рамка */
+            border-radius: 5px; /* Закругление углов */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Тень */
+            width: 250px; /* Ширина блока */
+        }
+
+        .weather-location {
+            font-size: 1.2em; /* Размер шрифта заголовка */
+            font-weight: bold; /* Жирный шрифт для заголовка */
+            margin-bottom: 10px; /* Отступ снизу для заголовка */
+        }
+
+        .weather-temperature {
+            font-size: 2em; /* Размер шрифта для температуры */
+            margin-bottom: 10px; /* Отступ снизу для температуры */
+        }
+
+        .weather-icon {
+            width: 50px; /* Ширина иконки */
+            height: 50px; /* Высота иконки */
+            margin-bottom: 10px; /* Отступ снизу для иконки */
+        }
+
+        .weather-description {
+            font-size: 0.9em; /* Размер шрифта для описания */
+        }
+
+        #my-orders-button {
+            padding: 10px 20px; /* Подходящие отступы для кнопки */
+            font-size: 16px; /* Размер шрифта текста на кнопке */
+            background-color: #007bff; /* Цвет фона кнопки */
+            color: #fff; /* Цвет текста на кнопке */
+            border: none; /* Убираем границу кнопки */
+            border-radius: 5px; /* Закругление углов кнопки */
+            cursor: pointer; /* Изменяем курсор при наведении */
+            transition: background-color 0.3s ease; /* Плавное изменение цвета фона */
+        }
+
+        /* Стили для кнопки "My Orders" при наведении */
+        #my-orders-button:hover {
+            background-color: #0056b3; /* Темный оттенок для активного состояния */
+        }
     </style>
 </head>
 <body>
+<!--<div id="orders-section"></div>-->
+
+<div id="weather-container" class="weather-container">
+    <div class="weather-location">Baku</div>
+    <div class="weather-temperature" id="weather-temperature">--°C</div>
+    <img class="weather-icon" id="weather-icon" src="" alt="Weather Icon">
+    <div class="weather-description" id="weather-description">Loading...</div>
+</div>
+
+
 <div class="container">
     <div class="auth-links">
         <div id="auth-links-logged-out">
@@ -229,6 +302,8 @@
         </div>
         <div id="auth-links-logged-in" style="display:none;">
             <span>Welcome, <span id="customer-name">User</span>!</span>
+            <button class="logout-button" onclick="logoutUser()">Logout</button>
+            <button id="my-orders-button" onclick="viewCustomerOrders()">My Orders</button>
         </div>
     </div>
 
@@ -265,19 +340,84 @@
             <a th:if="${products.hasNext()}" th:href="@{/ (page=${products.number + 2})}">Next</a>
         </div>
     </div>
+
+
 </div>
 
 
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        checkTokenExpiration();
 
+
+<script>
+
+    // document.addEventListener('DOMContentLoaded', function() {
+    //     fetchWeatherForBaku();
+    //     checkTokenExpiration();
+    //     const accessToken = sessionStorage.getItem('access_token');
+    //     if (accessToken) {
+    //         fetchUserInfo(accessToken);
+    //     } else {
+    //         hideMakeOrderButtonAndQuantity();
+    //     }
+    // });
+    function viewCustomerOrders() {
+        const accessToken = sessionStorage.getItem('access_token');
+        const customerId = sessionStorage.getItem('customerId');
+
+        if (!accessToken || !customerId) {
+            console.error('Access token or customer ID is missing.');
+            return;
+        }
+
+        // Переходим на страницу с заказами, передав параметры через URL
+        window.location.href = `/customer-order.html?customerId=${customerId}&accessToken=${accessToken}`;
+    }
+
+    function fetchWeatherForBaku() {
+        fetch('/weather')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('weather-temperature').textContent = `${data.temperature}°C`;
+                document.getElementById('weather-icon').src = data.iconUrl;
+                document.getElementById('weather-description').textContent = data.description;
+            })
+            .catch(error => {
+                console.error('Error fetching weather data:', error);
+                document.getElementById('weather-description').textContent = 'Ошибка при загрузке данных о погоде';
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchWeatherForBaku();
+        checkTokenExpiration();
         const accessToken = sessionStorage.getItem('access_token');
         if (accessToken) {
             fetchUserInfo(accessToken);
+        } else {
+            hideMakeOrderButtonAndQuantity();
         }
     });
+
+
+    function showMakeOrderButtonAndQuantity() {
+        const makeOrderButtons = document.querySelectorAll('.make-order-button');
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+        const quantityButtons = document.querySelectorAll('.quantity-btn');
+
+        makeOrderButtons.forEach(button => button.style.display = 'block');
+        quantityInputs.forEach(input => input.style.display = 'block');
+        quantityButtons.forEach(button => button.style.display = 'block');
+    }
+
+    function hideMakeOrderButtonAndQuantity() {
+        const makeOrderButtons = document.querySelectorAll('.make-order-button');
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+        const quantityButtons = document.querySelectorAll('.quantity-btn');
+
+        makeOrderButtons.forEach(button => button.style.display = 'none');
+        quantityInputs.forEach(input => input.style.display = 'none');
+        quantityButtons.forEach(button => button.style.display = 'none');
+    }
 
     function fetchUserInfo(accessToken) {
         fetch('/user/me', {
@@ -293,6 +433,7 @@
                 return response.json();
             })
             .then(data => {
+                showMakeOrderButtonAndQuantity(); // Добавляем вызов функции showMakeOrderButtonAndQuantity()
                 document.getElementById('auth-links-logged-out').style.display = 'none';
                 document.getElementById('auth-links-logged-in').style.display = 'block';
                 document.getElementById('customer-name').textContent = data.name;
@@ -305,38 +446,55 @@
             });
     }
 
+    // function checkTokenExpiration() {
+    //     const accessTokenExpiration = sessionStorage.getItem('access_token_expiration');
+    //     const refreshTokenExpiration = sessionStorage.getItem('refresh_token_expiration');
+    //     const currentTime = new Date().getTime() / 1000;
+    //     if (accessTokenExpiration && currentTime > accessTokenExpiration) {
+    //         if (refreshTokenExpiration && currentTime > refreshTokenExpiration) {
+    //             logout();
+    //         } else {
+    //             refreshToken();
+    //         }
+    //     }
+    // }
     function checkTokenExpiration() {
-        const accessTokenExpiration = sessionStorage.getItem('access_token_expiration');
         const refreshTokenExpiration = sessionStorage.getItem('refresh_token_expiration');
-        const currentTime = new Date().getTime() / 1000; // текущее время в секундах
+        const currentTime = new Date().getTime() / 1000;
 
-        if (accessTokenExpiration && currentTime > accessTokenExpiration) {
-            // Access token истек, проверяем refresh token
-            if (refreshTokenExpiration && currentTime > refreshTokenExpiration) {
-                // Refresh token и access token истекли, перенаправляем на страницу входа
-                logout();
-            } else {
-                // Access token истек, но refresh token еще действителен, продолжаем использовать текущий access token
-                console.log('Access token expired, but refresh token is still valid.');
-                fetchUserInfo(sessionStorage.getItem('access_token'));
-            }
+        if (refreshTokenExpiration && currentTime > refreshTokenExpiration) {
+            logout(); // Если refreshToken истек, разлогиниваем пользователя
+        } else {
+            refreshToken(); // Обновляем refreshToken, если он действителен
         }
     }
 
-    function refreshAccessToken() {
+
+    function refreshToken() {
         const refreshToken = sessionStorage.getItem('refresh_token');
         return fetch('/home/refresh', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ refreshToken })
+            body: JSON.stringify({ refreshToken: refreshToken })
         })
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Failed to refresh access token');
                 }
                 return response.json();
+            })
+            .then(data => {
+                const { accessToken, refreshToken } = data;
+                const currentTime = new Date().getTime();
+                const accessTokenExpiration = currentTime + 30000; // 30 секунд
+                const refreshTokenExpiration = currentTime + 60000; // 1 минута
+
+                sessionStorage.setItem('access_token', accessToken);
+                sessionStorage.setItem('access_token_expiration', accessTokenExpiration.toString());
+                sessionStorage.setItem('refresh_token', refreshToken);
+                sessionStorage.setItem('refresh_token_expiration', refreshTokenExpiration.toString());
             });
     }
 
@@ -350,8 +508,34 @@
         window.location.href = '/login';
     }
 
-    // Проверять срок действия токена каждую минуту
-    setInterval(checkTokenExpiration, 70000);
+    function logoutUser() {
+        fetch('/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    // Удаление токенов и других данных о пользователе из localStorage или sessionStorage
+                    sessionStorage.removeItem('access_token');
+                    sessionStorage.removeItem('refresh_token');
+                    sessionStorage.removeItem('customerName');
+                    sessionStorage.removeItem('customerId');
+                    // Перенаправление на главную страницу
+                    window.location.href = '/';
+                } else {
+                    console.error('Failed to logout:', response.statusText);
+
+                }
+            })
+            .catch(error => {
+                console.error('Error during logout:', error);
+            });
+    }
+
+    // Проверять срок действия токена
+    setInterval(checkTokenExpiration, 30000);
 
     const categoriesSection = document.getElementById('categories-section');
     const allCategoriesButton = document.getElementById('all-categories-button');
@@ -401,54 +585,60 @@
         }
     });
 
-    allCategoriesButton.addEventListener('click', function() {
-        if (categoriesSection.classList.contains('active')) {
-            categoriesSection.classList.remove('active');
-        } else {
+    let categoriesShown = false;
+
+    document.getElementById('all-categories-button').addEventListener('mouseenter', function() {
+        if (!categoriesShown) {
             fetch('/home/categories')
                 .then(response => response.json())
                 .then(categories => {
-                    categoriesSection.innerHTML = ''; // Clear the section
+                    const categoriesSection = document.getElementById('categories-section');
+                    categoriesSection.innerHTML = '';
                     categories.forEach(category => {
                         const categoryItem = document.createElement('li');
                         categoryItem.className = 'category-card';
                         categoryItem.innerHTML = `
-                            <h3>${category.name}</h3>
-                            <button onclick="loadProducts(${category.categoryId})">View Products</button>
-                        `;
+                        <h3>${category.name}</h3>
+                        <button class="view-products-button" onclick="loadProducts(${category.categoryId})">View Products</button>
+                    `;
                         categoriesSection.appendChild(categoryItem);
                     });
-                    categoriesSection.classList.add('active'); // Show the categories
+                    categoriesSection.style.display = 'flex';
                 })
                 .catch(error => console.error('Error loading categories:', error));
         }
     });
+
+    document.addEventListener('mouseover', function(event) {
+        const target = event.target;
+        const categoriesSection = document.getElementById('categories-section');
+        if (!target.closest('#all-categories-button') && !target.closest('#categories-section')) {
+            if (!categoriesSection.dataset.productsShown) {
+
+                categoriesSection.style.display = 'none';
+                categoriesShown = false;
+            }
+        }
+    });
+
     function loadProducts(categoryId) {
         fetch(`/home/${categoryId}/products`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(products => {
-                console.log('Products loaded:', products); // Log loaded products
                 const productsSection = document.getElementById('products-section');
                 productsSection.innerHTML = '';
-
                 if (products.length === 0) {
                     productsSection.innerHTML = '<p>No products available in this category.</p>';
                     return;
                 }
-
                 products.forEach(product => {
                     const productCard = document.createElement('div');
                     productCard.className = 'product-card';
                     productCard.innerHTML = `
-                    <img src="${product.imageUrl || 'default-image-url.jpg'}" alt="Product Image">
-                    <h3>${product.name || 'Unnamed'}</h3>
-                    <p>${product.description || 'No description available.'}</p>
-                    <p class="price">Price: ${product.price !== undefined ? product.price : 'N/A'}</p>
+                    <img src="${product.imageUrl}" alt="Product Image">
+                    <h3>${product.name}</h3>
+                    <p>${product.description}</p>
+                    <p class="price">Price: ${product.price}</p>
                     <div class="quantity">
                         <button class="quantity-btn" onclick="decrementQuantity(this)">-</button>
                         <input type="number" class="quantity-input" value="1" min="1">
@@ -458,6 +648,9 @@
                 `;
                     productsSection.appendChild(productCard);
                 });
+                const categoriesSection = document.getElementById('categories-section');
+                categoriesSection.dataset.productsShown = true; // Устанавливаем флаг, что категории были видны после просмотра продуктов
+                categoriesShown = true; // Теперь категории видны
             })
             .catch(error => {
                 console.error('Error loading products:', error);

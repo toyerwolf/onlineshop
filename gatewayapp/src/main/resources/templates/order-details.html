@@ -53,8 +53,8 @@
     <div id="order-info">
     </div>
     <div class="order-details">
-        <p><strong>Order ID:</strong> <span id="order-id"></span></p>
-        <p><strong>Customer ID:</strong> <span id="customer-id"></span></p>
+        <p style="display: none;"><strong>Order ID:</strong> <span id="order-id"></span></p>
+        <p style="display: none;"><strong>Customer ID:</strong> <span id="customer-id"></span></p>
         <button id="pay-button">Pay with PayPal</button>
     </div>
 </div>
@@ -81,20 +81,22 @@
             .then(data => {
                 const orderInfo = document.getElementById('order-info');
                 let productsHTML = '<p><strong>Products:</strong></p>';
-                data.products.forEach(product => {
+                data.forEach(product => {
                     productsHTML += `
-                        <p><strong>Product ID:</strong> ${product.productId}</p>
-                        <p><strong>Product Name:</strong> ${product.productName}</p>
-                        <p><strong>Quantity:</strong> ${product.quantity}</p>
-                        <p><strong>Price:</strong> $${product.price.toFixed(2)}</p>
-                        <p><strong>Discount Price:</strong> ${product.discountPrice ? '$' + product.discountPrice.toFixed(2) : 'N/A'}</p>
-                        <hr>
-                    `;
+                <p><strong>Product ID:</strong> ${product.productId}</p>
+                <p><strong>Product Name:</strong> ${product.productName}</p>
+                <p><strong>Quantity:</strong> ${product.quantity}</p>
+                <p><strong>Price:</strong> ${product.price}</p>
+                <p><strong>Discount Price:</strong> ${product.discountPrice ? product.discountPrice : 'N/A'}</p>
+                <hr>
+            `;
                 });
                 orderInfo.innerHTML = productsHTML;
             })
             .catch(error => {
                 console.error('Error fetching order details:', error);
+                const orderInfo = document.getElementById('order-info');
+                orderInfo.innerHTML = '<p>Error fetching order details. Please try again later.</p>';
             });
     }
 
@@ -121,8 +123,8 @@
             })
             .then(message => {
                 alert(message);
-                // Можно выполнить дополнительные действия после успешной оплаты, например, перенаправление
-                // window.location.href = '/payment-success'; // Пример перенаправления
+
+                window.location.href = '/payment-success';
             })
             .catch(error => {
                 console.error('Error processing payment:', error);

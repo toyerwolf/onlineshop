@@ -218,6 +218,20 @@
             background-color: #4CAF50;
             color: white;
         }
+
+        .logout-button {
+            background-color: #ff4444; /* Красный цвет */
+            color: white; /* Белый текст */
+            border: none; /* Убираем границу */
+            border-radius: 5px; /* Закругляем края */
+            padding: 10px 20px; /* Отступы внутри кнопки */
+            cursor: pointer; /* При наведении курсора меняем его на указатель */
+            transition: background-color 0.3s; /* Плавное изменение цвета при наведении */
+        }
+
+        .logout-button:hover {
+            background-color: #cc0000; /* Более темный красный при наведении */
+        }
     </style>
 </head>
 <body>
@@ -229,6 +243,7 @@
         </div>
         <div id="auth-links-logged-in" style="display:none;">
             <span>Welcome, <span id="customer-name">User</span>!</span>
+            <button class="logout-button" onclick="logoutUser()">Logout</button>
         </div>
     </div>
 
@@ -269,15 +284,45 @@
 
 
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        checkTokenExpiration();
 
+
+<script>
+
+
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Проверяем токен доступа при загрузке страницы
         const accessToken = sessionStorage.getItem('access_token');
         if (accessToken) {
+            // Если токен доступа есть, получаем информацию о пользователе
             fetchUserInfo(accessToken);
+        } else {
+            // Если токен доступа отсутствует, скрываем кнопки "Make Order" и элементы управления количеством
+            hideMakeOrderButtonAndQuantity();
         }
     });
+
+
+    function showMakeOrderButtonAndQuantity() {
+        const makeOrderButtons = document.querySelectorAll('.make-order-button');
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+        const quantityButtons = document.querySelectorAll('.quantity-btn');
+
+        makeOrderButtons.forEach(button => button.style.display = 'block');
+        quantityInputs.forEach(input => input.style.display = 'block');
+        quantityButtons.forEach(button => button.style.display = 'block');
+    }
+
+    function hideMakeOrderButtonAndQuantity() {
+        const makeOrderButtons = document.querySelectorAll('.make-order-button');
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+        const quantityButtons = document.querySelectorAll('.quantity-btn');
+
+        makeOrderButtons.forEach(button => button.style.display = 'none');
+        quantityInputs.forEach(input => input.style.display = 'none');
+        quantityButtons.forEach(button => button.style.display = 'none');
+    }
 
     function fetchUserInfo(accessToken) {
         fetch('/user/me', {
@@ -293,6 +338,7 @@
                 return response.json();
             })
             .then(data => {
+                showMakeOrderButtonAndQuantity(); // Добавляем вызов функции showMakeOrderButtonAndQuantity()
                 document.getElementById('auth-links-logged-out').style.display = 'none';
                 document.getElementById('auth-links-logged-in').style.display = 'block';
                 document.getElementById('customer-name').textContent = data.name;
@@ -348,6 +394,35 @@
 
         // Перенаправить пользователя на страницу входа или выполнить другие действия
         window.location.href = '/login';
+    }
+
+    function logoutUser() {
+        fetch('/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    // Удаление токенов и других данных о пользователе из localStorage или sessionStorage
+                    sessionStorage.removeItem('access_token');
+                    sessionStorage.removeItem('refresh_token');
+                    sessionStorage.removeItem('customerName');
+                    sessionStorage.removeItem('customerId');
+                    // Перенаправление на главную страницу
+                    window.location.href = '/';
+                } else {
+                    console.error('Failed to logout:', response.statusText);
+                    // Обработка ошибки выхода
+                    // Здесь вы можете отобразить пользователю сообщение об ошибке или выполнить другие действия
+                }
+            })
+            .catch(error => {
+                console.error('Error during logout:', error);
+                // Обработка ошибки выхода
+                // Здесь вы можете отобразить пользователю сообщение об ошибке или выполнить другие действия
+            });
     }
 
     // Проверять срок действия токена каждую минуту

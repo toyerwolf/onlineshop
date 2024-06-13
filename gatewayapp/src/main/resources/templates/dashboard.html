@@ -1,12 +1,529 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Dashboard</title>
-    <script th:src="@{/webjars/chart.js/3.9.1/dist/chart.min.js}"></script>
-    <script th:src="@{/webjars/react-chartjs-2/5.0.1/dist/react-chartjs-2.min.js}"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Shopping</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .auth-links {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .auth-links a {
+            color: #4CAF50;
+            text-decoration: none;
+            margin-left: 10px;
+        }
+        .auth-links a:hover {
+            text-decoration: underline;
+        }
+        .search-bar {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .search-bar input[type="text"] {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 200px;
+        }
+        .search-bar button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .category-list {
+            display: none;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-wrap: nowrap; /* Не переносить на новую строку */
+            justify-content: center;
+        }
+        .category-list.active {
+            display: flex;
+        }
+        .category-wrapper {
+            display: flex;
+            flex-wrap: nowrap; /* Не переносить на новую строку */
+            justify-content: center;
+        }
+        .category-card {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            width: 250px;
+            margin: 15px;
+        }
+        .category-card h3 {
+            margin-top: 10px;
+            margin-bottom: 5px;
+            font-size: 20px;
+        }
+        .category-card p {
+            margin-bottom: 10px;
+            color: #666;
+            font-size: 16px;
+        }
+        .category-card button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+        .category-card button:hover {
+            background-color: #45a049;
+        }
+        .product-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .product-card {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            width: 250px;
+            margin: 15px;
+        }
+        .product-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        .product-card h3 {
+            margin-top: 10px;
+            margin-bottom: 5px;
+            font-size: 18px;
+        }
+        .product-card p {
+            margin-bottom: 10px;
+            color: #666;
+            font-size: 16px;
+        }
+        .product-card .price {
+            font-weight: bold;
+            color: #4CAF50;
+            font-size: 18px;
+        }
+        .product-card .quantity {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .product-card .quantity button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+        }
+        .product-card .quantity input {
+            width: 50px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin: 0 10px;
+            padding: 5px;
+        }
+        .product-card .quantity input:focus {
+            outline: none;
+        }
+        .product-card .quantity button:hover {
+            background-color: #45a049;
+        }
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .pagination a {
+            color: #4CAF50;
+            text-decoration: none;
+            padding: 5px 10px;
+            margin: 0 5px;
+            border: 1px solid #4CAF50;
+            border-radius: 3px;
+        }
+        .pagination a:hover {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .logout-button {
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .logout-button:hover {
+            background-color: #cc0000;
+        }
+    </style>
 </head>
 <body>
-<h1>Dashboard</h1>
-<div th:replace="${dashboardGraph}"></div>
+<div class="container">
+    <div class="auth-links">
+        <div id="auth-links-logged-out">
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+        </div>
+        <div id="auth-links-logged-in" style="display:none;">
+            <span>Welcome, <span id="customer-name">User</span>!</span>
+            <button class="logout-button" onclick="logoutUser()">Logout</button>
+        </div>
+    </div>
+    <h1>Welcome to our Online Shopping Platform!</h1>
+    <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Search...">
+        <button id="search-button">Search</button>
+    </div>
+    <button id="all-categories-button">All Categories</button>
+    <ul id="categories-section" class="category-list horizontal"></ul>
+    <div id="products-section" class="product-list">
+        <h2>Featured Products</h2>
+        <div class="product-card" th:each="product : ${products.content}">
+            <img th:src="${product.imageUrl}" alt="Product Image">
+            <h3 th:text="${product.name}"></h3>
+            <p th:text="${product.description}"></p>
+            <p class="price">Price: <span th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 2, 'POINT')}"></span></p>
+            <div class="quantity">
+                <button class="quantity-btn" onclick="decrementQuantity(this)">-</button>
+                <input type="number" class="quantity-input" value="1" min="1">
+                <button class="quantity-btn" onclick="incrementQuantity(this)">+</button>
+            </div>
+            <button class="make-order-button" onclick="makeOrder([[${product.id}]])">Make Order</button>
+        </div>
+        <div class="pagination">
+            <a th:if="${products.hasPrevious()}" th:href="@{/ (page=${products.number})}">Previous</a>
+            <span th:each="i : ${#numbers.sequence(1, products.totalPages)}" th:if="${i >= products.number - 2 && i <= products.number + 2}">
+                <a th:href="@{/ (page=${i})}" th:text="${i}" th:classappend="${i == products.number + 1} ? 'active' : ''"></a>
+            </span>
+            <a th:if="${products.hasNext()}" th:href="@{/ (page=${products.number + 2})}">Next</a>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        checkTokenExpiration();
+        const accessToken = sessionStorage.getItem('access_token');
+        if (accessToken) {
+            fetchUserInfo(accessToken);
+        } else {
+            hideMakeOrderButtonAndQuantity();
+        }
+    });
+
+    function showMakeOrderButtonAndQuantity() {
+        const makeOrderButtons = document.querySelectorAll('.make-order-button');
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+        const quantityButtons = document.querySelectorAll('.quantity-btn');
+        makeOrderButtons.forEach(button => button.style.display = 'block');
+        quantityInputs.forEach(input => input.style.display = 'block');
+        quantityButtons.forEach(button => button.style.display = 'block');
+    }
+
+    function hideMakeOrderButtonAndQuantity() {
+        const makeOrderButtons = document.querySelectorAll('.make-order-button');
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+        const quantityButtons = document.querySelectorAll('.quantity-btn');
+        makeOrderButtons.forEach(button => button.style.display = 'none');
+        quantityInputs.forEach(input => input.style.display = 'none');
+        quantityButtons.forEach(button => button.style.display = 'none');
+    }
+
+    function fetchUserInfo(accessToken) {
+        fetch('/user/me', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + accessToken
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch user info');
+                }
+                return response.json();
+            })
+            .then(data => {
+                showMakeOrderButtonAndQuantity();
+                document.getElementById('auth-links-logged-out').style.display = 'none';
+                document.getElementById('auth-links-logged-in').style.display = 'block';
+                document.getElementById('customer-name').textContent = data.name;
+                sessionStorage.setItem('customerId', data.id);
+                sessionStorage.setItem('customerName', data.name);
+            })
+            .catch(error => {
+                console.error('Error fetching user info:', error);
+                logout();
+            });
+    }
+
+
+    searchButton.addEventListener('click', function() {
+        const keyword = searchInput.value.trim();
+        if (keyword !== '') {
+            fetch(`/home/search?keyword=${encodeURIComponent(keyword)}`)
+                .then(response => response.json())
+                .then(products => {
+                    console.log('Search results:', products); // Log search results
+                    const productsSection = document.getElementById('products-section');
+                    productsSection.innerHTML = '';
+
+                    if (products.length === 0) {
+                        productsSection.innerHTML = '<p>No products found.</p>';
+                        return;
+                    }
+
+                    products.forEach(product => {
+                        const productCard = document.createElement('div');
+                        productCard.className = 'product-card';
+                        productCard.innerHTML = `
+                            <img src="${product.imageUrl || 'default-image-url.jpg'}" alt="Product Image">
+                            <h3>${product.name || 'Unnamed'}</h3>
+                            <p>${product.description || 'No description available.'}</p>
+                            <p class="price">Price: ${product.price !== undefined ? product.price : 'N/A'}</p>
+                            <div class="quantity">
+                                <button class="quantity-btn" onclick="decrementQuantity(this)">-</button>
+                                <input type="number" class="quantity-input" value="1" min="1">
+                                <button class="quantity-btn" onclick="incrementQuantity(this)">+</button>
+                            </div>
+                            <button onclick="makeOrder(${product.id})">Make Order</button>
+                        `;
+                        productsSection.appendChild(productCard);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error searching products:', error);
+                    const productsSection = document.getElementById('products-section');
+                    productsSection.innerHTML = '<p>Error searching products. Please try again later.</p>';
+                });
+        }
+    });
+
+    function checkTokenExpiration() {
+        const accessTokenExpiration = sessionStorage.getItem('access_token_expiration');
+        const refreshTokenExpiration = sessionStorage.getItem('refresh_token_expiration');
+        const currentTime = new Date().getTime() / 1000;
+        if (accessTokenExpiration && currentTime > accessTokenExpiration) {
+            if (refreshTokenExpiration && currentTime > refreshTokenExpiration) {
+                logout();
+            } else {
+                refreshToken();
+            }
+        }
+    }
+
+    function refreshToken() {
+        const refreshToken = sessionStorage.getItem('refresh_token');
+        return fetch('/home/refresh', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ refreshToken: refreshToken })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to refresh access token');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const { accessToken, refreshToken } = data;
+                const currentTime = new Date().getTime();
+                sessionStorage.setItem('access_token', accessToken);
+                sessionStorage.setItem('access_token_expiration', (currentTime + 60000).toString());
+                sessionStorage.setItem('refresh_token', refreshToken);
+                sessionStorage.setItem('refresh_token_expiration', (currentTime + 100000).toString());
+            });
+    }
+
+    function logout() {
+        sessionStorage.removeItem('access_token');
+        sessionStorage.removeItem('refresh_token');
+        sessionStorage.removeItem('access_token_expiration');
+        sessionStorage.removeItem('customerId');
+        sessionStorage.removeItem('customerName');
+        window.location.href = '/login';
+    }
+
+    let categoriesShown = false;
+
+    document.getElementById('all-categories-button').addEventListener('mouseenter', function() {
+        if (!categoriesShown) {
+            fetch('/home/categories')
+                .then(response => response.json())
+                .then(categories => {
+                    const categoriesSection = document.getElementById('categories-section');
+                    categoriesSection.innerHTML = '';
+                    categories.forEach(category => {
+                        const categoryItem = document.createElement('li');
+                        categoryItem.className = 'category-card';
+                        categoryItem.innerHTML = `
+                        <h3>${category.name}</h3>
+                        <button class="view-products-button" onclick="loadProducts(${category.categoryId})">View Products</button>
+                    `;
+                        categoriesSection.appendChild(categoryItem);
+                    });
+                    categoriesSection.style.display = 'flex';
+                })
+                .catch(error => console.error('Error loading categories:', error));
+        }
+    });
+
+    document.addEventListener('mouseover', function(event) {
+        const target = event.target;
+        const categoriesSection = document.getElementById('categories-section');
+        if (!target.closest('#all-categories-button') && !target.closest('#categories-section')) {
+            if (!categoriesSection.dataset.productsShown) {
+                // Проверяем, что категории не были видны после просмотра продуктов
+                categoriesSection.style.display = 'none';
+                categoriesShown = false;
+            }
+        }
+    });
+
+    function loadProducts(categoryId) {
+        fetch(`/home/${categoryId}/products`)
+            .then(response => response.json())
+            .then(products => {
+                const productsSection = document.getElementById('products-section');
+                productsSection.innerHTML = '';
+                if (products.length === 0) {
+                    productsSection.innerHTML = '<p>No products available in this category.</p>';
+                    return;
+                }
+                products.forEach(product => {
+                    const productCard = document.createElement('div');
+                    productCard.className = 'product-card';
+                    productCard.innerHTML = `
+                    <img src="${product.imageUrl}" alt="Product Image">
+                    <h3>${product.name}</h3>
+                    <p>${product.description}</p>
+                    <p class="price">Price: ${product.price}</p>
+                    <div class="quantity">
+                        <button class="quantity-btn" onclick="decrementQuantity(this)">-</button>
+                        <input type="number" class="quantity-input" value="1" min="1">
+                        <button class="quantity-btn" onclick="incrementQuantity(this)">+</button>
+                    </div>
+                    <button onclick="makeOrder(${product.id})">Make Order</button>
+                `;
+                    productsSection.appendChild(productCard);
+                });
+                const categoriesSection = document.getElementById('categories-section');
+                categoriesSection.dataset.productsShown = true; // Устанавливаем флаг, что категории были видны после просмотра продуктов
+                categoriesShown = true; // Теперь категории видны
+            })
+            .catch(error => {
+                console.error('Error loading products:', error);
+                const productsSection = document.getElementById('products-section');
+                productsSection.innerHTML = '<p>Error loading products. Please try again later.</p>';
+            });
+    }
+
+    function makeOrder(productId) {
+        let accessToken = sessionStorage.getItem('access_token');
+        if (!accessToken) {
+            console.log('Access token is missing.');
+            return;
+        }
+        const quantityInput = document.querySelector('.quantity-input');
+        const quantity = parseInt(quantityInput.value);
+        if (isNaN(quantity) || quantity < 1) {
+            alert('Invalid quantity.');
+            return;
+        }
+        const orderRequest = {
+            productQuantities: {}
+        };
+        orderRequest.productQuantities[productId] = quantity;
+        fetch('/home/makeOrder', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + accessToken
+            },
+            body: JSON.stringify(orderRequest)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        return refreshToken().then(() => makeOrder(productId));
+                    }
+                    throw new Error('Failed to make order');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Order placed successfully:', data);
+                sessionStorage.setItem('orderId', data.orderId);
+                window.location.href = 'order-details';
+            })
+            .catch(error => {
+                console.error('Error making order:', error);
+                alert('Error making order. Please try again later.');
+            });
+    }
+
+    function incrementQuantity(element) {
+        const productCard = element.closest('.product-card');
+        const quantityInput = productCard.querySelector('.quantity-input');
+        let value = parseInt(quantityInput.value);
+        if (!isNaN(value)) {
+            quantityInput.value = value + 1;
+        }
+    }
+
+    function decrementQuantity(element) {
+        const productCard = element.closest('.product-card');
+        const quantityInput = productCard.querySelector('.quantity-input');
+        let value = parseInt(quantityInput.value);
+        if (!isNaN(value) && value > 1) {
+            quantityInput.value = value - 1;
+        }
+    }
+
+    function displayErrorMessage(errorMessage) {
+        const errorElement = document.createElement('div');
+        errorElement.textContent = errorMessage;
+        document.body.appendChild(errorElement);
+    }
+</script>
 </body>
 </html>

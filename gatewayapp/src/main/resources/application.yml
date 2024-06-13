@@ -24,8 +24,8 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: debug
 
 jwtSecret: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9123saddsaA2sdGgfsa
-jwtExpirationInMs: 360000
-refreshTokenExpiration: 3600000
+jwtExpirationInMs: 36000
+refreshTokenExpiration: 60000
 allowed-file-extension: jpg,jpeg,gif,ico,png
 
 
@@ -47,5 +47,12 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+weatherperson:
+  apiKey: 90a85ee6b6971e314b8bb9c2f34e0571
 
-
+feign:
+  compression:
+    request:
+      enabled: true
+    response:
+      enabled: true
