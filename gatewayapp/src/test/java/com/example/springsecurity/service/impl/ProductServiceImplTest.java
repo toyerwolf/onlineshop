@@ -535,10 +535,11 @@ class ProductServiceImplTest {
     public void testGetProductSalesStatistics() {
         // Arrange
         List<Object[]> mockResults = new ArrayList<>();
-        mockResults.add(new Object[]{Timestamp.valueOf(LocalDateTime.of(2023, 1, 1, 0, 0)), 10});
-        mockResults.add(new Object[]{Timestamp.valueOf(LocalDateTime.of(2023, 2, 1, 0, 0)), 20});
+        mockResults.add(new Object[]{BigDecimal.valueOf(2023), BigDecimal.valueOf(10)});
+        mockResults.add(new Object[]{BigDecimal.valueOf(2024), BigDecimal.valueOf(20)});
 
         when(productRepository.getProductSalesStatistics()).thenReturn(mockResults);
+
         // Act
         YearlySalesResponseDto salesResponseDto = productService.getProductSalesStatistics();
 
@@ -549,37 +550,35 @@ class ProductServiceImplTest {
         assertEquals(2023, yearlySales.get(0).getYear());
         assertEquals(10, yearlySales.get(0).getTotalSold());
 
-        assertEquals(2023, yearlySales.get(1).getYear());
+        assertEquals(2024, yearlySales.get(1).getYear());
         assertEquals(20, yearlySales.get(1).getTotalSold());
     }
 
 
 
     @Test
-    void testGetTotalProductSalesRevenueByYear() {
+    public void testGetTotalProductSalesRevenueByYear() {
         // Arrange
-        List<Object[]> data = new ArrayList<>();
-        data.add(new Object[]{Timestamp.valueOf("2020-01-01 00:00:00"), new BigDecimal("1500.75")});
-        data.add(new Object[]{Timestamp.valueOf("2021-01-01 00:00:00"), new BigDecimal("2000.50")});
+        List<Object[]> mockResults = new ArrayList<>();
+        mockResults.add(new Object[]{BigDecimal.valueOf(2023), BigDecimal.valueOf(10000)});
+        mockResults.add(new Object[]{BigDecimal.valueOf(2024), BigDecimal.valueOf(20000)});
 
-        when(productRepository.getSoldProductSalesStatistics()).thenReturn(data);
+        when(productRepository.getSoldProductSalesStatistics()).thenReturn(mockResults);
 
         // Act
-        YearlySalesRevenueResponseDTO responseDTO = productService.getTotalProductSalesRevenueByYear();
+        YearlySalesRevenueResponseDTO salesResponseDto = productService.getTotalProductSalesRevenueByYear();
 
         // Assert
-        assertNotNull(responseDTO);
-        List<YearlySalesRevenueDTO> salesByYear = responseDTO.getYearlySales();
-        assertNotNull(salesByYear);
-        assertEquals(2, salesByYear.size());
+        List<YearlySalesRevenueDTO> yearlySales = salesResponseDto.getYearlySales();
+        assertEquals(2, yearlySales.size());
 
-        // Check each YearlySalesRevenueDTO
-        assertEquals(2020, salesByYear.get(0).getYear());
-        assertEquals(new BigDecimal("1500.75"), salesByYear.get(0).getTotalRevenue());
+        assertEquals(2023, yearlySales.get(0).getYear());
+        assertEquals(BigDecimal.valueOf(10000), yearlySales.get(0).getTotalRevenue());
 
-        assertEquals(2021, salesByYear.get(1).getYear());
-        assertEquals(new BigDecimal("2000.50"), salesByYear.get(1).getTotalRevenue());
+        assertEquals(2024, yearlySales.get(1).getYear());
+        assertEquals(BigDecimal.valueOf(20000), yearlySales.get(1).getTotalRevenue());
     }
+
 
     @Test
     void testApplyNewYearDiscount() {

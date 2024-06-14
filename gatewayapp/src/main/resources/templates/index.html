@@ -461,7 +461,7 @@
     //     }
     // }
     function checkTokenExpiration() {
-        const refreshTokenExpiration = localStorage.getItem('refresh_token_expiration');
+        const refreshTokenExpiration = sessionStorage.getItem('refresh_token_expiration');
         const currentTime = new Date().getTime() / 1000;
 
         if (refreshTokenExpiration && currentTime > refreshTokenExpiration) {
@@ -717,9 +717,7 @@
                     window.location.href = 'order-details';
                 })
                 .catch(error => {
-                    console.error('Error making order:', error);
-                    alert('Error making order. Please try again later.');
-                    displayErrorMessage(error.message);
+                    window.location.href="/login"
                 });
         }
 

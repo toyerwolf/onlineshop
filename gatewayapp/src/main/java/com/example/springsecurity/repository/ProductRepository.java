@@ -30,17 +30,17 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
             "GROUP BY p.name, op.product_id", nativeQuery = true)
     List<Object[]> countSoldProductsByYear(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
-    @Query(value = "SELECT o.created_at AS sales_year, SUM(op.quantity) AS totalSold " +
+    @Query(value = "SELECT EXTRACT(YEAR FROM o.created_at) AS sales_year, SUM(op.quantity) AS totalSold " +
             "FROM order_test o " +
             "JOIN order_product op ON o.id = op.order_id " +
             "WHERE o.status = 'PAID' " +
-            "GROUP BY o.created_at", nativeQuery = true)
+            "GROUP BY EXTRACT(YEAR FROM o.created_at)", nativeQuery = true)
     List<Object[]> getProductSalesStatistics();
 
 
 
     @Query(value = "SELECT " +
-            "   o.created_at AS saleYear, " +
+            "   EXTRACT(YEAR FROM o.created_at) AS saleYear, " +
             "   SUM(opq.quantity * COALESCE(p.discount_price, p.price)) AS totalRevenue " +
             "FROM " +
             "   order_test o " +
@@ -49,9 +49,9 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
             "JOIN " +
             "   product_test p ON opq.product_id = p.id " +
             "WHERE " +
-            "   o.status = 'PAID' " + // условие на статус заказа
+            "   o.status = 'PAID' " +
             "GROUP BY " +
-            "   o.created_at " +
+            "   EXTRACT(YEAR FROM o.created_at) " +
             "ORDER BY " +
             "   saleYear ASC",
             nativeQuery = true)

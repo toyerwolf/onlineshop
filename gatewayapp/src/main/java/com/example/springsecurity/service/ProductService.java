@@ -36,7 +36,7 @@ public interface ProductService {
 
     YearlySalesResponseDto getProductSalesStatistics();
 
-    YearlySalesRevenueResponseDTO getTotalProductSalesRevenueByYear();
+    public YearlySalesRevenueResponseDTO getTotalProductSalesRevenueByYear();
 
     void applyNewYearDiscount();
 

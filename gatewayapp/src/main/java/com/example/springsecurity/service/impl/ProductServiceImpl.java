@@ -217,18 +217,21 @@ public ProductSalesResponseDto countSoldProductsByYear(int year) {
     }
     return new ProductSalesResponseDto(productSoldCounts);
 }
+
+
     @Override
     public YearlySalesResponseDto getProductSalesStatistics() {
         List<Object[]> results = productRepository.getProductSalesStatistics();
         List<YearlyProductSalesDTO> yearlySales = new ArrayList<>();
+
         for (Object[] row : results) {
-            Timestamp timestamp = (Timestamp) row[0];
-            LocalDateTime year = timestamp.toLocalDateTime();
-            int yearValue = year.getYear();
-            int totalSold = ((Number) row[1]).intValue();
+            Integer yearValue = ((Number) row[0]).intValue(); // Преобразуем год в Integer
+            Integer totalSold = ((Number) row[1]).intValue(); // Преобразуем общее количество продаж в Integer
+
             YearlyProductSalesDTO yearlyProductSalesDTO = new YearlyProductSalesDTO(yearValue, totalSold);
             yearlySales.add(yearlyProductSalesDTO);
         }
+
         return new YearlySalesResponseDto(yearlySales);
     }
 
@@ -238,19 +241,19 @@ public ProductSalesResponseDto countSoldProductsByYear(int year) {
     public YearlySalesRevenueResponseDTO getTotalProductSalesRevenueByYear() {
         List<Object[]> results = productRepository.getSoldProductSalesStatistics();
         List<YearlySalesRevenueDTO> salesByYear = new ArrayList<>();
+
         for (Object[] row : results) {
-            Timestamp timestamp = (Timestamp) row[0];
-            LocalDateTime saleYear = timestamp.toLocalDateTime();
-            int yearValue = saleYear.getYear();
-            BigDecimal totalRevenue = (BigDecimal) row[1]; // Предположим, что это тип BigDecimal
+            Integer yearValue = ((Number) row[0]).intValue(); // Преобразуем год в Integer
+            BigDecimal totalRevenue = (BigDecimal) row[1]; // Оставляем totalRevenue как BigDecimal
+
             YearlySalesRevenueDTO yearlySalesRevenueDTO = new YearlySalesRevenueDTO(yearValue, totalRevenue);
             salesByYear.add(yearlySalesRevenueDTO);
         }
+
         YearlySalesRevenueResponseDTO responseDTO = new YearlySalesRevenueResponseDTO();
         responseDTO.setYearlySales(salesByYear);
         return responseDTO;
     }
-
 
 
     @Override
