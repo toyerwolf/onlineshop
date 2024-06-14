@@ -25,7 +25,9 @@
 
         .auth-links {
             text-align: right;
-            margin-bottom: 20px;
+            position: absolute;
+            top: 20px;
+            right: 20px;
         }
 
         .auth-links a {
@@ -219,18 +221,19 @@
             color: white;
         }
 
-        .logout-button {
-            background-color: #ff4444; /* Красный цвет */
-            color: white; /* Белый текст */
-            border: none; /* Убираем границу */
-            border-radius: 5px; /* Закругляем края */
-            padding: 10px 20px; /* Отступы внутри кнопки */
-            cursor: pointer; /* При наведении курсора меняем его на указатель */
-            transition: background-color 0.3s; /* Плавное изменение цвета при наведении */
+        .logout-button, #my-orders-button {
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-left: 10px;
         }
 
-        .logout-button:hover {
-            background-color: #cc0000; /* Более темный красный при наведении */
+        .logout-button:hover, #my-orders-button:hover {
+            background-color: #cc0000;
         }
 
         .weather-container {
@@ -282,6 +285,14 @@
             background-color: #0056b3; /* Темный оттенок для активного состояния */
         }
 
+        header-image {
+            width: 100%;
+            height: 300px; /* Высота изображения */
+            object-fit: cover; /* Масштабирование и обрезка изображения */
+            display: block;
+            margin: 0 auto 30px auto; /* Центрирование изображения и отступ снизу */
+        }
+
 
     </style>
 </head>
@@ -294,7 +305,6 @@
     <img class="weather-icon" id="weather-icon" src="" alt="Weather Icon">
     <div class="weather-description" id="weather-description">Loading...</div>
 </div>
-
 
 <div class="container">
     <div class="auth-links">
@@ -309,7 +319,10 @@
         </div>
     </div>
 
-    <h1>Welcome to our Online Shopping Platform!</h1>
+    <!-- Приветственное изображение -->
+    <div style="text-align: center; margin-bottom: 30px;">
+        <img src="/static/welcome.jpg" alt="Welcome Image" class="header-image" style="width: 80%; max-width: 1000px;">
+    </div>
 
     <div class="search-bar">
         <input type="text" id="search-input" placeholder="Search...">
@@ -342,8 +355,6 @@
             <a th:if="${products.hasNext()}" th:href="@{/ (page=${products.number + 2})}">Next</a>
         </div>
     </div>
-
-
 </div>
 
 
@@ -694,30 +705,41 @@
             })
                 .then(response => {
                     if (response.status === 401) {
-                        // If 401 Unauthorized, try to refresh token
+                        // Если получили 401 Unauthorized, пытаемся обновить токен
                         return refreshAccessToken().then(({ newAccessToken, newRefreshToken }) => {
                             accessToken = newAccessToken;
                             sessionStorage.setItem('access_token', newAccessToken);
                             sessionStorage.setItem('refresh_token', newRefreshToken);
-                            return fetchOrder();
+                            return fetchOrder(); // Повторяем запрос с новым токеном
                         });
                     }
-
                     if (!response.ok) {
-                        throw new Error('Network response was not ok ' + response.statusText);
+                        return response.json().then(error => {
+                            throw new Error(error.message);
+                        });
                     }
                     return response.json();
                 })
                 .then(data => {
-                    console.log('Order placed successfully:',data);
+                    console.log('Order placed successfully:', data);
                     sessionStorage.setItem('orderId', data.orderId); // Сохраняем идентификатор заказа
 
                     // После размещения заказа перенаправляем пользователя на страницу с подробностями заказа
-
                     window.location.href = 'order-details';
                 })
                 .catch(error => {
-                    window.location.href="/login"
+                    if (error.message.includes('Insufficient quantity')) {
+                        alert('Insufficient quantity for the selected product.');
+                    } else if (error.message === 'Insufficient balance') {
+                        alert('Insufficient balance. Please add funds to your account.');
+                    } else if (error.message === 'Unauthorized') { // Исправлено здесь
+                        // Если ошибка связана с Unauthorized, перенаправляем на страницу входа
+                        window.location.href = '/login';
+                    } else {
+                        alert('Error: ' + error.message);
+                        window.location.href = '/login';// Выводим сообщение об ошибке пользователю
+                    }
+                    console.error('Error making order:', error);
                 });
         }
 
@@ -725,16 +747,7 @@
     }
 
 
-    function displayOrderInfo(orderData) {
-        const orderInfo = `
-        Order ID: ${orderData.orderId}
-        Total Amount: ${orderData.totalAmount}
-        Created At: ${orderData.createdAt}
-        Status: ${orderData.status}
-        Is Paid: ${orderData.isPaid}
-    `;
-        alert('Order placed successfully!\n' + orderInfo);
-    }
+
 
     function incrementQuantity(element) {
         const productCard = element.closest('.product-card');
