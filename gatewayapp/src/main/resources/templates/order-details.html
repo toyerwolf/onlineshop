@@ -61,8 +61,8 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const orderId = sessionStorage.getItem('orderId');
-        const customerId = sessionStorage.getItem('customerId');
+        const orderId = localStorage.getItem('orderId');
+        const customerId = localStorage.getItem('customerId');
         fetchOrderInfo(orderId);
         displayOrderDetails(orderId, customerId); // Вызываем функцию displayOrderDetails с orderId и customerId
 
@@ -80,16 +80,17 @@
             })
             .then(data => {
                 const orderInfo = document.getElementById('order-info');
-                let productsHTML = '<p><strong>Products:</strong></p>';
+                let productsHTML = `<p><strong>Order ID:</strong> ${orderId}</p>`;  // Добавляем Order ID
+                productsHTML += '<p><strong>Products:</strong></p>';
                 data.forEach(product => {
                     productsHTML += `
-                <p><strong>Product ID:</strong> ${product.productId}</p>
-                <p><strong>Product Name:</strong> ${product.productName}</p>
-                <p><strong>Quantity:</strong> ${product.quantity}</p>
-                <p><strong>Price:</strong> ${product.price}</p>
-                <p><strong>Discount Price:</strong> ${product.discountPrice ? product.discountPrice : 'N/A'}</p>
-                <hr>
-            `;
+
+                    <p><strong>Product Name:</strong> ${product.productName}</p>
+                    <p><strong>Quantity:</strong> ${product.quantity}</p>
+                    <p><strong>Price:</strong> ${product.price}</p>
+                    <p><strong>Discount Price:</strong> ${product.discountPrice ? product.discountPrice : 'N/A'}</p>
+                    <hr>
+                `;
                 });
                 orderInfo.innerHTML = productsHTML;
             })
@@ -100,14 +101,15 @@
             });
     }
 
+
     function displayOrderDetails(orderId, customerId) {
         document.getElementById('order-id').textContent = orderId;
         document.getElementById('customer-id').textContent = customerId;
     }
 
     function payWithPayPal() {
-        const orderId = sessionStorage.getItem('orderId');
-        const customerId = sessionStorage.getItem('customerId');
+        const orderId = localStorage.getItem('orderId');
+        const customerId = localStorage.getItem('customerId');
 
         fetch(`/paypal/${customerId}/${orderId}`, {
             method: 'POST',

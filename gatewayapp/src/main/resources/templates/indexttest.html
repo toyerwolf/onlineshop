@@ -129,12 +129,6 @@
             text-align: center;
             width: 250px;
             margin: 15px;
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Плавные переходы */
-        }
-
-        .product-card:hover {
-            transform: translateY(-5px); /* Поднятие карточки при наведении */
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Усиленная тень при наведении */
         }
 
         .product-card img {
@@ -369,7 +363,9 @@
     <button id="all-categories-button">All Categories</button>
 
     <ul id="categories-section" class="category-list"></ul>
+
     <div id="products-section" class="product-list">
+
         <h2>Featured Products</h2>
         <div class="product-card" th:each="product : ${products.content}">
             <img th:src="${product.imageUrl}" alt="Product Image">
@@ -492,8 +488,8 @@
                 document.getElementById('auth-links-logged-out').style.display = 'none';
                 document.getElementById('auth-links-logged-in').style.display = 'block';
                 document.getElementById('customer-name').textContent = data.name;
-                localStorage.setItem('customerId', data.id);
-                localStorage.setItem('customerName', data.name);
+                sessionStorage.setItem('customerId', data.id);
+                sessionStorage.setItem('customerName', data.name);
             })
             .catch(error => {
                 console.error('Error fetching user info:', error);

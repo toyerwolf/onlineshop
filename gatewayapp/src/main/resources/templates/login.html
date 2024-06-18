@@ -80,12 +80,12 @@
                 const { accessToken, refreshToken } = data;
 
                 // Установка access токена и его срока действия в 1 минуту
-                sessionStorage.setItem('access_token', accessToken);
-                sessionStorage.setItem('access_token_expiration', (new Date().getTime() + 36000).toString());
+                localStorage.setItem('access_token', accessToken);
+                localStorage.setItem('access_token_expiration', (new Date().getTime() + 36000).toString());
 
                 // Установка refresh токена и его срока действия в 5 минут
-                sessionStorage.setItem('refresh_token', refreshToken);
-                sessionStorage.setItem('refresh_token_expiration', (new Date().getTime() + 60000).toString());
+                localStorage.setItem('refresh_token', refreshToken);
+                localStorage.setItem('refresh_token_expiration', (new Date().getTime() + 60000).toString());
 
                 window.location.href = '/';
             })
