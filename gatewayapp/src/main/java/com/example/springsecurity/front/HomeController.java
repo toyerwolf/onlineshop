@@ -37,7 +37,7 @@ public class HomeController {
 
     @GetMapping
     public String home(Model model, @RequestParam(defaultValue = "1") int page, HttpSession session) {
-        int pageSize = 3;
+        int pageSize = 9;
         Page<ProductDto> products = productService.getAllProducts(page, pageSize);
         List<CategoryDto> categories = categoryService.getAllCategories();
         model.addAttribute("products", products);

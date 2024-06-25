@@ -3,6 +3,7 @@ package com.example.springsecurity.service.impl;
 import com.example.springsecurity.dto.*;
 import com.example.springsecurity.entity.Category;
 import com.example.springsecurity.entity.Product;
+import com.example.springsecurity.entity.Rating;
 import com.example.springsecurity.exception.InsufficientQuantityException;
 import com.example.springsecurity.exception.NotFoundException;
 import com.example.springsecurity.repository.CategoryRepository;
@@ -702,6 +703,73 @@ class ProductServiceImplTest {
         // Assert
         assertThat(product.getDiscount()).isNull();
         assertThat(product.getDiscountPrice()).isNull();
+    }
+
+    @Test
+    public void testGetProductRating_ProductFoundWithRatings() {
+        // Mock data
+        Long productId = 1L;
+        Product product = new Product();
+        product.setId(productId);
+
+
+        List<Rating> ratings = new ArrayList<>();
+        ratings.add(Rating.builder().rating(4).build());
+        ratings.add(Rating.builder().rating(5).build());
+        product.setRatings(ratings);
+
+        // Mock repository behavior
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+
+        // Call the method
+        Integer averageRating = productService.getProductRating(productId);
+
+        // Verify the result
+        assertNotNull(averageRating);
+        assertEquals(5, averageRating); // Average of {4, 5} is 4.5, rounded to nearest integer is 5
+
+        // Verify interactions
+        verify(productRepository, times(1)).findById(productId);
+    }
+
+    @Test
+    public void testGetProductRating_ProductFoundWithoutRatings() {
+        // Mock data
+        Long productId = 1L;
+        Product product = new Product();
+        product.setId(productId);
+        product.setRatings(new ArrayList<>()); // Empty ratings list
+
+        // Mock repository behavior
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+
+        // Call the method
+        Integer averageRating = productService.getProductRating(productId);
+
+        // Verify the result
+        assertNull(averageRating);
+
+        // Verify interactions
+        verify(productRepository, times(1)).findById(productId);
+    }
+
+    @Test
+    public void testGetProductRating_ProductNotFound() {
+        // Mock data
+        Long productId = 1L;
+
+        // Mock repository behavior (product not found)
+        when(productRepository.findById(productId)).thenReturn(Optional.empty());
+
+        // Verify that NotFoundException is thrown
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            productService.getProductRating(productId);
+        });
+
+        assertEquals("Product not found", exception.getMessage());
+
+        // Verify interactions
+        verify(productRepository, times(1)).findById(productId);
     }
 
 

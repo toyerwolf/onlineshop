@@ -3,6 +3,7 @@ package com.example.springsecurity.service.impl;
 import com.example.springsecurity.dto.*;
 import com.example.springsecurity.entity.Category;
 import com.example.springsecurity.entity.Product;
+import com.example.springsecurity.entity.Rating;
 import com.example.springsecurity.exception.InsufficientQuantityException;
 import com.example.springsecurity.exception.NotFoundException;
 import com.example.springsecurity.mapper.ProductMapper;
@@ -278,6 +279,25 @@ public ProductSalesResponseDto countSoldProductsByYear(int year) {
             removeDiscount(product);
             productRepository.save(product);
         }
+    }
+
+    @Override
+    public Integer getProductRating(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new NotFoundException("Product not found"));
+        List<Rating> ratings = product.getRatings();
+        if (ratings.isEmpty()) {
+            return null;
+        }
+
+        // Вычисляем средний рейтинг
+        double averageRating = ratings.stream()
+                .mapToInt(Rating::getRating)
+                .average()
+                .orElse(0); // или другое значение по умолчанию, если не удалось вычислить
+
+        // Округляем до целого числа и возвращаем
+        return (int) Math.round(averageRating);
     }
 
     void applyDiscount(Product product) {

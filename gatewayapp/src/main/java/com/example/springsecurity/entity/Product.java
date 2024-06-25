@@ -1,5 +1,6 @@
 package com.example.springsecurity.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,6 +47,10 @@ public class Product {
 
     private boolean isDeleted;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Rating> ratings;
+
 
     public void setCategory(Category category) {
         this.category = category;
@@ -53,6 +58,12 @@ public class Product {
     }
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<OrderProduct> orderProducts;
+
+
+    public void addRating(Rating rating) {
+        ratings.add(rating);
+        rating.setProduct(this);
+    }
 
 
 

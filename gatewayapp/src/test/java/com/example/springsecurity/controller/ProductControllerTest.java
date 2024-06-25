@@ -286,6 +286,30 @@ class ProductControllerTest {
 
     }
 
+    @Test
+    @Sql(scripts = {
+            "classpath:sql/category-add.sql",
+            "classpath:sql/productadd.sql",
+            "classpath:sql/userinsert.sql",
+            "classpath:sql/customerainsert.sql",
+            "classpath:sql/rating-add.sql"
+    }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void getProductRating() {
+        // Задаем идентификатор продукта для теста
+        long productId = 1L;
+
+        // Выполняем HTTP GET запрос на эндпоинт
+        ResponseEntity<Integer> response = restTemplate.getForEntity(
+                createURLWithPort("/products/" + productId + "/rating"), Integer.class);
+
+        // Проверяем статус ответа
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        // Проверяем, что в ответе вернулся ожидаемый средний рейтинг
+        assertNotNull(response.getBody());
+        // Добавьте дополнительные проверки, если необходимо
+    }
+
 
 
 

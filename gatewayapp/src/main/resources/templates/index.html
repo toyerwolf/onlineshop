@@ -196,8 +196,8 @@
         }
 
         .pagination {
-            text-align: center;
-            margin-top: 20px;
+            text-align: center; /* Выравниваем текст пагинации по центру */
+            margin-top: 20px; /* Добавляем отступ сверху */
         }
 
         .pagination a {
@@ -330,6 +330,33 @@
             color: #4CAF50;
         }
 
+        .rating {
+            unicode-bidi: bidi-override;
+            direction: rtl;
+            text-align: center;
+        }
+
+        .rating > .star {
+            display: inline-block;
+            position: relative;
+            font-size: 20px;
+            color: #ddd;
+            cursor: pointer;
+        }
+
+        .rating > .star:hover:before,
+        .rating > .star:hover ~ .star:before {
+            content: '\2605';
+            position: absolute;
+            color: gold;
+        }
+
+        .rating > .star.active:before,
+        .rating > .star.active ~ .star:before {
+            content: '\2605';
+            position: absolute;
+            color: gold;
+        }
 
     </style>
 </head>
@@ -369,26 +396,43 @@
     <button id="all-categories-button">All Categories</button>
 
     <ul id="categories-section" class="category-list"></ul>
-    <div id="products-section" class="product-list">
-        <h2>Featured Products</h2>
-        <div class="product-card" th:each="product : ${products.content}">
-            <img th:src="${product.imageUrl}" alt="Product Image">
-            <h3 th:text="${product.name}"></h3>
-            <p th:text="${product.description}"></p>
-            <p class="price" th:if="${product.discountPrice != null}">
-                <span class="original-price" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 2, 'POINT')}"></span>
-                <span class="discounted-price" th:text="${#numbers.formatDecimal(product.discountPrice, 0, 'COMMA', 2, 'POINT')}"></span>
-            </p>
-            <p class="price" th:if="${product.discountPrice == null}">
-                <span th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 2, 'POINT')}"></span>
-            </p>
-            <div class="quantity">
-                <button class="quantity-btn" onclick="decrementQuantity(this)">-</button>
-                <input type="number" class="quantity-input" value="1" min="1">
-                <button class="quantity-btn" onclick="incrementQuantity(this)">+</button>
+
+
+    <div class="container">
+<!--        <h1>Featured Products</h1>-->
+
+        <div id="products-section" class="product-list">
+            <!-- Карточки продуктов здесь -->
+            <div class="product-card" th:each="product : ${products.content}" th:data-product-id="${product.id}">
+                <img th:src="${product.imageUrl}" alt="Product Image">
+                <h3 th:text="${product.name}"></h3>
+                <p th:text="${product.description}"></p>
+                <p class="price" th:if="${product.discountPrice != null}">
+                    <span class="original-price" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 2, 'POINT')}"></span>
+                    <span class="discounted-price" th:text="${#numbers.formatDecimal(product.discountPrice, 0, 'COMMA', 2, 'POINT')}"></span>
+                </p>
+                <p class="price" th:if="${product.discountPrice == null}">
+                    <span th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 2, 'POINT')}"></span>
+                </p>
+                <div class="quantity">
+                    <button class="quantity-btn" onclick="decrementQuantity(this)">-</button>
+                    <label>
+                        <input type="number" class="quantity-input" value="1" min="1">
+                    </label>
+                    <button class="quantity-btn" onclick="incrementQuantity(this)">+</button>
+                </div>
+                <div class="rating" data-product-id="${product.id}">
+                    <span class="star" data-value="5" onclick="rateProduct(this)">☆</span>
+                    <span class="star" data-value="4" onclick="rateProduct(this)">☆</span>
+                    <span class="star" data-value="3" onclick="rateProduct(this)">☆</span>
+                    <span class="star" data-value="2" onclick="rateProduct(this)">☆</span>
+                    <span class="star" data-value="1" onclick="rateProduct(this)">☆</span>
+                </div>
+                <button class="make-order-button" onclick="makeOrder(this.closest('.product-card').getAttribute('data-product-id'))">Make Order</button>
             </div>
-            <button class="make-order-button" onclick="makeOrder(this.closest('.product-card'))">Make Order</button>
         </div>
+
+        <!-- Пагинация -->
         <div class="pagination">
             <a th:if="${products.hasPrevious()}" th:href="@{/ (page=${products.number})}">Previous</a>
             <span th:each="i : ${#numbers.sequence(1, products.totalPages)}" th:if="${i >= products.number - 2 && i <= products.number + 2}">
@@ -397,6 +441,7 @@
             <a th:if="${products.hasNext()}" th:href="@{/ (page=${products.number + 2})}">Next</a>
         </div>
     </div>
+
 </div>
 
 
@@ -630,6 +675,14 @@
                             <input type="number" class="quantity-input" value="1" min="1">
                             <button class="quantity-btn" onclick="incrementQuantity(this)">+</button>
                         </div>
+
+                        <div class="rating" data-product-id="${product.id}">
+        <span class="star" data-value="5" onclick="rateProduct(this)">☆</span>
+        <span class="star" data-value="4" onclick="rateProduct(this)">☆</span>
+        <span class="star" data-value="3" onclick="rateProduct(this)">☆</span>
+        <span class="star" data-value="2" onclick="rateProduct(this)">☆</span>
+        <span class="star" data-value="1" onclick="rateProduct(this)">☆</span>
+    </div>
                         <button onclick="makeOrder('${product.id}')">Make Order</button>
                     `;
                         productsSection.appendChild(productCard);
@@ -728,36 +781,56 @@
 
 
     function makeOrder(productId) {
+        // Log the productId for debugging purposes
+        console.log('Product ID:', productId);
+
+        // Retrieve access token from local storage
         let accessToken = localStorage.getItem('access_token');
 
+        // Check if access token is missing
         if (!accessToken) {
             console.log('Access token is missing.');
             return;
         }
 
-        // Находим карточку продукта по productId
+        // Use template literals for selector to find the product card
         const productCard = document.querySelector(`.product-card[data-product-id="${productId}"]`);
+        // Log the selector used to find the product card
+        console.log('Product Card Selector:', `.product-card[data-product-id="${productId}"]`);
+        // Log the found product card element
+        console.log('Product Card:', productCard);
+
+        // Check if product card was not found
         if (!productCard) {
             console.error('Product card not found');
             return;
         }
 
-        // Находим поле ввода количества в конкретной карточке продукта
+        // Find the quantity input field within the product card
         const quantityInput = productCard.querySelector('.quantity-input');
-        const quantity = parseInt(quantityInput.value); // Получаем значение количества и конвертируем в число
+        // Log the quantity input element
+        console.log('Quantity Input:', quantityInput);
 
+        // Parse the quantity input value to ensure it's a valid number
+        const quantity = parseInt(quantityInput.value);
+        // Log the parsed quantity value
+        console.log('Quantity:', quantity);
+
+        // Check if quantity is not a number or less than 1
         if (isNaN(quantity) || quantity < 1) {
             alert('Invalid quantity.');
             return;
         }
 
+        // Create an order request object with product quantities
         const orderRequest = {
             productQuantities: {}
         };
 
-        // Добавляем в объект заказа указанное количество выбранного продукта
+        // Add the selected product and its quantity to the order request
         orderRequest.productQuantities[productId] = quantity;
 
+        // Function to fetch the order
         function fetchOrder() {
             fetch('/home/makeOrder', {
                 method: 'POST',
@@ -768,45 +841,55 @@
                 body: JSON.stringify(orderRequest)
             })
                 .then(response => {
+                    // Handle case where response status is 401 (Unauthorized)
                     if (response.status === 401) {
-                        // Если получили 401 Unauthorized, пытаемся обновить токен
+                        // Attempt to refresh access token and retry order request
                         return refreshAccessToken().then(({ newAccessToken, newRefreshToken }) => {
                             accessToken = newAccessToken;
                             localStorage.setItem('access_token', newAccessToken);
                             localStorage.setItem('refresh_token', newRefreshToken);
-                            return fetchOrder(); // Повторяем запрос с новым токеном
+                            return fetchOrder();
                         });
                     }
+                    // Handle case where response is not ok
                     if (!response.ok) {
+                        // Parse response body as JSON and throw an error with its message
                         return response.json().then(error => {
                             throw new Error(error.message);
                         });
                     }
+                    // Parse response body as JSON and return the data
                     return response.json();
                 })
                 .then(data => {
+                    // Log success message with the returned data
                     console.log('Order placed successfully:', data);
-                    localStorage.setItem('orderId', data.orderId); // Сохраняем идентификатор заказа
-
-                    // После размещения заказа перенаправляем пользователя на страницу с подробностями заказа
+                    // Store the orderId in local storage
+                    localStorage.setItem('orderId', data.orderId);
+                    // Redirect user to order details page
                     window.location.href = 'order-details';
                 })
                 .catch(error => {
+                    // Check if error message indicates insufficient quantity
                     if (error.message.includes('Insufficient quantity')) {
                         alert('Insufficient quantity for the selected product.');
                     } else if (error.message === 'Insufficient balance') {
+                        // Handle case where error message indicates insufficient balance
                         alert('Insufficient balance. Please add funds to your account.');
                     } else if (error.message === 'Unauthorized') {
-                        // Если ошибка связана с Unauthorized, перенаправляем на страницу входа
+                        // Redirect user to login page if error message indicates unauthorized access
                         window.location.href = '/login';
                     } else {
+                        // Handle other errors with an alert and redirect to login page
                         alert('Error: ' + error.message);
                         window.location.href = '/login';
                     }
+                    // Log the error message to the console
                     console.error('Error making order:', error);
                 });
         }
 
+        // Initiate the fetchOrder function to start the order process
         fetchOrder();
     }
 
@@ -834,6 +917,86 @@
         const errorElement = document.createElement('div');
         errorElement.textContent = errorMessage;
         document.body.appendChild(errorElement);
+    }
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Восстанавливаем рейтинг для каждого продукта
+        const productCards = document.querySelectorAll('.product-card');
+        productCards.forEach(card => {
+            const productId = card.dataset.productId;
+            const savedRating = localStorage.getItem(`product_${productId}_rating`);
+            if (savedRating) {
+                const ratingElement = card.querySelector('.rating');
+                updateStars(ratingElement, parseInt(savedRating));
+            }
+        });
+    });
+
+    function rateProduct(starElement) {
+        const productId = starElement.closest('.product-card').dataset.productId;
+        const ratingValue = parseInt(starElement.dataset.value);
+
+        const accessToken = localStorage.getItem('access_token');
+        const customerId = localStorage.getItem('customerId');
+
+        const ratingData = {
+            rating: ratingValue,
+            productId: productId,
+            customerId: customerId
+        };
+
+        fetch(`/ratings/${productId}/rate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + accessToken
+            },
+            body: JSON.stringify(ratingData)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to rate product');
+                }
+                return response.json(); // Получаем JSON-ответ
+            })
+            .then(data => {
+                console.log('Product rated successfully:', data.message);
+                // Сохраняем рейтинг в localStorage
+                localStorage.setItem(`product_${productId}_rating`, ratingValue.toString());
+                // Обновляем звезды, чтобы отразить рейтинг
+                updateStars(starElement.parentNode, ratingValue);
+                // Получаем средний рейтинг продукта и отображаем его
+                return fetch(`/products/${productId}/rating`);
+            })
+            .then(response => response.json())
+            .then(averageRating => {
+                console.log('Average rating:', averageRating); // Проверка значения среднего рейтинга
+                const ratingDisplay = starElement.closest('.product-card').querySelector('.average-rating span');
+                if (ratingDisplay) {
+                    ratingDisplay.textContent = averageRating.toFixed(1); // Отображаем средний рейтинг с одним знаком после запятой
+                } else {
+                    // Если элемента нет, создаем его
+                    const newRatingDisplay = document.createElement('div');
+                    newRatingDisplay.classList.add('average-rating');
+                    newRatingDisplay.innerHTML = `Average Rating: <span>${averageRating.toFixed(1)}</span>`;
+                    starElement.closest('.product-card').appendChild(newRatingDisplay);
+                }
+            })
+            .catch(error => {
+                console.error('Error rating product:', error);
+            });
+    }
+
+    function updateStars(ratingElement, ratingValue) {
+        const stars = ratingElement.querySelectorAll('.star');
+        stars.forEach(star => {
+            if (parseInt(star.dataset.value) <= ratingValue) {
+                star.classList.add('active');
+            } else {
+                star.classList.remove('active');
+            }
+        });
     }
 
 </script>

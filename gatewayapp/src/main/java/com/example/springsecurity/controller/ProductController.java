@@ -1,11 +1,15 @@
 package com.example.springsecurity.controller;
 
 import com.example.springsecurity.dto.ProductDto;
+import com.example.springsecurity.dto.RatingDto;
+import com.example.springsecurity.entity.Rating;
 import com.example.springsecurity.req.ProductRequest;
 import com.example.springsecurity.service.ImageService;
 import com.example.springsecurity.service.ProductService;
+import com.example.springsecurity.service.RatingService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +25,7 @@ public class ProductController {
 
     private final ProductService productService;
     private final ImageService imageService;
+    private final RatingService ratingService;
 
 
 
@@ -81,6 +86,20 @@ public class ProductController {
         return productService.searchProductByName(keyword);
 }
 
+
+
+    @GetMapping("/{productId}/rating")
+    public ResponseEntity<Integer> getProductRating(@PathVariable Long productId) {
+        Integer averageRating = productService.getProductRating(productId);
+        return ResponseEntity.ok(averageRating);
+    }
+
+
+}
+
+
+
+
 //    @Secured("ADMIN")
 //    @PatchMapping("/{productId}/decrease-count")
 //    public ResponseEntity<String> decreaseCount(@PathVariable Long productId,@RequestParam int quantity){
@@ -93,5 +112,5 @@ public class ProductController {
 //        List<ProductDto> products = productService.findProductsByOrderId(orderId);
 //        return ResponseEntity.ok(products);
 //    }
-}
+
 //test

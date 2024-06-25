@@ -3,6 +3,7 @@ package com.example.springsecurity.service;
 import com.example.springsecurity.dto.*;
 import com.example.springsecurity.entity.Product;
 import com.example.springsecurity.req.ProductRequest;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
@@ -40,7 +41,9 @@ public interface ProductService {
 
     void applyNewYearDiscount();
 
-    public void removeNewYearDiscount();
+    void removeNewYearDiscount();
+
+    Integer getProductRating(Long productId);
 
 
 
