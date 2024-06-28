@@ -29,5 +29,7 @@ public class ProductDto {
     private Integer averageRating;
 
 
+
+
 }
 

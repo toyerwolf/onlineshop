@@ -406,7 +406,7 @@
             <div class="product-card" th:each="product : ${products.content}" th:data-product-id="${product.id}">
                 <img th:src="${product.imageUrl}" alt="Product Image">
                 <h3 th:text="${product.name}"></h3>
-                <p th:text="${product.description}"></p>
+                <p th:text="${product.categoryName}"></p>
                 <p class="price" th:if="${product.discountPrice != null}">
                     <span class="original-price" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 2, 'POINT')}"></span>
                     <span class="discounted-price" th:text="${#numbers.formatDecimal(product.discountPrice, 0, 'COMMA', 2, 'POINT')}"></span>

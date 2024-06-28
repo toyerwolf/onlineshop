@@ -107,32 +107,105 @@
         document.getElementById('customer-id').textContent = customerId;
     }
 
-    function payWithPayPal() {
-        const orderId = localStorage.getItem('orderId');
-        const customerId = localStorage.getItem('customerId');
-
-        fetch(`/paypal/${customerId}/${orderId}`, {
+    function refreshToken() {
+        const refreshToken = localStorage.getItem('refresh_token');
+        return fetch('/home/refresh', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
-            }
+            },
+            body: JSON.stringify({ refreshToken: refreshToken })
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Failed to process payment');
+                    throw new Error('Failed to refresh access token');
                 }
-                return response.text();
+                return response.json();
             })
-            .then(message => {
-                alert(message);
+            .then(data => {
+                const { accessToken, refreshToken } = data;
+                const currentTime = new Date().getTime();
+                const accessTokenExpiration = currentTime + 30000; // 30 секунд
+                const refreshTokenExpiration = currentTime + 60000; // 1 минута
 
-                window.location.href = '/payment-success';
-            })
-            .catch(error => {
-                console.error('Error processing payment:', error);
-                alert('Payment failed. Please try again later.');
+                localStorage.setItem('access_token', accessToken);
+                localStorage.setItem('access_token_expiration', accessTokenExpiration.toString());
+                localStorage.setItem('refresh_token', refreshToken);
+                localStorage.setItem('refresh_token_expiration', refreshTokenExpiration.toString());
             });
     }
+
+    async function payWithPayPal() {
+        const orderId = localStorage.getItem('orderId');
+        const customerId = localStorage.getItem('customerId');
+        let accessToken = localStorage.getItem('accessToken');
+
+        async function attemptPayment() {
+            return fetch(`payments/paypal/${customerId}/${orderId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + accessToken
+                }
+            });
+        }
+
+        try {
+            let response = await attemptPayment();
+
+            if (response.status === 401) {
+                // If the access token has expired, refresh it
+                const tokens = await refreshAccessToken();
+                accessToken = tokens.newAccessToken;
+                response = await attemptPayment();
+            }
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message);
+            }
+
+            const message = await response.text();
+            alert(message);
+            window.location.href = '/payment-success';
+        } catch (error) {
+            console.error('Error processing payment:', error);
+
+            if (error.message.includes('Order is already paid')) {
+                alert('Order is already paid.');
+            } else if (error.message.includes('Order status is cancel')) {
+                alert('Order status is cancel.');
+                window.location.href = '/login';
+            } else if (error.message === 'Unauthorized') {
+                window.location.href = '/login';
+            } else {
+                alert('Error: ' + error.message);
+                window.location.href = '/login';
+            }
+        }
+    }
+
+    function checkTokenExpiration() {
+        const refreshTokenExpiration = localStorage.getItem('refresh_token_expiration');
+        const currentTime = new Date().getTime() / 1000;
+
+        if (refreshTokenExpiration && currentTime > refreshTokenExpiration) {
+            logout(); // Если refreshToken истек, разлогиниваем пользователя
+        } else {
+            refreshToken(); // Обновляем refreshToken, если он действителен
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('accessTokenExpiry');
+        localStorage.removeItem('refreshTokenExpiry');
+        window.location.href = '/login';
+    }
+
+    // Call checkTokenExpiration function periodically, e.g., every 5 minutes
+    setInterval(checkTokenExpiration, 60000);
 </script>
 </body>
 </html>
