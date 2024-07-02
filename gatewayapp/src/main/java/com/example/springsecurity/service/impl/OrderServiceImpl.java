@@ -1,6 +1,7 @@
 package com.example.springsecurity.service.impl;
 
 
+import com.example.springsecurity.dto.DiscountProductResponse;
 import com.example.springsecurity.dto.OrderDto;
 
 import com.example.springsecurity.dto.OrderProductDto;
@@ -14,6 +15,8 @@ import com.example.springsecurity.exception.NotFoundException;
 import com.example.springsecurity.exception.OrderDeliveredException;
 import com.example.springsecurity.mapper.OrderMapper;
 
+import com.example.springsecurity.repository.CustomerDiscountRepository;
+import com.example.springsecurity.repository.CustomerRepository;
 import com.example.springsecurity.repository.OrderRepository;
 
 import com.example.springsecurity.repository.ProductRepository;
@@ -52,6 +55,8 @@ public class OrderServiceImpl implements OrderService {
     private final CardService cardService;
     private final OrderCancellationService orderCancellationService;
     private final OrderProductService orderProductService;
+
+    private final CustomerDiscountService customerDiscountService;
     public static final long DELAY_IN_MINUTES = 1;
 
 
@@ -102,6 +107,9 @@ public class OrderServiceImpl implements OrderService {
         return getOrderResponse(order);
 
     }
+
+
+
 
     void scheduleOrderPaymentCheck(Long orderId) {
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -211,11 +219,30 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void saveOrder(Order order) {
         orderRepository.save(order);
+    }
 
 
-
-
+    @Transactional
+    public OrderResponse makeOrderForDiscountedProduct(Long customerId, Long productId) {
+        // Найти информацию о скидке для выигранного продукта
+        DiscountProductResponse discountProductResponse = customerDiscountService.getDiscountedProductResponse(customerId);
+        Customer customer = customerService.findCustomerById(customerId);
+        Product product = productService.findProductById(productId);
+        if (!"iphone 15".equals(product.getName())) {
+            throw new AppException(HttpStatus.BAD_REQUEST,"Discount is only applicable for iPhone 15");
+        }
+        customerBalanceService.validateCustomerBalance(customer,discountProductResponse.getDiscountedPrice());
+        Map<Product, Integer> productQuantities = new HashMap<>();
+        productQuantities.put(product, 1); // Проверяем наличие одного продукта
+        productInventoryService.validateProductQuantities(productQuantities);
+        productInventoryService.decreaseProductCount(productQuantities);// Уменьшаем на один продукт
+        Order order = createOrder(customer, discountProductResponse.getDiscountedPrice());
+        saveOrderProduct(order, productQuantities);
+        saveOrder(order);
+        return getOrderResponse(order);
 }
+
+
 }
 
 

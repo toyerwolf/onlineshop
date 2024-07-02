@@ -29,6 +29,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -191,6 +192,48 @@ class OrderControllerTest {
         assertNotNull(orders);
 
     }
+
+    @Test
+    @Sql(scripts = {
+            "classpath:sql/userinsert.sql",
+            "classpath:sql/customerainsert.sql",
+            "classpath:sql/category-add.sql",
+            "classpath:sql/productadd.sql",
+            "classpath:sql/customer-discount.sql"
+    }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    public void testMakeOrderForDiscountedProduct() {
+        long customerId = 2L;
+        long productId = 2L;
+
+        // Prepare headers if needed
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", userToken);
+        HttpEntity<?> requestEntity = new HttpEntity<>(headers);
+
+        // Build the URL with parameters using UriComponentsBuilder
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("/orders/makeOrderForDiscountedProduct")
+                .queryParam("customerId", customerId)
+                .queryParam("productId", productId);
+        String url = builder.toUriString();
+
+        // Send POST request with URL parameters
+        System.out.println("Sending POST request to: " + url);
+        ResponseEntity<OrderResponse> responseEntity = restTemplate.postForEntity(url, requestEntity, OrderResponse.class);
+
+        // Assert the response
+        assertNotNull(responseEntity.getBody(), "Response must not be null");
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode(), "Expected status OK");
+
+        // Assert other fields in OrderResponse if needed
+        OrderResponse orderResponse = responseEntity.getBody();
+        assertNotNull(orderResponse.getOrderId(), "Order ID must not be null");
+
+        // Add additional assertions as per your response structure
+    }
+
+
+
+
 
 
 

@@ -1,9 +1,11 @@
 package com.example.springsecurity.controller;
 
+import com.example.springsecurity.dto.DiscountProductResponse;
 import com.example.springsecurity.dto.ProductDto;
 import com.example.springsecurity.dto.RatingDto;
 import com.example.springsecurity.entity.Rating;
 import com.example.springsecurity.req.ProductRequest;
+import com.example.springsecurity.service.CustomerDiscountService;
 import com.example.springsecurity.service.ImageService;
 import com.example.springsecurity.service.ProductService;
 import com.example.springsecurity.service.RatingService;
@@ -25,7 +27,7 @@ public class ProductController {
 
     private final ProductService productService;
     private final ImageService imageService;
-    private final RatingService ratingService;
+    private final CustomerDiscountService customerDiscountService;
 
 
 
@@ -92,6 +94,13 @@ public class ProductController {
     public ResponseEntity<Integer> getProductRating(@PathVariable Long productId) {
         Integer averageRating = productService.getProductRating(productId);
         return ResponseEntity.ok(averageRating);
+    }
+
+
+    @GetMapping("/discounted-product")
+    public ResponseEntity<DiscountProductResponse> getDiscountedProduct(@RequestParam Long customerId) {
+        DiscountProductResponse response = customerDiscountService.getDiscountedProductResponse(customerId);
+        return ResponseEntity.ok(response);
     }
 
 

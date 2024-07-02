@@ -79,11 +79,11 @@ class OrderProductControllerTest {
         OrderProductDto firstProduct = response.getBody().getProducts().get(0);
         OrderProductDto secondProduct = response.getBody().getProducts().get(1);
 
-        assertEquals(1L, firstProduct.getProductId());
+        assertEquals(1L, firstProduct.getOrderId());
         assertEquals("samsung", firstProduct.getProductName());
         assertEquals(5, firstProduct.getQuantity());
 
-        assertEquals(2L, secondProduct.getProductId());
+        assertEquals(2L, secondProduct.getOrderId());
         assertEquals("test", secondProduct.getProductName());
         assertEquals(3, secondProduct.getQuantity());
     }

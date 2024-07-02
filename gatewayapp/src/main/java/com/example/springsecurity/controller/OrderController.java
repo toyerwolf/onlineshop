@@ -5,6 +5,7 @@ import com.example.springsecurity.dto.OrderResponse;
 import com.example.springsecurity.dto.ProductDto;
 import com.example.springsecurity.entity.Order;
 import com.example.springsecurity.req.OrderRequest;
+import com.example.springsecurity.service.CustomerDiscountService;
 import com.example.springsecurity.service.OrderService;
 import com.example.springsecurity.service.ProductService;
 import com.example.springsecurity.service.impl.OrderServiceImpl;
@@ -23,6 +24,7 @@ import java.util.List;
 public class OrderController {
     private final OrderService orderService;
     private final ProductService productService;
+    private final CustomerDiscountService customerDiscountService;
 
 
     @Secured("USER")
@@ -63,6 +65,18 @@ public class OrderController {
                                                            @PathVariable Long cardId,
                                                            @RequestBody OrderRequest orderRequest) {
         OrderResponse orderResponse = orderService.makeOrderWithCard(customerId, orderRequest, cardId);
+        return ResponseEntity.ok(orderResponse);
+    }
+
+
+
+    @Secured("USER")
+    @PostMapping("/makeOrderForDiscountedProduct")
+    public ResponseEntity<OrderResponse> makeOrderForDiscountedProduct(
+            @RequestParam Long customerId,
+            @RequestParam Long productId
+    ) {
+        OrderResponse orderResponse = orderService.makeOrderForDiscountedProduct(customerId, productId);
         return ResponseEntity.ok(orderResponse);
     }
 }

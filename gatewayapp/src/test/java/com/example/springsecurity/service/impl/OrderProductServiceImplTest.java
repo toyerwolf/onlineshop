@@ -51,10 +51,13 @@ class OrderProductServiceImplTest {
         assertNotNull(result);
         assertEquals(orderProducts.size(), result.size());
         OrderProductDto orderProductDto = result.get(0);
-        assertEquals(orderProduct1.getId(), orderProductDto.getProductId());
+        assertEquals(orderProduct1.getId(), orderProductDto.getOrderId());
         assertEquals(orderProduct1.getQuantity(), orderProductDto.getQuantity());
         assertEquals(orderProduct1.getProductName(), orderProductDto.getProductName());
         assertEquals(orderProduct1.getProduct().getPrice(), orderProductDto.getPrice());
         assertEquals(orderProduct1.getProduct().getDiscountPrice(), orderProductDto.getDiscountPrice());
     }
+
+
+
 }

@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 public class OrderProductDto {
-    private Long productId;
+    private Long orderId;
     private String productName;
     private Integer quantity;
     private BigDecimal price;

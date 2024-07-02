@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -13,7 +14,9 @@ import java.util.List;
 
 @Entity
 @Data
-
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Customer {
 
 
@@ -45,6 +48,9 @@ public class Customer {
         cards.add(card);
         card.setCustomer(this);
     }
+
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private CustomerDiscount customerDiscount;
 
 
 }

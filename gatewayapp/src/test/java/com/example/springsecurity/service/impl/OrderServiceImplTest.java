@@ -1,5 +1,6 @@
 package com.example.springsecurity.service.impl;
 
+import com.example.springsecurity.dto.DiscountProductResponse;
 import com.example.springsecurity.dto.OrderDto;
 import com.example.springsecurity.dto.OrderProductDto;
 import com.example.springsecurity.dto.OrderResponse;
@@ -10,10 +11,7 @@ import com.example.springsecurity.repository.OrderProductRepository;
 import com.example.springsecurity.repository.OrderRepository;
 import com.example.springsecurity.repository.ProductRepository;
 import com.example.springsecurity.req.OrderRequest;
-import com.example.springsecurity.service.CardService;
-import com.example.springsecurity.service.CustomerService;
-import com.example.springsecurity.service.OrderProductService;
-import com.example.springsecurity.service.ProductService;
+import com.example.springsecurity.service.*;
 import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
@@ -76,6 +74,9 @@ class OrderServiceImplTest {
     private OrderProductService orderProductService;
     @Mock
     private CustomerBalanceService customerBalanceService;
+
+    @Mock
+    private CustomerDiscountService customerDiscountService;
 
 
 
@@ -319,7 +320,7 @@ class OrderServiceImplTest {
         for (int i = 0; i < orderProductDtos.size(); i++) {
             OrderProductDto expectedDto = orderProductDtos.get(i);
             OrderProductDto actualDto = orderResponse.getProducts().get(i);
-            assertEquals(expectedDto.getProductId(), actualDto.getProductId());
+            assertEquals(expectedDto.getOrderId(), actualDto.getOrderId());
             assertEquals(expectedDto.getProductName(), actualDto.getProductName());
             assertEquals(expectedDto.getQuantity(), actualDto.getQuantity());
         }
@@ -340,12 +341,12 @@ class OrderServiceImplTest {
     private static List<OrderProductDto> getOrderProductDtos() {
         List<OrderProductDto> orderProductDtos = new ArrayList<>();
         OrderProductDto orderProductDto1 = new OrderProductDto();
-        orderProductDto1.setProductId(1L);
+        orderProductDto1.setOrderId(1L);
         orderProductDto1.setProductName("Product1");
         orderProductDto1.setQuantity(2);
         orderProductDtos.add(orderProductDto1);
         OrderProductDto orderProductDto2 = new OrderProductDto();
-        orderProductDto2.setProductId(2L);
+        orderProductDto2.setOrderId(2L);
         orderProductDto2.setProductName("Product2");
         orderProductDto2.setQuantity(1);
         orderProductDtos.add(orderProductDto2);
@@ -487,7 +488,7 @@ class OrderServiceImplTest {
         for (int i = 0; i < orderProductDtos.size(); i++) {
             OrderProductDto expectedDto = orderProductDtos.get(i);
             OrderProductDto actualDto = orderResponse.getProducts().get(i);
-            assertEquals(expectedDto.getProductId(), actualDto.getProductId());
+            assertEquals(expectedDto.getOrderId(), actualDto.getOrderId());
             assertEquals(expectedDto.getProductName(), actualDto.getProductName());
             assertEquals(expectedDto.getQuantity(), actualDto.getQuantity());
         }
@@ -785,7 +786,7 @@ class OrderServiceImplTest {
         for (int i = 0; i < orderProducts.size(); i++) {
             OrderProductDto expectedDto = orderProducts.get(i);
             OrderProductDto actualDto = orderResponse.getProducts().get(i);
-            assertEquals(expectedDto.getProductId(), actualDto.getProductId());
+            assertEquals(expectedDto.getOrderId(), actualDto.getOrderId());
             assertEquals(expectedDto.getProductName(), actualDto.getProductName());
             assertEquals(expectedDto.getQuantity(), actualDto.getQuantity());
         }
@@ -795,10 +796,182 @@ class OrderServiceImplTest {
     }
 
 
+    @Test
+    void testMakeOrderForDiscountedProduct() {
+        // Mock data
+        Long customerId = 1L;
+        Long productId = 2L;
+        BigDecimal discountedPrice = BigDecimal.valueOf(900); // Assuming discounted price for iPhone 15
 
+        // Mock responses
+        DiscountProductResponse discountProductResponse = new DiscountProductResponse();
+        discountProductResponse.setDiscountedPrice(discountedPrice);
+        when(customerDiscountService.getDiscountedProductResponse(customerId)).thenReturn(discountProductResponse);
 
+        Customer customer = new Customer();
+        when(customerService.findCustomerById(customerId)).thenReturn(customer);
 
+        Product product = new Product();
+        product.setId(productId);
+        product.setName("iphone 15");
+        when(productService.findProductById(productId)).thenReturn(product);
+
+        Map<Product, Integer> productQuantities = new HashMap<>();
+        productQuantities.put(product, 1);
+
+        // Mock validations and service calls
+        doNothing().when(customerBalanceService).validateCustomerBalance(customer, discountedPrice);
+        doNothing().when(productInventoryService).validateProductQuantities(productQuantities);
+        doNothing().when(productInventoryService).decreaseProductCount(productQuantities);
+
+        Order order = new Order();
+        order.setId(1L);
+        order.setStatus(OrderStatus.PENDING);// Mock order ID for verification
+        when(orderService.createOrder(customer, discountedPrice)).thenReturn(order);
+
+        doNothing().when(orderProductRepositorySave).saveAll(productQuantities, order);
+
+        // Test method invocation
+        OrderResponse orderResponse = orderService.makeOrderForDiscountedProduct(customerId, productId);
+
+        // Assertions
+        assertEquals(order.getId(), orderResponse.getOrderId());
+        assertEquals(order.getTotalAmount(), orderResponse.getTotalAmount());
+        assertEquals(order.getCreatedAt(), orderResponse.getCreatedAt());
+        assertEquals(order.getStatus().toString(), orderResponse.getStatus().toString());
+        assertEquals(order.isPaid(), orderResponse.isPaid());
+
+        // Verify method invocations
+        verify(customerDiscountService).getDiscountedProductResponse(customerId);
+        verify(customerService).findCustomerById(customerId);
+        verify(productService).findProductById(productId);
+        verify(customerBalanceService).validateCustomerBalance(customer, discountedPrice);
+        verify(productInventoryService).validateProductQuantities(productQuantities);
+        verify(productInventoryService).decreaseProductCount(productQuantities);
+        verify(orderService).createOrder(customer, discountedPrice);
+        verify(orderProductRepositorySave).saveAll(productQuantities, order);
     }
+
+
+    @Test
+    void testMakeOrderForDiscountedProduct_InvalidProduct() {
+        Long customerId = 1L;
+        Long productId = 3L; // Assuming productId does not correspond to iPhone 15
+
+        // Mock responses
+        Customer customer = new Customer();
+        when(customerService.findCustomerById(customerId)).thenReturn(customer);
+
+        Product product = new Product();
+        product.setId(productId);
+        product.setName("ipad");
+        when(productService.findProductById(productId)).thenReturn(product);
+
+        // Test exception
+        AppException exception = assertThrows(AppException.class,
+                () -> orderService.makeOrderForDiscountedProduct(customerId, productId));
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+        assertEquals("Discount is only applicable for iPhone 15", exception.getMessage());
+
+        // Verify method invocations
+        verify(customerService).findCustomerById(customerId);
+        verify(productService).findProductById(productId);
+        verify(customerBalanceService, never()).validateCustomerBalance(any(), any());
+        verify(productInventoryService, never()).validateProductQuantities(any());
+        verify(productInventoryService, never()).decreaseProductCount(any());
+        verify(orderService, never()).createOrder(any(), any());
+        verify(orderProductRepositorySave, never()).saveAll(any(), any());
+    }
+
+
+    @Test
+    void testInsufficientBalanceException() {
+        Long customerId = 1L;
+        Long productId = 2L;
+        BigDecimal discountedPrice = BigDecimal.valueOf(900);
+
+        // Mock responses
+        DiscountProductResponse discountProductResponse = new DiscountProductResponse();
+        discountProductResponse.setDiscountedPrice(discountedPrice);
+        when(customerDiscountService.getDiscountedProductResponse(customerId)).thenReturn(discountProductResponse);
+
+        Customer customer = new Customer();
+        when(customerService.findCustomerById(customerId)).thenReturn(customer);
+
+        Product product = new Product();
+        product.setId(productId);
+        product.setName("iphone 15");
+        when(productService.findProductById(productId)).thenReturn(product);
+
+        // Mock validation: throw InsufficientBalanceException
+        doThrow(new InsufficientBalanceException("Insufficient balance")).when(customerBalanceService).validateCustomerBalance(customer, discountedPrice);
+
+        // Test
+        assertThrows(InsufficientBalanceException.class, () -> {
+            orderService.makeOrderForDiscountedProduct(customerId, productId);
+        });
+
+        // Verify interactions
+        verify(customerDiscountService).getDiscountedProductResponse(customerId);
+        verify(customerService).findCustomerById(customerId);
+        verify(productService).findProductById(productId);
+        verify(customerBalanceService).validateCustomerBalance(customer, discountedPrice);
+
+        // Ensure other methods are not called
+        verifyNoMoreInteractions(customerDiscountService, productService, customerService, productInventoryService, orderProductRepositorySave);
+    }
+
+
+    @Test
+    void testInsufficientQuantityException() {
+        Long customerId = 1L;
+        Long productId = 2L;
+        BigDecimal discountedPrice = BigDecimal.valueOf(900);
+
+        // Mock responses
+        DiscountProductResponse discountProductResponse = new DiscountProductResponse();
+        discountProductResponse.setDiscountedPrice(discountedPrice);
+        when(customerDiscountService.getDiscountedProductResponse(customerId)).thenReturn(discountProductResponse);
+
+        Customer customer = new Customer();
+        when(customerService.findCustomerById(customerId)).thenReturn(customer);
+
+        Product product = new Product();
+        product.setId(productId);
+        product.setQuantity(1); // Устанавливаем доступное количество продукта
+        product.setName("iphone 15");
+        when(productService.findProductById(productId)).thenReturn(product);
+
+        // Mock product quantities
+        Map<Product, Integer> productQuantities = new HashMap<>();
+        productQuantities.put(product, 2); // Пытаемся заказать два продукта, хотя доступен только один
+
+        // Mock validation: throw InsufficientQuantityException
+        doThrow(new InsufficientQuantityException("Insufficient quantity"))
+                .when(productInventoryService).validateProductQuantities(anyMap()); // Используем anyMap(), чтобы не специфицировать конкретный объект
+
+        // Test
+        assertThrows(InsufficientQuantityException.class, () -> {
+            orderService.makeOrderForDiscountedProduct(customerId, productId);
+        });
+
+        // Verify interactions
+        verify(customerDiscountService).getDiscountedProductResponse(customerId);
+        verify(customerService).findCustomerById(customerId);
+        verify(productService).findProductById(productId);
+        verify(customerBalanceService).validateCustomerBalance(customer, discountedPrice);
+        verify(productInventoryService).validateProductQuantities(anyMap()); // Проверяем вызов метода с любыми аргументами
+
+        // Ensure other methods are not called
+        verifyNoMoreInteractions(customerDiscountService, productService, customerService, productInventoryService, orderProductRepositorySave);
+    }
+}
+
+
+
+
+
+
 
 
 

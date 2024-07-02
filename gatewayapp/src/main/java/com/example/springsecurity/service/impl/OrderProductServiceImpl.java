@@ -29,7 +29,7 @@ public class OrderProductServiceImpl implements OrderProductService {
         List<OrderProductDto> orderProductDtos = new ArrayList<>();
         for (OrderProduct orderProduct : orderProducts) {
             OrderProductDto orderProductDto = new OrderProductDto();
-            orderProductDto.setProductId(orderProduct.getId());
+            orderProductDto.setOrderId(orderProduct.getId());
             orderProductDto.setQuantity(orderProduct.getQuantity());
             orderProductDto.setPrice(orderProduct.getProduct().getPrice());
             orderProductDto.setDiscountPrice(orderProduct.getProduct().getDiscountPrice());

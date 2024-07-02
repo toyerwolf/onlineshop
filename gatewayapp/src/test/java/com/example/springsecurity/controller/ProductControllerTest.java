@@ -1,5 +1,6 @@
 package com.example.springsecurity.controller;
 
+import com.example.springsecurity.dto.DiscountProductResponse;
 import com.example.springsecurity.dto.ProductDto;
 import com.example.springsecurity.req.ProductRequest;
 import com.example.springsecurity.security.JwtTestUtil;
@@ -309,6 +310,41 @@ class ProductControllerTest {
         assertNotNull(response.getBody());
         // Добавьте дополнительные проверки, если необходимо
     }
+
+
+    @Test
+    @Sql(scripts = {
+            "classpath:sql/category-add.sql",
+            "classpath:sql/productadd.sql",
+            "classpath:sql/userinsert.sql",
+            "classpath:sql/customerainsert.sql",
+            "classpath:sql/customer-discount.sql"
+    }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    public void testGetDiscountedProduct(){
+        long customerId = 2L;  // Замените на реальный ID клиента, для которого хотите протестировать
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", userToken);
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        // When
+        ResponseEntity<DiscountProductResponse> responseEntity = restTemplate.exchange(
+                createURLWithPort("/products/discounted-product?customerId=" + customerId),
+                HttpMethod.GET,
+                entity,
+                DiscountProductResponse.class);
+
+        // Then
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        DiscountProductResponse response = responseEntity.getBody();
+        // Добавьте дополнительные проверки возвращаемого ответа, если необходимо
+
+        // Пример проверки:
+        // assertEquals(expectedValue, response.getSomeValue());
+    }
+
+
+
 
 
 

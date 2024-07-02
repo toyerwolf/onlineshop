@@ -24,5 +24,9 @@ public interface OrderService {
     List<OrderDto> findOrdersByCustomerID(Long customerId);
     OrderResponse makeOrderWithCard(Long customerId, OrderRequest orderRequest, Long cardId);
 
+     OrderResponse makeOrderForDiscountedProduct(Long customerId, Long productId);
+
+
+
 
 }

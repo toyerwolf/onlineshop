@@ -358,6 +358,25 @@
             color: gold;
         }
 
+        .dice-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .dice {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .dice:hover {
+            background-color: #0056b3;
+        }
+
     </style>
 </head>
 <body>
@@ -430,6 +449,7 @@
                 </div>
                 <button class="make-order-button" onclick="makeOrder(this.closest('.product-card').getAttribute('data-product-id'))">Make Order</button>
             </div>
+
         </div>
 
         <!-- Пагинация -->
@@ -442,6 +462,10 @@
         </div>
     </div>
 
+    <div class="dice-container">
+        <button class="dice" onclick="rollDice()">Бросить кости</button>
+    </div>
+
 </div>
 
 
@@ -449,6 +473,79 @@
 
 
 <script>
+
+
+    function checkTokenExpiration() {
+        const refreshTokenExpiration = localStorage.getItem('refresh_token_expiration');
+        const currentTime = new Date().getTime() / 1000;
+
+        if (refreshTokenExpiration && currentTime > refreshTokenExpiration) {
+            logout(); // Если refreshToken истек, разлогиниваем пользователя
+        } else {
+            refreshToken(); // Обновляем refreshToken, если он действителен
+        }
+    }
+
+    setInterval(checkTokenExpiration, 75000);
+
+
+    function rollDice() {
+        const customerId = localStorage.getItem('customerId');
+        const productId = 5; // ID продукта iPhone 15
+        const url = `/api/roll-dice?customerId=${customerId}&productId=${productId}`;
+
+        fetch(url, {
+            method: 'POST'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to roll dice');
+                }
+                return response.json();
+            })
+            .then(data => {
+                handleDiceRollResult(data);
+            })
+            .catch(error => {
+                console.error('Error rolling dice:', error);
+                // Обработка ошибки, если не удалось выполнить бросок костей
+            });
+    }
+
+    function handleDiceRollResult(result) {
+        const diceContainer = document.querySelector('.dice-container');
+
+        // Clear the container before adding new results
+        diceContainer.innerHTML = '';
+
+        // Create elements to display dice roll results
+        const resultMessage = document.createElement('p');
+        resultMessage.textContent = `Первая кость: ${result.die1}, Вторая кость: ${result.die2}`;
+        diceContainer.appendChild(resultMessage);
+
+        // Create image elements for the rolled dice
+        const dice1Image = document.createElement('img');
+        dice1Image.src = `/static/dice${result.die1}.jpg`; // Путь к изображению для первой кости
+        dice1Image.alt = `Dice ${result.die1}`;
+        diceContainer.appendChild(dice1Image);
+
+        const dice2Image = document.createElement('img');
+        dice2Image.src = `/static/dice${result.die2}.jpg`; // Путь к изображению для второй кости
+        dice2Image.alt = `Dice ${result.die2}`;
+        diceContainer.appendChild(dice2Image);
+
+        // Handle discount applied logic
+        if (result.discountApplied) {
+            if (result.die1 === 6 && result.die2 === 6) {
+                alert('Выпало 6 на обеих костях! Применён скидочный купон на продукт.');
+                // Дополнительная логика для применения скидки на продукт
+            } else {
+                alert('Бросок выполнен, но не выпало две шестёрки.');
+            }
+        } else {
+            alert('Бросок уже выполнен для этого пользователя и продукта.');
+        }
+    }
 
     // document.addEventListener('DOMContentLoaded', function() {
     //     fetchWeatherForBaku();
@@ -558,16 +655,6 @@
     //         }
     //     }
     // }
-    function checkTokenExpiration() {
-        const refreshTokenExpiration = localStorage.getItem('refresh_token_expiration');
-        const currentTime = new Date().getTime() / 1000;
-
-        if (refreshTokenExpiration && currentTime > refreshTokenExpiration) {
-            logout(); // Если refreshToken истек, разлогиниваем пользователя
-        } else {
-            refreshToken(); // Обновляем refreshToken, если он действителен
-        }
-    }
 
 
     function refreshToken() {
@@ -635,7 +722,7 @@
     }
 
     // Проверять срок действия токена
-    setInterval(checkTokenExpiration, 60000);
+
 
     const categoriesSection = document.getElementById('categories-section');
     const allCategoriesButton = document.getElementById('all-categories-button');
