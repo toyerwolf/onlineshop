@@ -877,7 +877,7 @@
                         <input type="number" class="quantity-input" value="1" min="1">
                         <button class="quantity-btn" onclick="incrementQuantity(this)">+</button>
                     </div>
-                    <button onclick="makeOrder(${product.id})">Заказать</button>
+                    <button onclick="makeOrder(${product.id})">Make Order</button>
                 `;
                     productsSection.appendChild(productCard);
                 });
@@ -1082,8 +1082,9 @@
     function rateProduct(starElement) {
         const productId = starElement.closest('.product-card').getAttribute('data-product-id');
         const ratingValue = parseInt(starElement.getAttribute('data-value'));
-        checkTokenExpiration();
 
+        // Проверяем срок действия токенов перед отправкой запроса
+        checkTokenExpiration();
 
         const accessToken = localStorage.getItem('access_token');
         const customerId = localStorage.getItem('customerId');
@@ -1096,7 +1097,6 @@
 
         // Отправляем запрос на сервер для оценки продукта
         fetch(`/ratings/${productId}/rate`, {
-
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1106,6 +1106,10 @@
         })
             .then(response => {
                 if (!response.ok) {
+                    if (response.status === 401) { // Проверяем статус 401 (Unauthorized)
+                        logout(); // Вызываем logout при неавторизованном доступе
+                        throw new Error('Unauthorized: User logged out');
+                    }
                     throw new Error('Failed to rate product');
                 }
                 return response.json(); // Получаем JSON-ответ
