@@ -158,6 +158,19 @@ public class HomeController {
     }
 
 
+    @GetMapping("/product-details")
+    public String getProductDetailsPage() {
+        return "product-details";
+    }
+
+    @GetMapping("home/products/{id}")
+    public String getProductById(@PathVariable Long id, Model model) {
+        ProductDto productDto = productService.getProductById(id);
+        model.addAttribute("product", productDto);
+        return "product-details";
+    }
+
+
 
 
 }
