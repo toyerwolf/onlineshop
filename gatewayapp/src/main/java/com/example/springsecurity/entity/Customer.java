@@ -53,6 +53,10 @@ public class Customer {
     private CustomerDiscount customerDiscount;
 
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "wishlist_id", referencedColumnName = "id")
+    private Wishlist wishlist;
+
 }
 
 
