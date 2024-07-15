@@ -82,3 +82,66 @@ export function logout() {
     // Перенаправить пользователя на страницу входа или выполнить другие действия
     window.location.href = '/login';
 }
+
+export async function checkTokenExpiration() {
+    try {
+        const refreshTokenExpiration = localStorage.getItem('refresh_token_expiration');
+        const currentTime = Math.floor(new Date().getTime() / 1000); // Округляем текущее время в секундах
+
+        if (refreshTokenExpiration && currentTime > parseInt(refreshTokenExpiration)) {
+            logout(); // Если refreshToken истек, разлогиниваем пользователя
+        } else {
+            await refreshToken(); // Обновляем refreshToken, если он действителен
+        }
+    } catch (error) {
+        console.error('Error checking token expiration:', error);
+    }
+}
+
+
+function checkTokenAvailability() {
+    const accessToken = localStorage.getItem('access_token');
+    const productCards = document.querySelectorAll('.product-card');
+
+    productCards.forEach(card => {
+        const makeOrderButton = card.querySelector('button[data-action="make-order"]');
+        if (makeOrderButton) {
+            if (accessToken) {
+                makeOrderButton.style.display = 'block';
+            } else {
+                makeOrderButton.style.display = 'none';
+            }
+        }
+
+        const quantityButtons = card.querySelectorAll('.quantity-btn');
+        const quantityInput = card.querySelector('.quantity-input');
+        if (quantityInput) {
+            if (accessToken) {
+                quantityButtons.forEach(button => {
+                    button.style.display = 'inline-block';
+                });
+                quantityInput.style.display = 'inline-block';
+            } else {
+                quantityButtons.forEach(button => {
+                    button.style.display = 'none';
+                });
+                quantityInput.style.display = 'none';
+            }
+        }
+
+        const ratingStars = card.querySelectorAll('.rating .star');
+        if (ratingStars.length > 0) {
+            if (accessToken) {
+                ratingStars.forEach(star => {
+                    star.style.display = 'inline-block';
+                });
+            } else {
+                ratingStars.forEach(star => {
+                    star.style.display = 'none';
+                });
+            }
+        }
+    });
+}
+
+setInterval(checkTokenExpiration, 75000);

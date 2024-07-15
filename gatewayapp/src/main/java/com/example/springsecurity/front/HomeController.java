@@ -170,6 +170,11 @@ public class HomeController {
         return "product-details";
     }
 
+    @GetMapping("/wishlist.html")
+    public String viewWishlist() {
+        return "wishlist"; // возвращает имя файла wishlist.html
+    }
+
 
 
 

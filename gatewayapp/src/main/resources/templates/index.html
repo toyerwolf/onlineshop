@@ -4,406 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Shopping</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .auth-links {
-            text-align: right;
-            position: absolute;
-            top: 20px;
-            right: 20px;
-        }
-
-        .auth-links a {
-            color: #4CAF50;
-            text-decoration: none;
-            margin-left: 10px;
-        }
-
-        .auth-links a:hover {
-            text-decoration: underline;
-        }
-
-        .search-bar {
-            text-align: right;
-            margin-bottom: 20px;
-        }
-
-        .search-bar input[type="text"] {
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            width: 200px;
-        }
-
-        .search-bar button {
-            padding: 10px 20px;
-            border-radius: 5px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-
-        .category-list {
-            display: none;
-            flex-wrap: wrap;
-            justify-content: center;
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .category-list.active {
-            display: flex;
-        }
-
-        .category-card {
-            background-color: #fff;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            text-align: center;
-            width: 250px;
-            margin: 15px;
-        }
-
-        .category-card h3 {
-            margin-top: 10px;
-            margin-bottom: 5px;
-            font-size: 20px;
-        }
-
-        .category-card p {
-            margin-bottom: 10px;
-            color: #666;
-            font-size: 16px;
-        }
-
-        .category-card button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 3px;
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            width: 100%;
-        }
-
-        .category-card button:hover {
-            background-color: #45a049;
-        }
-
-        .product-list {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .product-card {
-            position: relative;
-            background-color: #fff;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            text-align: center;
-            width: 250px;
-            margin: 15px;
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Плавные переходы */
-        }
-
-        .product-card:hover {
-            transform: translateY(-5px); /* Поднятие карточки при наведении */
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Усиленная тень при наведении */
-        }
-
-        .product-card img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 5px;
-        }
-
-        .product-card h3 {
-            margin-top: 10px;
-            margin-bottom: 5px;
-            font-size: 18px;
-        }
-
-        .product-card p {
-            margin-bottom: 10px;
-            color: #666;
-            font-size: 16px;
-        }
-
-        .product-card .price {
-            font-weight: bold;
-            color: #4CAF50;
-            font-size: 18px;
-        }
-
-        .product-card .quantity {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .product-card .quantity button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            cursor: pointer;
-        }
-
-        .product-card .quantity input {
-            width: 50px;
-            text-align: center;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin: 0 10px;
-            padding: 5px;
-        }
-
-        .product-card .quantity input:focus {
-            outline: none;
-        }
-
-        .product-card .quantity button:hover {
-            background-color: #45a049;
-        }
-
-        .pagination {
-            text-align: center; /* Выравниваем текст пагинации по центру */
-            margin-top: 20px; /* Добавляем отступ сверху */
-        }
-
-        .pagination a {
-            color: #4CAF50;
-            text-decoration: none;
-            padding: 5px 10px;
-            margin: 0 5px;
-            border: 1px solid #4CAF50;
-            border-radius: 3px;
-        }
-
-        .pagination a:hover {
-            background-color: #4CAF50;
-            color: white}
-
-        .pagination a {
-            color: #4CAF50;
-            text-decoration: none;
-            padding: 5px 10px;
-            margin: 0 5px;
-            border: 1px solid #4CAF50;
-            border-radius: 3px;
-        }
-
-        .pagination a:hover {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        .logout-button, #my-orders-button {
-            background-color: #ff4444;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 20px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin-left: 10px;
-        }
-
-        .logout-button:hover, #my-orders-button:hover {
-            background-color: #cc0000;
-        }
-
-        /*.weather-container {*/
-        /*    position: sticky; !* Фиксированная позиция для блока,esli fixed no ne budet zaviset ot kursora//fixed *!*/
-        /*    top: 20px; !* Отступ сверху *!*/
-        /*    left: 20px; !* Отступ слева *!*/
-        /*    padding: 10px; !* Внутренний отступ для контейнера *!*/
-        /*    background-color: #f0f0f0; !* Цвет фона *!*/
-        /*    border: 1px solid #ccc; !* Рамка *!*/
-        /*    border-radius: 5px; !* Закругление углов *!*/
-        /*    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); !* Тень *!*/
-        /*    width: 250px; !* Ширина блока *!*/
-        /*}*/
-
-        .weather-container {
-            position: sticky;
-            top: 20px; /* Отступ сверху от начала "зафиксированного" состояния */
-            padding: 10px;
-            background-color: #f0f0f0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 250px;
-            z-index: 1000; /* Позиционируем поверх других элементов */
-        }
-
-        .weather-location {
-            font-size: 1.2em; /* Размер шрифта заголовка */
-            font-weight: bold; /* Жирный шрифт для заголовка */
-            margin-bottom: 10px; /* Отступ снизу для заголовка */
-        }
-
-        .weather-temperature {
-            font-size: 2em; /* Размер шрифта для температуры */
-            margin-bottom: 10px; /* Отступ снизу для температуры */
-        }
-
-        .weather-icon {
-            width: 50px; /* Ширина иконки */
-            height: 50px; /* Высота иконки */
-            margin-bottom: 10px; /* Отступ снизу для иконки */
-        }
-
-        .weather-description {
-            font-size: 0.9em; /* Размер шрифта для описания */
-        }
-
-        #my-orders-button {
-            padding: 10px 20px; /* Подходящие отступы для кнопки */
-            font-size: 16px; /* Размер шрифта текста на кнопке */
-            background-color: #007bff; /* Цвет фона кнопки */
-            color: #fff; /* Цвет текста на кнопке */
-            border: none; /* Убираем границу кнопки */
-            border-radius: 5px; /* Закругление углов кнопки */
-            cursor: pointer; /* Изменяем курсор при наведении */
-            transition: background-color 0.3s ease; /* Плавное изменение цвета фона */
-        }
-
-        /* Стили для кнопки "My Orders" при наведении */
-        #my-orders-button:hover {
-            background-color: #0056b3; /* Темный оттенок для активного состояния */
-        }
-
-        .header-image {
-            width: 100%; /* Ширина изображения будет занимать 100% доступной ширины контейнера */
-            height: auto; /* Автоматический расчет высоты для поддержки пропорций */
-            object-fit: cover; /* Масштабирование и обрезка изображения */
-            display: block;
-            margin: 0 auto 30px auto; /* Центрирование изображения и отступ снизу */
-            max-width: 1500px; /* Ограничение максимальной ширины изображения для больших экранов */
-            max-height: 300px; /* Ограничение максимальной высоты изображения */
-        }
-
-        .price {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-
-        .original-price {
-            text-decoration: line-through;
-            color: #999;
-            margin-right: 5px;
-        }
-
-        .discounted-price {
-            font-weight: bold;
-            color: #4CAF50;
-        }
-
-        .rating {
-            unicode-bidi: bidi-override;
-            direction: rtl;
-            text-align: center;
-        }
-
-        .rating > .star {
-            display: inline-block;
-            position: relative;
-            font-size: 20px;
-            color: #ddd;
-            cursor: pointer;
-        }
-
-        .rating > .star:hover:before,
-        .rating > .star:hover ~ .star:before {
-            content: '\2605';
-            position: absolute;
-            color: gold;
-        }
-
-        .rating > .star.active:before,
-        .rating > .star.active ~ .star:before {
-            content: '\2605';
-            position: absolute;
-            color: gold;
-        }
-
-        .dice-container {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .dice {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        .dice:hover {
-            background-color: #0056b3;
-        }
-
-        .heart {
-            cursor: pointer;
-            position: absolute;
-            top: 10px; /* Отступ от верхнего края карточки */
-            right: 10px; /* Отступ от правого края карточки */
-            font-size: 24px; /* Размер сердечка */
-            transition: color 0.3s ease; /* Плавное изменение цвета */
-        }
-
-        .heart::before {
-            content: '♡'; /* Символ сердечка */
-            font-size: 24px; /* Размер символа */
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-
-        .heart.favorite::before {
-            content: '❤'; /* Символ сердечка при добавлении в избранное */
-            color: red; /* Красный цвет символа */
-        }
-
-
-    </style>
+    <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
 <!--<div id="orders-section"></div>-->
@@ -425,6 +26,7 @@
             <span>Welcome, <span id="customer-name">User</span>!</span>
             <button class="logout-button" onclick="logoutUser()">Logout</button>
             <button id="my-orders-button" onclick="viewCustomerOrders()">My Orders</button>
+            <a href="wishlist.html">My Wishlist</a> <!-- Добавьте ссылку здесь -->
         </div>
     </div>
 
@@ -482,6 +84,10 @@
                 <span class="heart" onclick="toggleFavorite(this)">♡</span>
             </div>
 
+            <div id="wishlist-section" class="product-list">
+                <!-- Карточки избранных продуктов здесь -->
+            </div>
+
         </div>
 
         <!-- Пагинация -->
@@ -500,22 +106,6 @@
 
     <button id="back-button" style="display: none;">Back</button>
 
-
-    <div id="product-details">
-        <!-- Сюда будет загружаться информация о продукте -->
-    </div>
-
-    <div id="wishlist-section">
-        <a href="#" onclick="viewWishlist()">My Wishlist</a>
-    </div>
-
-
-
-
-
-
-
-
 </div>
 
 
@@ -525,77 +115,6 @@
 <script>
 
 
-    async function viewWishlist() {
-        const customerId = localStorage.getItem('customerId');
-        const accessToken = localStorage.getItem('access_token');
-
-        if (!customerId || !accessToken) {
-            console.error('Customer ID or Access Token is missing');
-            return;
-        }
-
-        try {
-            const response = await fetch(`/wishlist/getAllProducts/${customerId}`, {
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`
-                }
-            });
-
-            if (!response.ok) {
-                console.error('Failed to fetch wishlist');
-                return;
-            }
-
-            const products = await response.json();
-            const wishlistSection = document.getElementById('wishlist-section');
-            const wishlistContainer = document.createElement('div');
-            wishlistContainer.id = 'wishlist-container';
-
-            products.forEach(product => {
-                const productCard = document.createElement('div');
-                productCard.className = 'product-card';
-
-                productCard.innerHTML = `
-                <img src="${product.imageUrl}" alt="Product Image">
-                <h3>${product.name}</h3>
-                <p>${product.categoryName}</p>
-                <p class="price">
-                    ${product.discountPrice ? `
-                        <span class="original-price">${product.price}</span>
-                        <span class="discounted-price">${product.discountPrice}</span>
-                    ` : `
-                        <span>${product.price}</span>
-                    `}
-                </p>
-                <div class="quantity">
-                    <button class="quantity-btn" onclick="decrementQuantity(this)">-</button>
-                    <label>
-                        <input type="number" class="quantity-input" value="1" min="1">
-                    </label>
-                    <button class="quantity-btn" onclick="incrementQuantity(this)">+</button>
-                </div>
-                <div class="rating" data-product-id="${product.id}">
-                    <span class="star" data-value="5" onclick="rateProduct(this)">☆</span>
-                    <span class="star" data-value="4" onclick="rateProduct(this)">☆</span>
-                    <span class="star" data-value="3" onclick="rateProduct(this)">☆</span>
-                    <span class="star" data-value="2" onclick="rateProduct(this)">☆</span>
-                    <span class="star" data-value="1" onclick="rateProduct(this)">☆</span>
-                </div>
-                <div class="average-rating">
-                    <!-- Средний рейтинг продукта будет здесь -->
-                </div>
-                <button class="make-order-button" onclick="makeOrder(${product.id})">Make Order</button>
-                <span class="heart" onclick="toggleFavorite(this)">♡</span>
-            `;
-
-                wishlistContainer.appendChild(productCard);
-            });
-
-            wishlistSection.appendChild(wishlistContainer);
-        } catch (error) {
-            console.error('Error fetching wishlist items:', error);
-        }
-    }
     function toggleFavorite(element) {
         const isFavorite = element.classList.toggle('favorite');
         if (isFavorite) {
@@ -605,7 +124,7 @@
         }
     }
 
-
+    // Функция для загрузки состояния избранного при загрузке страницы
     function loadFavorites() {
         const productCards = document.querySelectorAll('.product-card');
         const customerId = localStorage.getItem('customerId');
@@ -615,10 +134,8 @@
             return;
         }
 
-        // Загрузка избранных продуктов для текущего пользователя
         const favorites = JSON.parse(localStorage.getItem(`favorites_${customerId}`)) || [];
 
-        // Применение статуса избранного к каждой карточке продукта
         productCards.forEach(card => {
             const productId = card.getAttribute('data-product-id');
             const heart = card.querySelector('.heart');
@@ -631,7 +148,7 @@
         });
     }
 
-    // Функция для сохранения состояния сердечка при добавлении или удалении из избранного
+    // Функция для добавления продукта в избранное
     function addToWishlist(element) {
         const productCard = element.closest('.product-card');
         if (!productCard) {
@@ -640,49 +157,43 @@
         }
 
         const productId = productCard.getAttribute('data-product-id');
-        const customerId = localStorage.getItem('customerId'); // Получаем customerId из localStorage
-        const accessToken = localStorage.getItem('access_token'); // Получаем accessToken из localStorage
+        const customerId = localStorage.getItem('customerId');
+        const accessToken = localStorage.getItem('access_token');
 
         if (!customerId || !accessToken) {
             console.error('Customer ID or AccessToken not found in localStorage');
             return;
         }
 
-        // Загружаем текущий список избранных продуктов пользователя
         let favorites = JSON.parse(localStorage.getItem(`favorites_${customerId}`)) || [];
 
-        // Добавляем productId в список избранных, если его там еще нет
         if (!favorites.includes(productId)) {
             favorites.push(productId);
-        }
+            localStorage.setItem(`favorites_${customerId}`, JSON.stringify(favorites));
 
-        // Сохраняем обновленный список избранных продуктов в localStorage
-        localStorage.setItem(`favorites_${customerId}`, JSON.stringify(favorites));
+            const url = '/wishlist/addProduct';
+            const data = { customerId: customerId, productId: productId };
 
-        // Отправляем запрос на сервер для добавления в избранное
-        const url = '/wishlist/addProduct'; // Замените на корректный URL вашего эндпоинта
-        const data = { customerId: customerId, productId: productId };
-
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${accessToken}` // Добавляем accessToken в заголовки запроса
-            },
-            body: JSON.stringify(data)
-        })
-            .then(response => {
-                if (response.ok) {
-                    // Успешно добавлено в избранное
-                    console.log('Product added to wishlist successfully');
-                    element.classList.add('favorite'); // Добавляем класс 'favorite' для изменения сердечка
-                } else {
-                    console.error('Failed to add product to wishlist');
-                }
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify(data)
             })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Product added to wishlist successfully');
+                        element.classList.add('favorite');
+                    } else {
+                        console.error('Failed to add product to wishlist');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
     }
 
     // Функция для удаления продукта из избранного
@@ -702,7 +213,11 @@
             return;
         }
 
-        const url = `/wishlist/removeProduct?customerId=${customerId}&productId=${productId}`; // Adjusted URL
+        let favorites = JSON.parse(localStorage.getItem(`favorites_${customerId}`)) || [];
+        favorites = favorites.filter(id => id !== productId);
+        localStorage.setItem(`favorites_${customerId}`, JSON.stringify(favorites));
+
+        const url = `/wishlist/removeProduct?customerId=${customerId}&productId=${productId}`;
 
         fetch(url, {
             method: 'DELETE',

@@ -39,4 +39,6 @@ public class WishlistController {
         wishlistService.removeProductFromWishlist(customerId, productId);
         return ResponseEntity.ok("Product removed from wishlist successfully");
     }
+
+
 }
