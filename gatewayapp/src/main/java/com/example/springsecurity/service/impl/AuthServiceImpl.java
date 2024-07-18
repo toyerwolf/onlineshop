@@ -2,11 +2,13 @@ package com.example.springsecurity.service.impl;
 
 import com.example.springsecurity.dto.JwtResponse;
 import com.example.springsecurity.dto.LoginDto;
+import com.example.springsecurity.exception.AppException;
 import com.example.springsecurity.security.JwtTokenProvider;
 import com.example.springsecurity.security.UserPrincipal;
 import com.example.springsecurity.service.AuthService;
 import io.jsonwebtoken.Claims;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -35,7 +37,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public JwtResponse refreshAccessTokenAndGenerateNewToken(String oldToken) {
        if(!jwtTokenProvider.validateToken(oldToken)){
-           throw new RuntimeException("none");}
+           throw new AppException(HttpStatus.BAD_GATEWAY,"none");}
            String username= jwtTokenProvider.getUserNameFromJwtToken(oldToken);
            return new JwtResponse(jwtTokenProvider.generateTokenFromUsername(username), jwtTokenProvider.generateRefreshTokenFromUsername(username) );
        }

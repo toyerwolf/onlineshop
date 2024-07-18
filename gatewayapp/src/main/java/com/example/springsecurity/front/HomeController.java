@@ -175,6 +175,11 @@ public class HomeController {
         return "wishlist"; // возвращает имя файла wishlist.html
     }
 
+    @GetMapping("/currency.html")
+    public String showCurrencyPage() {
+        return "currency"; // Это имя представления (view name), которое соответствует currency.html
+    }
+
 
 
 

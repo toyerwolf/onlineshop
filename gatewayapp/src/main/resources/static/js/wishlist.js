@@ -108,3 +108,4 @@ async function viewWishlist() {
         console.error('Error fetching wishlist items:', error);
     }
 }
+window.addEventListener('load', loadFavorites);

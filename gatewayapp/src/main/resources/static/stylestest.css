@@ -236,41 +236,50 @@ h1 {
     background-color: #cc0000;
 }
 
-.weather-container {
-    /*position: fixed; !* Используем fixed для фиксированного позиционирования *!*/
-    top: 20px;
-    left: 20px;
-    padding: 15px;
-    background-color: #fff;
-    border: 1px solid rgba(0, 0, 0, 0.125);
-    border-radius: 0.25rem;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    width: 250px;
-    z-index: 1000;
-}
+/*.weather-container {*/
+/*    position: sticky; !* Фиксированная позиция для блока,esli fixed no ne budet zaviset ot kursora//fixed *!*/
+/*    top: 20px; !* Отступ сверху *!*/
+/*    left: 20px; !* Отступ слева *!*/
+/*    padding: 10px; !* Внутренний отступ для контейнера *!*/
+/*    background-color: #f0f0f0; !* Цвет фона *!*/
+/*    border: 1px solid #ccc; !* Рамка *!*/
+/*    border-radius: 5px; !* Закругление углов *!*/
+/*    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); !* Тень *!*/
+/*    width: 250px; !* Ширина блока *!*/
+/*}*/
 
-.weather-location {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-}
+/*.weather-container {*/
+/*    position: sticky;*/
+/*    top: 20px; !* Отступ сверху от начала "зафиксированного" состояния *!*/
+/*    padding: 10px;*/
+/*    background-color: #f0f0f0;*/
+/*    border: 1px solid #ccc;*/
+/*    border-radius: 5px;*/
+/*    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);*/
+/*    width: 250px;*/
+/*    z-index: 1000; !* Позиционируем поверх других элементов *!*/
+/*}*/
 
-.weather-temperature {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-}
+/*.weather-location {*/
+/*    font-size: 1.2em; !* Размер шрифта заголовка *!*/
+/*    font-weight: bold; !* Жирный шрифт для заголовка *!*/
+/*    margin-bottom: 10px; !* Отступ снизу для заголовка *!*/
+/*}*/
 
-.weather-icon {
-    width: 70px;
-    height: 70px;
-    margin-bottom: 0.5rem;
-}
+/*.weather-temperature {*/
+/*    font-size: 2em; !* Размер шрифта для температуры *!*/
+/*    margin-bottom: 10px; !* Отступ снизу для температуры *!*/
+/*}*/
 
-.weather-description {
-    font-size: 1rem;
-    color: #6c757d; /* Цвет текста описания, аналогичный Bootstrap */
-    margin-bottom: 0;
-}
+/*.weather-icon {*/
+/*    width: 50px; !* Ширина иконки *!*/
+/*    height: 50px; !* Высота иконки *!*/
+/*    margin-bottom: 10px; !* Отступ снизу для иконки *!*/
+/*}*/
+
+/*.weather-description {*/
+/*    font-size: 0.9em; !* Размер шрифта для описания *!*/
+/*}*/
 
 #my-orders-button {
     padding: 10px 20px; /* Подходящие отступы для кнопки */
