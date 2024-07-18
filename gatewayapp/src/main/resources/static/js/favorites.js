@@ -7,7 +7,7 @@ export function toggleFavorite(element) {
     }
 }
 
-function loadFavorites() {
+export function loadFavorites() {
     const productCards = document.querySelectorAll('.product-card');
     const customerId = localStorage.getItem('customerId');
 
@@ -119,4 +119,4 @@ function removeFromWishlist(element) {
         });
 }
 
-export { loadFavorites }; // Добавляем экспорт loadFavorites
+// Добавляем экспорт loadFavorites
