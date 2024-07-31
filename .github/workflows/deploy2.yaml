@@ -14,23 +14,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install lftp
-        run: sudo apt-get install -y lftp
+      - name: Install SFTP and SSH tools
+        run: sudo apt-get install -y openssh-client
 
       - name: Upload JAR file via SFTP
-        run: |
-          lftp -u ${{ secrets.EC2_USER }},${{ secrets.EC2_SSH_KEY }} -e "
-            put ./gatewayapp/build/libs/gatewayapp-0.0.1-SNAPSHOT.jar -o /home/ubuntu/gatewayapp-0.0.1-SNAPSHOT.jar
-            bye
-          " sftp://${{ secrets.EC2_HOST }}
-
-      - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+          
+          sftp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} <<EOF
+            put ./gatewayapp/build/libs/gatewayapp-0.0.1-SNAPSHOT.jar /home/ubuntu/gatewayapp-0.0.1-SNAPSHOT.jar
+            bye
+          EOF
 
       - name: Restart service on EC2
         uses: appleboy/ssh-action@v0.1.7
