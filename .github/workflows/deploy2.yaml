@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build JAR file
-        run: ./gradle build # или ваша команда сборки
+        run: gradle build # или ваша команда сборки
 
       - name: Check JAR file existence
         run: ls -al ./gatewayapp/build/libs/gatewayapp-0.0.1-SNAPSHOT.jar
