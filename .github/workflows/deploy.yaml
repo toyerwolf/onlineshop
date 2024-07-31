@@ -59,33 +59,6 @@ jobs:
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
-          key: |
-            -----BEGIN RSA PRIVATE KEY-----
-            MIIEowIBAAKCAQEAmJrM9T9ya7OMaUr4GtdgJx3Izi/qvWhICR5TJaBl+9WuDPbt
-            bZVicG4EU5UsQnyCgMKIhoyxr2uegREr/bj3hEbxYIR5OGwJ8sIFivVLtDdHN/o7
-            sQg4XasbE5UltbElsc6+ZYd5UhQczXi49ZU1Vk3G7bW09436eZSjJKlP1iwSKJ3Q
-            qQRDbLII5gD8Vsti1Z3oaqUzvkH/f334gxP1LeLOjfW+CTdGU+UBSfmYZhoRaasq
-            aQFssdA2ATdAvIh4hQJPGM9cc+E1+iti4uJyQ6IoYPUbQ+tPnyKScXOONgpOdexe
-            Amb7mFajjM5HIKmLVCU7YSsbu0GUhyEDzJQyswIDAQABAoIBAF/QcfdZysGMjhBe
-            HcDckWZ98OJke4JIw1HWVGY/e0jPNOS29QPk01W7/cNs2ck028t0WLwCAl4dt/tZ
-            iMFZLS9ES7FJ+8JNM0HUSB6jPND+FB01Y90XSCynjeyRrIeTnhMxt6GPmcDLF/p6
-            Xcbz0/VICCqf9+umnSlRBc2y8ImLTJUZ3mOqZQF/VWjbhYsrBe4px600VBRT1jHe
-            VxsOCF4AberdDOatxLm5lQqhaWwb4coYV0qQgsh8b4a6djts5GZo4r/TOOdkH2gM
-            sVnMeBxcVoERxG6MhvKGIq26dUmLbssBxb1OMn8v3TyR1IpsxzT4lhaWbcWqcidg
-            UyxRdIECgYEA81hEsHIZTAa5USqEWLNKUOctQEsfELV0bjCM/GkYGjlwYvB+uZ8i
-            UUpHVyBFjl/nagva6sDNnXngZzOnVgcT0T8KtqPznNwC4fLhT3E2F+/GfUpYQ+A+
-            leCbNvvwPlf9WQNVywCY4EzbJCAiLJYy48lxiRGUKcj7/kpwOVBMQXECgYEAoIp6
-            gDbc+fZU84G+/qEWNCRYLryT/YCnRxBAMK0tFTy11iFwzBl8L+VErkrpGGYTHJdP
-            rhtf/4pdAay5uA30d8VMuPpO/WsK9LcB2UU9piY9WiBKomF0M13wt1aSpdKmARQ3
-            wTnGC3vYfkbtJe/dZc69rnvO9fPQOgYgI5KTJGMCgYEA6bHJNZI9zQ9gBRzJwM1d
-            /1gj0uzRxqAcUn35x6W96eFjlwDTErxKnrqwzHFHmzVq7iK4eF30mNkksreeajWd
-            yIO8bC4DlI6NjiRMUJiulEpG2qf9ICJIuHLdXO6Sh6zEtylGyQ+nwTDN+2GIsD0G
-            Xk9k43eoTICh0FH4eHIu6WECgYAQp60jxg1QxVR02r4EzpNuH2Minh/ASeuQvMfc
-            BOtLa7v1lgyMsAwpL+DbMBxUkqpi6fOzPVXNPf5+IPw3cwMstcRK4HT3Z3aAgsfn
-            UX6e0RLGWdlEVVXnylQhwRJ/r4XXUNCj9CluoY+JMjSCHgta94LIKkIDVCMDEgWd
-            iyRGvwKBgEP4QK3F3MWeAT+4lUTgA9ilmQkIUcGBwMRWbKJO42SOx/tCkMxeDtP9
-            VX0exTDMuKOteCPvP4CGFHXJ+dogiSlQhP5VyBm3MuHMjfp8gFqBy8iJM2qON/8+
-            jwlye5IEChL0HtbYILnUA6FqpeEMyZmx72dD72Bt/UpclEiwhRUA
-            -----END RSA PRIVATE KEY-----
+          key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             echo "SSH connection successful. Test command executed."
