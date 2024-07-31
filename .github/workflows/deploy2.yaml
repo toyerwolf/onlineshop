@@ -1,64 +1,64 @@
-#name: Deploy to EC2
-#
-#on:
-#  push:
-#    branches: [ "master" ]
-#  pull_request:
-#    branches: [ "master" ]
-#
-#jobs:
-#  build:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout code
-#        uses: actions/checkout@v4
-#
-#      - name: Build JAR file
-#        run: ./gradlew build # или ваша команда сборки
-#
-#      - name: Check JAR file existence
-#        run: ls -al ./gatewayapp/build/libs/gatewayapp-0.0.1-SNAPSHOT.jar
-#
-#      - name: Upload JAR file as artifact
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: gatewayapp-jar
-#          path: ./gatewayapp/build/libs/gatewayapp-0.0.1-SNAPSHOT.jar
-#
-#  deploy:
-#    needs: build
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Download artifact
-#        uses: actions/download-artifact@v3
-#        with:
-#          name: gatewayapp-jar
-#
-#      - name: Setup SSH key
-#        run: |
-#          mkdir -p ~/.ssh
-#          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
-#          chmod 600 ~/.ssh/id_rsa
-#
-#      - name: Check downloaded artifact
-#        run: ls -al ./gatewayapp-0.0.1-SNAPSHOT.jar
-#
-#      - name: Upload JAR file via SFTP
-#        run: |
-#          sftp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} <<EOF
-#            put ./gatewayapp-0.0.1-SNAPSHOT.jar /home/ubuntu/gatewayapp-0.0.1-SNAPSHOT.jar
-#            bye
-#          EOF
-#
-#      - name: Restart service on EC2
-#        uses: appleboy/ssh-action@v0.1.7
-#        with:
-#          host: ${{ secrets.EC2_HOST }}
-#          username: ${{ secrets.EC2_USER }}
-#          key: ${{ secrets.EC2_SSH_KEY }}
-#          script: |
-#            echo "Updating JAR file and restarting service..."
-#            sudo systemctl stop gatewayapp.service
-#            sudo systemctl daemon-reload
-#            sudo systemctl start gatewayapp.service
-#            sudo systemctl status gatewayapp.service
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build JAR file
+        run: ./gradlew build # или ваша команда сборки
+
+      - name: Check JAR file existence
+        run: ls -al ./gatewayapp/build/libs/gatewayapp-0.0.1-SNAPSHOT.jar
+
+      - name: Upload JAR file as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: gatewayapp-jar
+          path: ./gatewayapp/build/libs/gatewayapp-0.0.1-SNAPSHOT.jar
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: gatewayapp-jar
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Check downloaded artifact
+        run: ls -al ./gatewayapp-0.0.1-SNAPSHOT.jar
+
+      - name: Upload JAR file via SFTP
+        run: |
+          sftp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} <<EOF
+            put ./gatewayapp-0.0.1-SNAPSHOT.jar /home/ubuntu/gatewayapp-0.0.1-SNAPSHOT.jar
+            bye
+          EOF
+
+      - name: Restart service on EC2
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            echo "Updating JAR file and restarting service..."
+            sudo systemctl stop gatewayapp.service
+            sudo systemctl daemon-reload
+            sudo systemctl start gatewayapp.service
+            sudo systemctl status gatewayapp.service
