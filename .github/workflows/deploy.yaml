@@ -22,17 +22,30 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build with Gradle
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3.1.0
+        with:
+          gradle-version: '8.9'
+
+      - name: List project directory
+        run: ls -R
+
+      - name: List gatewayapp directory
+        run: ls -R ./gatewayapp
+
+      - name: Build online-shopping with Gradle
         run: gradle build -x test bootJar
+        shell: sh
+        working-directory: ./gatewayapp
 
       - name: List files in build/libs directory
-        run: ls -l build/libs
+        run: ls -l ./gatewayapp/build/libs
 
-      - name: Upload JAR file
+      - name: Archive build artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: gatewayapp-jar
-          path: build/libs/gatewayapp-0.0.1-SNAPSHOT.jar
+          name: app-jar
+          path: gatewayapp/build/libs/*.jar
 
   deploy:
     name: Deploy
@@ -42,7 +55,7 @@ jobs:
       - name: Download JAR file
         uses: actions/download-artifact@v2
         with:
-          name: gatewayapp-jar
+          name: app-jar
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v0.1.2
@@ -57,7 +70,7 @@ jobs:
             rm -f gatewayapp-0.0.1-SNAPSHOT.jar
             
             # Копирование нового JAR файла
-            scp -o StrictHostKeyChecking=no -i ${{ secrets.EC2_SSH_KEY }} build/libs/gatewayapp-0.0.1-SNAPSHOT.jar ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/
+            scp -o StrictHostKeyChecking=no -i ${{ secrets.EC2_SSH_KEY }} gatewayapp-0.0.1-SNAPSHOT.jar ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/
             
             # Перезагрузка сервиса
             sudo systemctl daemon-reload
