@@ -34,7 +34,7 @@ jobs:
         run: ls -R ./gatewayapp
 
       - name: Build gatewayapp with Gradle
-        run: gradle bootJar
+        run: gradle build
         shell: sh
         working-directory: ./gatewayapp
 
