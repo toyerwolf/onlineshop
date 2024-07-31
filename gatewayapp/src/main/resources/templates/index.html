@@ -5,15 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Shopping</title>
     <link rel="stylesheet" href="/styles.css">
-<!--    <script src="https://unpkg.com/zooming/build/zooming.min.js"></script>-->
-<!--    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>-->
+    <!-- Подключаем jQuery и Zooming JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/zooming/build/zooming.min.js"></script>
     <script src="/js/zoom.js"></script>
 </head>
 <body>
-<!--<div id="orders-section"></div>-->
-
+<!-- Раздел для погоды -->
 <div id="weather-container" class="weather-container">
     <div class="weather-location">Baku</div>
     <div class="weather-temperature" id="weather-temperature">--°C</div>
@@ -31,7 +29,7 @@
             <span>Welcome, <span id="customer-name">User</span>!</span>
             <button class="logout-button" onclick="logoutUser()">Logout</button>
             <button id="my-orders-button" onclick="viewCustomerOrders()">My Orders</button>
-            <a href="wishlist.html">My Wishlist</a> <!-- Добавьте ссылку здесь -->
+            <a href="wishlist.html">My Wishlist</a>
         </div>
     </div>
 
@@ -49,10 +47,7 @@
 
     <ul id="categories-section" class="category-list"></ul>
 
-
     <div class="container">
-<!--        <h1>Featured Products</h1>-->
-
         <div id="products-section" class="product-list">
             <!-- Карточки продуктов здесь -->
             <div class="product-card" th:each="product : ${products.content}" th:data-product-id="${product.id}">
@@ -90,36 +85,40 @@
             </div>
         </div>
 
-            <div id="wishlist-section" class="product-list">
-                <!-- Карточки избранных продуктов здесь -->
-            </div>
-
-        </div>
-
-        <!-- Пагинация -->
-        <div class="pagination">
-            <a th:if="${products.hasPrevious()}" th:href="@{/ (page=${products.number})}">Previous</a>
-            <span th:each="i : ${#numbers.sequence(1, products.totalPages)}" th:if="${i >= products.number - 2 && i <= products.number + 2}">
-            <a th:href="@{/ (page=${i})}" th:text="${i}" th:classappend="${i == products.number + 1} ? 'active' : ''"></a>
-        </span>
-            <a th:if="${products.hasNext()}" th:href="@{/ (page=${products.number + 2})}">Next</a>
+        <div id="wishlist-section" class="product-list">
+            <!-- Карточки избранных продуктов здесь -->
         </div>
     </div>
 
-    <div class="dice-container">
-        <button class="dice" onclick="rollDice()">Бросить кости</button>
+    <!-- Пагинация -->
+    <div class="pagination">
+        <a th:if="${products.hasPrevious()}" th:href="@{/ (page=${products.number})}">Previous</a>
+        <span th:each="i : ${#numbers.sequence(1, products.totalPages)}" th:if="${i >= products.number - 2 && i <= products.number + 2}">
+                <a th:href="@{/ (page=${i})}" th:text="${i}" th:classappend="${i == products.number + 1} ? 'active' : ''"></a>
+            </span>
+        <a th:if="${products.hasNext()}" th:href="@{/ (page=${products.number + 2})}">Next</a>
     </div>
+</div>
 
-    <button id="back-button" style="display: none;">Back</button>
+<div class="dice-container">
+    <button class="dice" onclick="rollDice()">Бросить кости</button>
+</div>
 
-    <div id="currency-container">
-        <!-- Контейнер для данных о валютных курсах -->
-    </div>
+<button id="back-button" style="display: none;">Back</button>
 
-    <script src="/js/currency.js"></script>
+<div id="currency-container">
+    <!-- Контейнер для данных о валютных курсах -->
+</div>
+
+<script src="/js/currency.js"></script>
+
+
+
+
 
 
 <script>
+
 
     document.addEventListener('DOMContentLoaded', function() {
         const images = document.querySelectorAll('.zoomable-image');
@@ -136,6 +135,8 @@
             });
         });
     });
+
+
 
     function toggleFavorite(element) {
         const isFavorite = element.classList.toggle('favorite');
