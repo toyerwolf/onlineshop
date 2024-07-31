@@ -32,7 +32,7 @@ jobs:
         env:
           SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
 
-      - name: Deploy and restart service on EC2
+      - name: Restart service on EC2
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -42,10 +42,9 @@ jobs:
             echo "Updating JAR file and restarting service..."
             # Stop the service
             sudo systemctl stop gatewayapp.service
-            # Replace the old JAR with the new one
-            sudo cp /home/ubuntu/gatewayapp-0.0.1-SNAPSHOT.jar /home/ubuntu/gatewayapp-0.0.1-SNAPSHOT.jar
-            # Reload and restart the service
+            # Reload the systemd configuration
             sudo systemctl daemon-reload
+            # Start the service
             sudo systemctl start gatewayapp.service
             # Check the status of the service
             sudo systemctl status gatewayapp.service
