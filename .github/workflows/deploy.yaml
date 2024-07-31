@@ -87,5 +87,5 @@ jobs:
             # Reload and restart the service
             sudo systemctl daemon-reload
             sudo systemctl start gatewayapp.service
-            # Check the status of the service
+            # Check the status of the service test
             sudo systemctl status gatewayapp.service
