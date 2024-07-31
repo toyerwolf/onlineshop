@@ -59,11 +59,17 @@ jobs:
         with:
           name: app-jar
 
-      - name: Copy JAR file to EC2
+      - name: Setup SSH key
         run: |
-          scp -i /tmp/id_rsa -o StrictHostKeyChecking=no ./gatewayapp/build/libs/gatewayapp-0.0.1-SNAPSHOT.jar ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/gatewayapp-0.0.1-SNAPSHOT.jar
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
         env:
           SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: Copy JAR file to EC2
+        run: |
+          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ./gatewayapp/build/libs/gatewayapp-0.0.1-SNAPSHOT.jar ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/gatewayapp-0.0.1-SNAPSHOT.jar
 
       - name: Deploy and restart service on EC2
         uses: appleboy/ssh-action@v0.1.7
