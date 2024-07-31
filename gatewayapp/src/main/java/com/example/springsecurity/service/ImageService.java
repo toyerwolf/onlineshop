@@ -6,6 +6,6 @@ import java.io.IOException;
 
 public interface ImageService {
 
-     String saveImage(MultipartFile image) throws IOException;
-    void changeImage(Long productId, MultipartFile updatedImage) throws IOException;
+     String saveImage(MultipartFile image);
+    void changeImage(Long productId, MultipartFile updatedImage) ;
 }

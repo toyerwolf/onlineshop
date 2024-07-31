@@ -8,6 +8,7 @@ import com.example.springsecurity.exception.NotFoundException;
 import com.example.springsecurity.repository.CustomerCardDetailsRepository;
 import com.example.springsecurity.repository.CustomerRepository;
 import com.example.springsecurity.req.CustomerCardReq;
+import com.example.springsecurity.service.AuthService;
 import com.example.springsecurity.service.CardService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -23,12 +24,14 @@ public class CardServiceImpl implements CardService {
 
     private final CustomerRepository customerRepository;
    private final CustomerCardDetailsRepository cardDetailsRepository;
+   private final CustomerFinderService customerFinderService;
+   private final AuthService authService;
 
 
-   @Override
-    public void addCardToCustomer(Long customerId, CustomerCardReq customerCardReq) {
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new NotFoundException("Customer not found"));
+    public void addCardToCustomer(CustomerCardReq customerCardReq, Long customerId) {
+        // Поиск клиента по полученному customerId
+        Customer customer = customerFinderService.findCustomerById(customerId);
+
         if (isCardNumberUnique(customerCardReq.getCardNumber())) {
             CustomerCardDetails cardDetails = new CustomerCardDetails();
             cardDetails.setCardNumber(customerCardReq.getCardNumber());

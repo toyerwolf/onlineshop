@@ -1,33 +1,36 @@
 package com.example.springsecurity.service.impl;
 
 import com.example.springsecurity.entity.Product;
+
 import com.example.springsecurity.exception.InvalidFileExtensionException;
 import com.example.springsecurity.exception.NotFoundException;
+
 import com.example.springsecurity.repository.ProductRepository;
-import org.junit.jupiter.api.Assertions;
+
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.io.TempDir;
+
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.env.Environment;
+
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+
 import static org.mockito.Mockito.*;
 
 
@@ -39,6 +42,13 @@ class ImageServiceImplTest {
 
     @Mock
     private ProductRepository productRepository;
+
+
+
+
+
+
+
 
 
     @Test
@@ -162,4 +172,73 @@ class ImageServiceImplTest {
         assertEquals("Invalid extension for file", exception.getMessage());
     }
 
+    @Test
+    void testValidateAndCleanFileName_ValidExtension() {
+        ImageServiceImpl imageService = new ImageServiceImpl(null,null); // Замените ... на ваши зависимости
+        imageService.setAllowedFileExtension(Arrays.asList("jpg", "png"));
+        String fileName = "image.jpg";
+
+        String cleanedFileName = imageService.validateAndCleanFileName(fileName);
+
+        assertEquals("image.jpg", cleanedFileName);
+    }
+
+    @Test
+    void testValidateAndCleanFileName_InvalidExtension() {
+        ImageServiceImpl imageService = new ImageServiceImpl(null,null); // Замените ... на ваши зависимости
+        imageService.setAllowedFileExtension(Arrays.asList("jpg", "png"));
+        String fileName = "image.txt";
+
+        InvalidFileExtensionException thrown = assertThrows(InvalidFileExtensionException.class, () ->
+                imageService.validateAndCleanFileName(fileName)
+        );
+
+        assertEquals("Invalid extension for file", thrown.getMessage());
+    }
+
+
+    @Test
+    void testGetUploadPath_Success() {
+        ImageServiceImpl imageService = new ImageServiceImpl(null,null);
+
+        Path path = imageService.getUploadPath();
+
+        assertNotNull(path);
+        assertTrue(Files.exists(path), "Upload path should exist");
+    }
+
+    @Test
+    void testCreateDirectoriesIfNotExists_DirectoryAlreadyExists() throws IOException {
+        ImageServiceImpl imageService = new ImageServiceImpl(null, null);
+        Path path = Paths.get("tempDir");
+
+        // Создайте директорию
+        Files.createDirectory(path);
+
+        // Убедитесь, что директория была создана
+        assertTrue(Files.isDirectory(path));
+
+        // Вызовите метод, который проверяет и, возможно, создает директорию
+        imageService.createDirectoriesIfNotExists(path);
+
+        // Убедитесь, что директория не была повторно создана
+        assertTrue(Files.isDirectory(path));
+
+        // Удалите временную директорию
+        if (Files.exists(path)) {
+            Files.walk(path)
+                    .map(Path::toFile)
+                    .forEach(file -> {
+                        if (!file.delete()) {
+                            throw new RuntimeException("Failed to delete file: " + file);
+                        }
+                    });
+            Files.deleteIfExists(path);
+        }
+
+
 }
+}
+
+
+

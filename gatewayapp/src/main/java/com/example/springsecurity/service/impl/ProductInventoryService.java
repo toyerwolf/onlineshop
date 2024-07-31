@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 public class ProductInventoryService {
     private final ProductService productService;
     private final ProductRepository productRepository;
+    private final ProductFinderService productFinderService;
 
     public void validateProductQuantities(Map<Product, Integer> productQuantities) {
         for (Map.Entry<Product, Integer> entry : productQuantities.entrySet()) {
@@ -39,7 +40,7 @@ public class ProductInventoryService {
         for (Map.Entry<Long, Integer> entry : productQuantities.entrySet()) {
             Long productId = entry.getKey();
             Integer quantity = entry.getValue();
-            Product product = productService.findProductById(productId);
+            Product product = productFinderService.findProductById(productId);
             products.put(product, quantity);
         }
         return products;
@@ -55,8 +56,7 @@ public class ProductInventoryService {
 
     @Transactional
     public void increaseProductCount(Product product, int quantity) {
-        Product existingProduct = productRepository.findById(product.getId())
-                .orElseThrow(() -> new NotFoundException("Product not found with id: " + product.getId()));
+        Product existingProduct = productFinderService.findProductById(product.getId());
         int newQuantity = existingProduct.getQuantity() + quantity;
         existingProduct.setQuantity(newQuantity);
         productRepository.save(existingProduct);

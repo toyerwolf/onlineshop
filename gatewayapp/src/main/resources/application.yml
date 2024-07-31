@@ -3,7 +3,7 @@ server:
 
 spring:
   profiles:
-    include: db,actuator
+    include: db,actuator,google
   main:
     allow-bean-definition-overriding: true
   mvc:
@@ -24,8 +24,8 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: debug
 
 jwtSecret: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9123saddsaA2sdGgfsa
-jwtExpirationInMs: 36000
-refreshTokenExpiration: 60000
+jwtExpirationInMs: 360000
+refreshTokenExpiration: 600000
 allowed-file-extension: jpg,jpeg,gif,ico,png
 
 

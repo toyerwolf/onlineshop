@@ -48,6 +48,7 @@ public class OrderServiceImpl implements OrderService {
     private final ProductService productService;
     private final CustomerService customerService;
     private OrderRepository orderRepository;
+    private final ProductFinderService productFinderService;
     private final OrderMapper orderMapper=OrderMapper.INSTANCE;
     private final CustomerBalanceService customerBalanceService;
     private final ProductInventoryService productInventoryService;
@@ -57,6 +58,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderProductService orderProductService;
 
     private final CustomerDiscountService customerDiscountService;
+    private final CustomerFinderService customerFinderService;
     public static final long DELAY_IN_MINUTES = 1;
 
 
@@ -64,11 +66,11 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderResponse makeOrder(Long customerId, OrderRequest orderRequest) {
-        Customer customer = customerService.findCustomerById(customerId);
-        BigDecimal totalAmount = calculateTotalAmount(orderRequest);
-        customerBalanceService.validateCustomerBalance(customer, totalAmount);
+        Customer customer = customerFinderService.findCustomerById(customerId);
         Map<Product, Integer> productQuantities = productInventoryService.getProductQuantities(orderRequest.getProductQuantities());
-       productInventoryService.validateProductQuantities(productQuantities);
+        BigDecimal totalAmount = calculateTotalAmount(orderRequest,productQuantities);
+        customerBalanceService.validateCustomerBalance(customer, totalAmount);
+        productInventoryService.validateProductQuantities(productQuantities);
        Order order = createOrder(customer, totalAmount);
        productInventoryService.decreaseProductCount(productQuantities);
         saveOrder(order);
@@ -89,23 +91,23 @@ public class OrderServiceImpl implements OrderService {
         return orderResponse;
     }
 
+    @Override
     @Transactional
     public OrderResponse makeOrderWithCard(Long customerId, OrderRequest orderRequest, Long cardId) {
-        Customer customer = customerService.findCustomerById(customerId);
+
+        Customer customer = customerFinderService.findCustomerById(customerId);
         CustomerCardDetails card = customerService.getCustomerCardById(customer, cardId);
         if (cardService.isCardExpired(card.getExpirationDate())) {
             throw new CarExpiredException("The card has expired");
-        }
-        BigDecimal totalAmount = calculateTotalAmount(orderRequest);
+        }Map<Product, Integer> productQuantities = productInventoryService.getProductQuantities(orderRequest.getProductQuantities());
+        BigDecimal totalAmount = calculateTotalAmount(orderRequest, productQuantities);
         cardService.validateCardBalance(card, totalAmount);
-        Map<Product, Integer> productQuantities = productInventoryService.getProductQuantities(orderRequest.getProductQuantities());
         productInventoryService.validateProductQuantities(productQuantities);
-        productInventoryService.decreaseProductCount(productQuantities);
         Order order = createOrder(customer, totalAmount);
-        saveOrderProduct(order, productQuantities);
+        productInventoryService.decreaseProductCount(productQuantities);
         saveOrder(order);
+        saveOrderProduct(order, productQuantities);
         return getOrderResponse(order);
-
     }
 
 
@@ -155,27 +157,22 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.ordersToOrderDtos(orders);
     }
 
-//    public List<ProductDto> findProductsByOrderId(Long orderId) {
-//        return productService.findProductsByOrderId(orderId);
-//    }
 
 
 
 
     //proxodimsa po mapu,berem id  kajdogo prodcuta i kolichestvo kajdogo produkta
 //    esli est discount price ispolzuyem ego esli netu sam price,i umnojayem na count
-     protected BigDecimal calculateTotalAmount(OrderRequest orderRequest) {
+    protected BigDecimal calculateTotalAmount(OrderRequest orderRequest, Map<Product, Integer> productMap) {
         BigDecimal totalAmount = BigDecimal.ZERO;
-        for (Map.Entry<Long, Integer> entry : orderRequest.getProductQuantities().entrySet()) {
-            Long productId = entry.getKey();
+        for (Map.Entry<Product, Integer> entry : productMap.entrySet()) {
+            Product product = entry.getKey();
             Integer quantity = entry.getValue();
-            Product product = productService.findProductById(productId);
             BigDecimal price = product.getDiscountPrice() != null ? product.getDiscountPrice() : product.getPrice();
             totalAmount = totalAmount.add(price.multiply(BigDecimal.valueOf(quantity)));
         }
         return totalAmount;
     }
-
 
      protected Order createOrder(Customer customer, BigDecimal totalAmount) {
         Order order = new Order();
@@ -226,8 +223,8 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponse makeOrderForDiscountedProduct(Long customerId, Long productId) {
         // Найти информацию о скидке для выигранного продукта
         DiscountProductResponse discountProductResponse = customerDiscountService.getDiscountedProductResponse(customerId);
-        Customer customer = customerService.findCustomerById(customerId);
-        Product product = productService.findProductById(productId);
+        Customer customer = customerFinderService.findCustomerById(customerId);
+        Product product = productFinderService.findProductById(productId);
         if (!"iphone 15".equals(product.getName())) {
             throw new AppException(HttpStatus.BAD_REQUEST,"Discount is only applicable for iPhone 15");
         }

@@ -42,8 +42,10 @@ class CardControllerTest {
             "classpath:sql/customerainsert.sql"
     }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void testAddCardToCustomer() {
-        String token = "Bearer " + jwtTestUtil.generateToken(2L,"USER");
-        long customerId = 2L;
+        // Генерация токена для клиента с ID 2
+        String token = "Bearer " + jwtTestUtil.generateToken(2L, "USER");
+        System.out.println("Generated Token: " + token);
+
         CustomerCardReq customerCardReq = new CustomerCardReq();
         customerCardReq.setCardNumber("1234567890123456");
         customerCardReq.setCardBalance(BigDecimal.valueOf(1000.0));
@@ -54,12 +56,15 @@ class CardControllerTest {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", token);
 
-        // HttpEntity нужен для передачи headers и тела запроса
         HttpEntity<CustomerCardReq> request = new HttpEntity<>(customerCardReq, headers);
         ResponseEntity<String> responseEntity = restTemplate.postForEntity(
-                createURLWithPort("/cards/" + customerId),
+                createURLWithPort("/cards"),
                 request,
                 String.class);
+
+        // Отладочная информация
+        System.out.println("Response Status Code: " + responseEntity.getStatusCode());
+        System.out.println("Response Body: " + responseEntity.getBody());
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals("Card added successfully", responseEntity.getBody());

@@ -34,15 +34,17 @@ public class WishListServiceImpl implements WishlistService {
     private WishListRepository wishlistRepository;;
     private WishListItemRepository wishListItemRepository;
     private CustomerRepository customerRepository;
+    private final ProductFinderService productFinderService;
+    private final CustomerFinderService customerFinderService;
 
 
     @Override
     public void addProductToWishlist(AddProductToWishlistRequest request) {
         // Получаем клиента по ID
-        Customer customer = customerService.findCustomerById(request.getCustomerId());
+        Customer customer = customerFinderService.findCustomerById(request.getCustomerId());
 
         // Получаем продукт по ID
-        Product product = productService.findProductById(request.getProductId());
+        Product product = productFinderService.findProductById(request.getProductId());
 
         // Получаем или создаем wishlist клиента
         Wishlist wishlist = customer.getWishlist();
@@ -66,7 +68,7 @@ public class WishListServiceImpl implements WishlistService {
 
     @Override
     public List<ProductDto> getAllProductsInWishlist(Long customerId) {
-        Customer customer = customerService.findCustomerById(customerId);
+        Customer customer = customerFinderService.findCustomerById(customerId);
         Wishlist wishlist = customer.getWishlist();
         if (wishlist == null) {
             return Collections.emptyList(); // Возвращаем пустой список, если wishlist не существует
@@ -97,7 +99,7 @@ public class WishListServiceImpl implements WishlistService {
     @Transactional
     public void removeProductFromWishlist(Long customerId, Long productId) {
         // Проверяем существование Wishlist у Customer
-        Customer customer = customerService.findCustomerById(customerId);
+        Customer customer = customerFinderService.findCustomerById(customerId);
         if (customer == null || customer.getWishlist() == null) {
             throw new NotFoundException("Wishlist not found for customer with ID " + customerId);
         }

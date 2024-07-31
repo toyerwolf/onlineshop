@@ -11,6 +11,7 @@ import com.example.springsecurity.repository.CategoryRepository;
 import com.example.springsecurity.req.CategoryReq;
 import com.example.springsecurity.service.CategoryService;
 import com.example.springsecurity.service.ProductService;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
-    private final ProductService productService;
+    private final CategoryFinderService categoryFinderService;
 
 
     @Override
@@ -33,17 +34,9 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
-    public Optional<CategoryDtoForClient> getCategoryById(Long categoryId) {
-        Optional<Category> categoryOptional = categoryRepository.findById(categoryId);
-        if (categoryOptional.isPresent()) {
-            Category category = categoryOptional.get();
-            CategoryDtoForClient categoryDto = new CategoryDtoForClient();
-            categoryDto.setCategoryId(category.getCategoryId());
-            categoryDto.setName(category.getName());
-            return Optional.of(categoryDto);
-        } else {
-            return Optional.empty();
-        }
+    public CategoryDtoForClient getCategoryById(Long categoryId) {
+        Category category = categoryFinderService.findCategoryById(categoryId);
+        return new CategoryDtoForClient(category.getCategoryId(), category.getName());
     }
 
     @Override
@@ -52,36 +45,22 @@ public class CategoryServiceImpl implements CategoryService {
         categoryRepository.save(category);
     }
     @Override
+    @Transactional
     public void updateCategory(Long categoryId, CategoryDto updatedCategoryDTO) {
-        Optional<Category> existingCategoryOptional = categoryRepository.findById(categoryId);
-        if (existingCategoryOptional.isPresent()) {
-            Category existingCategory = existingCategoryOptional.get();
-            existingCategory.setName(updatedCategoryDTO.getName());
-            existingCategory.setDescription(updatedCategoryDTO.getDescription());
-            categoryRepository.save(existingCategory);
-        } else {
-            throw new NotFoundException("Category with " + categoryId + " not found");
-        }
+        Category existingCategory = categoryFinderService.findCategoryById(categoryId);
+        existingCategory.setName(updatedCategoryDTO.getName());
+        existingCategory.setDescription(updatedCategoryDTO.getDescription());
+        categoryRepository.save(existingCategory);
     }
 
     @Override
+    @Transactional
     public void deleteCategory(Long categoryId) {
-        Optional<Category> categoryOptional = categoryRepository.findById(categoryId);
-        categoryOptional.ifPresent(category -> {
-            category.setDeleted(true);
-            categoryRepository.save(category);
-        });
+        Category category = categoryFinderService.findCategoryById(categoryId);
+        category.setDeleted(true);
+        categoryRepository.save(category);
     }
 
-//    @Override
-//    public CategoryDto getCategoryByIdWithProducts(Long categoryId) {
-//        Category category = categoryRepository.findById(categoryId)
-//                .orElseThrow(() -> new NotFoundException("Category not found for id: " + categoryId));
-//        List<ProductDto> productsInCategory = productService.findProductsByCategoryId(categoryId);
-//        CategoryDto categoryDto = CategoryMapper.INSTANCE.categoryToCategoryDTO(category);
-//        categoryDto.setProductDtoList(productsInCategory);
-//        return categoryDto;
-//    }
 
 
 

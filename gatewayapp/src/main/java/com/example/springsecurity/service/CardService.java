@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 public interface CardService {
 
-    void addCardToCustomer(Long customerId, CustomerCardReq customerCardReq);
+    public void addCardToCustomer(CustomerCardReq customerCardReq, Long customerId);
     void validateCardBalance(CustomerCardDetails card, BigDecimal totalAmount);
 
     boolean isCardExpired(LocalDate expirationDate);

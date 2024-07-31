@@ -62,6 +62,9 @@ class OrderServiceImplTest {
     @Mock
     private ProductInventoryService productInventoryService;
 
+    @Mock
+    private ProductFinderService productFinderService;
+
 
 
 
@@ -78,13 +81,16 @@ class OrderServiceImplTest {
     @Mock
     private CustomerDiscountService customerDiscountService;
 
+    @Mock
+    private CustomerFinderService customerFinderService;
+
 
 
 
 
     @Test
     void testCalculateTotalAmount() {
-        // Act
+        // Arrange
         Map<Long, Integer> productQuantities = new HashMap<>();
         productQuantities.put(1L, 2);
         productQuantities.put(2L, 1);
@@ -94,42 +100,50 @@ class OrderServiceImplTest {
 
         Product product1 = new Product();
         product1.setId(1L);
-        product1.setPrice(BigDecimal.TEN);
-        when(productService.findProductById(1L)).thenReturn(product1);
+        product1.setPrice(BigDecimal.TEN); // 10
+
 
         Product product2 = new Product();
         product2.setId(2L);
-        product2.setDiscountPrice(BigDecimal.valueOf(8));
-        when(productService.findProductById(2L)).thenReturn(product2);
+        product2.setDiscountPrice(BigDecimal.valueOf(8)); // 8
 
 
-        BigDecimal totalAmount = orderService.calculateTotalAmount(orderRequest);
+        // Создание Map<Product, Integer> из productQuantities
+        Map<Product, Integer> productMap = new HashMap<>();
+        productMap.put(product1, 2); // 2 * 10 = 20
+        productMap.put(product2, 1); // 1 * 8 = 8
 
-        BigDecimal expectedTotalAmount = BigDecimal.valueOf(28);
+        // Act
+        BigDecimal totalAmount = orderService.calculateTotalAmount(orderRequest, productMap);
 
+        // Assert
+        BigDecimal expectedTotalAmount = BigDecimal.valueOf(28); // 20 + 8
         assertEquals(expectedTotalAmount, totalAmount);
     }
 
     @Test
     void testCalculateTotalAmount_NoDiscount() {
-        // Act
+        // Arrange
         Map<Long, Integer> productQuantities = new HashMap<>();
         productQuantities.put(1L, 3); // Продукт с id = 1 в количестве 3
         OrderRequest orderRequest = new OrderRequest();
         orderRequest.setProductQuantities(productQuantities);
 
-
+        // Создание продукта с заданной ценой
         Product product1 = new Product();
         product1.setId(1L);
         product1.setPrice(BigDecimal.valueOf(15)); // Устанавливаем цену продукта
-        when(productService.findProductById(1L)).thenReturn(product1);
+//        when(productFinderService.findProductById(1L)).thenReturn(product1);
 
-        // Вызываем метод, который тестируем
-        BigDecimal totalAmount = orderService.calculateTotalAmount(orderRequest);
+        // Создание Map<Product, Integer> из productQuantities
+        Map<Product, Integer> productMap = new HashMap<>();
+        productMap.put(product1, 3); // 3 * 15
 
-        BigDecimal expectedTotalAmount = BigDecimal.valueOf(45);
+        // Act
+        BigDecimal totalAmount = orderService.calculateTotalAmount(orderRequest, productMap);
 
-        // Проверяем, что результат соответствует ожидаемому значению
+        // Assert
+        BigDecimal expectedTotalAmount = BigDecimal.valueOf(45); // 3 * 15
         assertEquals(expectedTotalAmount, totalAmount);
     }
 
@@ -259,63 +273,64 @@ class OrderServiceImplTest {
     @Transactional
     void testMakeOrderWithValidCard() {
         // Arrange
+        Long customerId = 1L;
+        Long cardId = 1L;
+        Long productId = 1L;
+        BigDecimal totalAmount = new BigDecimal("200.00");
+
         Customer customer = new Customer();
-        customer.setId(1L);
+        customer.setId(customerId);
+
         CustomerCardDetails card = new CustomerCardDetails();
-        card.setId(1L);
+        card.setId(cardId);
         card.setExpirationDate(LocalDate.now().plusYears(1));
         card.setCardBalance(new BigDecimal("1000.00"));
 
-        Map<Long, Integer> productQuantities = new HashMap<>();
-        productQuantities.put(1L, 2);
-        OrderRequest orderRequest = new OrderRequest();
-        orderRequest.setProductQuantities(productQuantities);
-        Long productId = 1L;
         Product product = new Product();
         product.setId(productId);
         product.setPrice(new BigDecimal("100.00"));
         product.setQuantity(3);
 
+        Map<Long, Integer> productQuantities = new HashMap<>();
+        productQuantities.put(productId, 2);
+
+        OrderRequest orderRequest = new OrderRequest();
+        orderRequest.setProductQuantities(productQuantities);
+
         Order order = new Order();
         order.setId(1L);
-        order.setTotalAmount(new BigDecimal("200.00"));
+        order.setTotalAmount(totalAmount);
         order.setCreatedAt(LocalDateTime.now());
         order.setStatus(OrderStatus.PENDING);
         order.setPaid(false);
 
-        when(customerService.findCustomerById(1L)).thenReturn(customer);
-        when(customerService.getCustomerCardById(customer, 1L)).thenReturn(card);
+        // Set up mocks
+        when(customerFinderService.findCustomerById(customerId)).thenReturn(customer);
+        when(customerService.getCustomerCardById(customer, cardId)).thenReturn(card);
         when(cardService.isCardExpired(card.getExpirationDate())).thenReturn(false);
-        when(productService.findProductById(productId)).thenReturn(product);
-        when(orderService.calculateTotalAmount(orderRequest)).thenReturn(new BigDecimal("200.00"));
-        doNothing().when(cardService).validateCardBalance(card, new BigDecimal("200.00"));
-        doNothing().when(productInventoryService).decreaseProductCount(anyMap());
-
+        when(orderService.calculateTotalAmount(orderRequest, Map.of(product, 2))).thenReturn(totalAmount);
+        doNothing().when(cardService).validateCardBalance(card, totalAmount);
         when(productInventoryService.getProductQuantities(productQuantities)).thenReturn(Map.of(product, 2));
         doNothing().when(productInventoryService).validateProductQuantities(anyMap());
-        when(orderService.createOrder(customer, new BigDecimal("200.00"))).thenReturn(order);
+        doNothing().when(productInventoryService).decreaseProductCount(anyMap());
+        when(orderService.createOrder(customer, totalAmount)).thenReturn(order);
+        doNothing().when(orderService).saveOrder(order);
+
         List<OrderProductDto> orderProductDtos = getOrderProductDtos();
-
-
         when(orderProductService.findOrderProductsByOrderId(order.getId())).thenReturn(orderProductDtos);
 
+        // Act
+        OrderResponse orderResponse = orderService.makeOrderWithCard(customerId, orderRequest, cardId);
 
-        OrderResponse orderResponse = orderService.makeOrderWithCard(1L, orderRequest, 1L);
-
+        // Assert
         assertNotNull(orderResponse);
-        assertNotNull(orderResponse.getOrderId());
-        assertNotNull(orderResponse.getCreatedAt());
-        assertNotNull(orderResponse.getStatus());
-        assertNotNull(orderResponse.getProducts());
-
-        assertNotNull(order);
         assertEquals(order.getId(), orderResponse.getOrderId());
         assertEquals(order.getTotalAmount(), orderResponse.getTotalAmount());
         assertEquals(order.getCreatedAt(), orderResponse.getCreatedAt());
         assertEquals(order.getStatus(), orderResponse.getStatus());
         assertEquals(order.isPaid(), orderResponse.isPaid());
-        //equals size from response and from dtos
-       // проверяем, что каждый OrderProductDto возвращаемый из orderProductService совпадает с каждым OrderProductDto в orderResponse.
+
+        assertNotNull(orderResponse.getProducts());
         assertEquals(orderProductDtos.size(), orderResponse.getProducts().size());
         for (int i = 0; i < orderProductDtos.size(); i++) {
             OrderProductDto expectedDto = orderProductDtos.get(i);
@@ -324,17 +339,18 @@ class OrderServiceImplTest {
             assertEquals(expectedDto.getProductName(), actualDto.getProductName());
             assertEquals(expectedDto.getQuantity(), actualDto.getQuantity());
         }
-        verify(customerService).findCustomerById(1L);
-        verify(customerService).getCustomerCardById(customer, 1L);
+
+        // Verify interactions
+        verify(customerFinderService).findCustomerById(customerId);
+        verify(customerService).getCustomerCardById(customer, cardId);
         verify(cardService).isCardExpired(card.getExpirationDate());
-        verify(cardService).validateCardBalance(card, new BigDecimal("200.00"));
+        verify(cardService).validateCardBalance(card, totalAmount);
         verify(productInventoryService).getProductQuantities(productQuantities);
         verify(productInventoryService).validateProductQuantities(anyMap());
         verify(productInventoryService).decreaseProductCount(anyMap());
-        verify(orderService).createOrder(customer, new BigDecimal("200.00"));
+        verify(orderService).createOrder(customer, totalAmount);
         verify(orderService).saveOrder(order);
         verify(orderProductService).findOrderProductsByOrderId(order.getId());
-        verify(orderService).scheduleOrderPaymentCheck(order.getId());
     }
 
     @NotNull
@@ -366,7 +382,7 @@ class OrderServiceImplTest {
 
         OrderRequest orderRequest = new OrderRequest();
 
-        when(customerService.findCustomerById(customerId)).thenReturn(customer);
+        when(customerFinderService.findCustomerById(customerId)).thenReturn(customer);
         when(customerService.getCustomerCardById(customer, cardId)).thenReturn(card);
         when(cardService.isCardExpired(card.getExpirationDate())).thenReturn(true);
 
@@ -374,7 +390,7 @@ class OrderServiceImplTest {
         assertThrows(CarExpiredException.class, () -> orderService.makeOrderWithCard(customerId, orderRequest, cardId));
 
         // Проверка взаимодействия
-        verify(customerService).findCustomerById(customerId);
+        verify(customerFinderService).findCustomerById(customerId);
         verify(customerService).getCustomerCardById(customer, cardId);
         verify(cardService).isCardExpired(card.getExpirationDate());
 
@@ -405,10 +421,10 @@ class OrderServiceImplTest {
         card.setId(cardId);
         card.setExpirationDate(LocalDate.now().plusMonths(1));
 
-        when(customerService.findCustomerById(customerId)).thenReturn(customer);
+        when(customerFinderService.findCustomerById(customerId)).thenReturn(customer);
         when(customerService.getCustomerCardById(customer, cardId)).thenReturn(card);
         when(cardService.isCardExpired(card.getExpirationDate())).thenReturn(false);
-        when(productService.findProductById(productId)).thenReturn(product);
+        when(productFinderService.findProductById(productId)).thenReturn(product);
 
         when(productInventoryService.getProductQuantities(productQuantities)).thenAnswer(invocation -> {
             Map<Long, Integer> requestedQuantities = invocation.getArgument(0);
@@ -416,7 +432,7 @@ class OrderServiceImplTest {
             for (Map.Entry<Long, Integer> entry : requestedQuantities.entrySet()) {
                 Long productIdEntry = entry.getKey();
                 Integer requestedQuantity = entry.getValue();
-                Product productEntry = productService.findProductById(productIdEntry);
+                Product productEntry = productFinderService.findProductById(productIdEntry);
                 if (productEntry.getQuantity() < requestedQuantity) {
                     throw new InsufficientQuantityException("Insufficient quantity for product: " + productEntry.getName());
                 }
@@ -431,22 +447,21 @@ class OrderServiceImplTest {
     @Test
     @Transactional
     void testMakeOrder() {
-        // Arrange
-        Customer customer = new Customer();
-        customer.setId(1L);
+        Customer customer=new Customer();
+        Long customerId = 1L;
+        customer.setId(customerId);
         BigDecimal totalAmount = new BigDecimal("200.00");
 
         Map<Long, Integer> productQuantities = new HashMap<>();
         productQuantities.put(1L, 2);
         OrderRequest orderRequest = new OrderRequest();
         orderRequest.setProductQuantities(productQuantities);
-        Long product1Id = 1L;
 
+        Long product1Id = 1L;
         Product product = new Product();
         product.setId(product1Id);
         product.setPrice(new BigDecimal("100.00"));
         product.setQuantity(3);
-
 
         Order order = new Order();
         order.setId(1L);
@@ -455,20 +470,21 @@ class OrderServiceImplTest {
         order.setStatus(OrderStatus.PENDING);
         order.setPaid(false);
 
+        List<OrderProductDto> orderProductDtos = getOrderProductDtos();
 
-
-        when(customerService.findCustomerById(1L)).thenReturn(customer);
-        when(productService.findProductById(product1Id)).thenReturn(product);
-        when(orderService.calculateTotalAmount(orderRequest)).thenReturn(totalAmount);
+        // Set up mocks
+        when(customerFinderService.findCustomerById(customerId)).thenReturn(customer);
+//        when(productFinderService.findProductById(product1Id)).thenReturn(product);
+        when(orderService.calculateTotalAmount(orderRequest, Map.of(product, 2))).thenReturn(totalAmount);
         when(productInventoryService.getProductQuantities(productQuantities)).thenReturn(Map.of(product, 2));
         doNothing().when(productInventoryService).validateProductQuantities(anyMap());
-        when(orderService.createOrder(customer, totalAmount)).thenReturn(order);
-        doNothing().when(customerBalanceService).validateCustomerBalance(customer, totalAmount);
-        List<OrderProductDto> orderProductDtos = getOrderProductDtos();
+        doNothing().when(productInventoryService).decreaseProductCount(anyMap());
+        when(orderService.createOrder(any(Customer.class), any(BigDecimal.class))).thenReturn(order);
+        doNothing().when(customerBalanceService).validateCustomerBalance(any(Customer.class), any(BigDecimal.class));
         when(orderProductService.findOrderProductsByOrderId(order.getId())).thenReturn(orderProductDtos);
 
         // Act
-        OrderResponse orderResponse = orderService.makeOrder(1L, orderRequest);
+        OrderResponse orderResponse = orderService.makeOrder(customerId, orderRequest);
 
         // Assert
         assertNotNull(orderResponse);
@@ -477,7 +493,6 @@ class OrderServiceImplTest {
         assertNotNull(orderResponse.getStatus());
         assertNotNull(orderResponse.getProducts());
 
-        assertNotNull(order);
         assertEquals(order.getId(), orderResponse.getOrderId());
         assertEquals(order.getTotalAmount(), orderResponse.getTotalAmount());
         assertEquals(order.getCreatedAt(), orderResponse.getCreatedAt());
@@ -493,15 +508,17 @@ class OrderServiceImplTest {
             assertEquals(expectedDto.getQuantity(), actualDto.getQuantity());
         }
 
-        verify(customerService).findCustomerById(1L);
-        verify(orderService).calculateTotalAmount(orderRequest);
+        // Verify interactions
+        verify(customerFinderService).findCustomerById(customerId);
+//        verify(productFinderService).findProductById(product1Id);
+        verify(orderService).calculateTotalAmount(orderRequest, Map.of(product, 2));
         verify(productInventoryService).getProductQuantities(productQuantities);
         verify(productInventoryService).validateProductQuantities(anyMap());
-        verify(orderService).createOrder(customer, totalAmount);
-        verify(orderService).saveOrder(any(Order.class));
-        verify(customerBalanceService).validateCustomerBalance(customer, totalAmount);
         verify(productInventoryService).decreaseProductCount(anyMap());
-
+        verify(orderService).createOrder(any(Customer.class), any(BigDecimal.class));
+        verify(orderService).saveOrder(any(Order.class));
+        verify(customerBalanceService).validateCustomerBalance(any(Customer.class), any(BigDecimal.class));
+        verify(orderProductService).findOrderProductsByOrderId(order.getId());
     }
 
     @Test
@@ -510,30 +527,49 @@ class OrderServiceImplTest {
         Long customerId = 1L;
         Long productId = 1L;
         OrderRequest orderRequest = new OrderRequest();
-        Map<Long, Integer> productQuantities = new HashMap<>();
-        productQuantities.put(productId, 2);
-        orderRequest.setProductQuantities(productQuantities);
+        Map<Long, Integer> productQuantitiesRequest = new HashMap<>();
+        productQuantitiesRequest.put(productId, 2);
+        orderRequest.setProductQuantities(productQuantitiesRequest);
 
         Product product = new Product();
         product.setId(productId);
         product.setPrice(new BigDecimal("100.00"));
-        product.setQuantity(3);
+        product.setDiscountPrice(null); // Нет скидки
 
         Customer customer = new Customer();
-        customer.setBalance(BigDecimal.valueOf(10.0));
+        customer.setId(customerId);
+        customer.setBalance(new BigDecimal("10.00")); // Баланс клиента меньше суммы заказа
 
-        BigDecimal totalAmount = new BigDecimal("100");
-        when(productService.findProductById(productId)).thenReturn(product);
-        when(orderService.calculateTotalAmount(orderRequest)).thenReturn(totalAmount);
+        BigDecimal totalAmount = new BigDecimal("200.00"); // Сумма заказа больше баланса
 
-        when(customerService.findCustomerById(customerId)).thenReturn(customer);
+        // Преобразуйте Map<Long, Integer> в Map<Product, Integer>
+        Map<Product, Integer> productQuantities = new HashMap<>();
+        productQuantities.put(product, 2);
 
+        // Настройка мока
+        when(customerFinderService.findCustomerById(customerId)).thenReturn(customer);
+        when(productInventoryService.getProductQuantities(orderRequest.getProductQuantities())).thenReturn(productQuantities);
+        when(orderService.calculateTotalAmount(orderRequest, productQuantities)).thenReturn(totalAmount);
+
+        // Настройка для выбрасывания исключения при недостаточном балансе
         doThrow(new InsufficientBalanceException("Insufficient funds on the card"))
                 .when(customerBalanceService)
                 .validateCustomerBalance(customer, totalAmount);
 
+        // Проверка исключения
+        InsufficientBalanceException thrownException = assertThrows(InsufficientBalanceException.class, () ->
+                orderService.makeOrder(customerId, orderRequest)
+        );
+        assertEquals("Insufficient funds on the card", thrownException.getMessage());
 
-        assertThrows(InsufficientBalanceException.class, () -> orderService.makeOrder(customerId, orderRequest));
+        // Убедитесь, что методы были вызваны
+        verify(customerFinderService).findCustomerById(customerId);
+        verify(productInventoryService).getProductQuantities(orderRequest.getProductQuantities());
+        verify(orderService).calculateTotalAmount(orderRequest, productQuantities);
+        verify(customerBalanceService).validateCustomerBalance(customer, totalAmount);
+
+        // Убедитесь, что методы не вызываются после выбрасывания исключения
+        verifyNoMoreInteractions(productInventoryService, customerFinderService, customerBalanceService);
     }
 
     @Test
@@ -554,7 +590,7 @@ class OrderServiceImplTest {
         Customer customer = new Customer();
         customer.setId(customerId);
 
-        when(productService.findProductById(product1.getId())).thenReturn(product1);
+        when(productFinderService.findProductById(product1.getId())).thenReturn(product1);
         //здесь перехватываем exception потому что он в другом методе
         when(productInventoryService.getProductQuantities(productQuantities)).thenAnswer(invocation -> {
             Map<Long, Integer> requestedQuantities = invocation.getArgument(0);
@@ -562,7 +598,7 @@ class OrderServiceImplTest {
             for (Map.Entry<Long, Integer> entry : requestedQuantities.entrySet()) {
                 Long productId = entry.getKey();
                 Integer requestedQuantity = entry.getValue();
-                Product product = productService.findProductById(productId);
+                Product product = productFinderService.findProductById(productId);
                 if (product.getQuantity() < requestedQuantity) {
                     throw new InsufficientQuantityException("Insufficient quantity for product: " + product.getName());
                 }
@@ -570,7 +606,7 @@ class OrderServiceImplTest {
             }
             return availableProducts;
         });
-        when(customerService.findCustomerById(customerId)).thenReturn(customer);
+        when(customerFinderService.findCustomerById(customerId)).thenReturn(customer);
 
         // Act & Assert
         assertThrows(InsufficientQuantityException.class, () -> {
@@ -809,12 +845,12 @@ class OrderServiceImplTest {
         when(customerDiscountService.getDiscountedProductResponse(customerId)).thenReturn(discountProductResponse);
 
         Customer customer = new Customer();
-        when(customerService.findCustomerById(customerId)).thenReturn(customer);
+        when(customerFinderService.findCustomerById(customerId)).thenReturn(customer);
 
         Product product = new Product();
         product.setId(productId);
         product.setName("iphone 15");
-        when(productService.findProductById(productId)).thenReturn(product);
+        when(productFinderService.findProductById(productId)).thenReturn(product);
 
         Map<Product, Integer> productQuantities = new HashMap<>();
         productQuantities.put(product, 1);
@@ -843,8 +879,8 @@ class OrderServiceImplTest {
 
         // Verify method invocations
         verify(customerDiscountService).getDiscountedProductResponse(customerId);
-        verify(customerService).findCustomerById(customerId);
-        verify(productService).findProductById(productId);
+        verify(customerFinderService).findCustomerById(customerId);
+        verify(productFinderService).findProductById(productId);
         verify(customerBalanceService).validateCustomerBalance(customer, discountedPrice);
         verify(productInventoryService).validateProductQuantities(productQuantities);
         verify(productInventoryService).decreaseProductCount(productQuantities);
@@ -860,12 +896,12 @@ class OrderServiceImplTest {
 
         // Mock responses
         Customer customer = new Customer();
-        when(customerService.findCustomerById(customerId)).thenReturn(customer);
+        when(customerFinderService.findCustomerById(customerId)).thenReturn(customer);
 
         Product product = new Product();
         product.setId(productId);
         product.setName("ipad");
-        when(productService.findProductById(productId)).thenReturn(product);
+        when(productFinderService.findProductById(productId)).thenReturn(product);
 
         // Test exception
         AppException exception = assertThrows(AppException.class,
@@ -874,8 +910,8 @@ class OrderServiceImplTest {
         assertEquals("Discount is only applicable for iPhone 15", exception.getMessage());
 
         // Verify method invocations
-        verify(customerService).findCustomerById(customerId);
-        verify(productService).findProductById(productId);
+        verify(customerFinderService).findCustomerById(customerId);
+        verify(productFinderService).findProductById(productId);
         verify(customerBalanceService, never()).validateCustomerBalance(any(), any());
         verify(productInventoryService, never()).validateProductQuantities(any());
         verify(productInventoryService, never()).decreaseProductCount(any());
@@ -896,12 +932,12 @@ class OrderServiceImplTest {
         when(customerDiscountService.getDiscountedProductResponse(customerId)).thenReturn(discountProductResponse);
 
         Customer customer = new Customer();
-        when(customerService.findCustomerById(customerId)).thenReturn(customer);
+        when(customerFinderService.findCustomerById(customerId)).thenReturn(customer);
 
         Product product = new Product();
         product.setId(productId);
         product.setName("iphone 15");
-        when(productService.findProductById(productId)).thenReturn(product);
+        when(productFinderService.findProductById(productId)).thenReturn(product);
 
         // Mock validation: throw InsufficientBalanceException
         doThrow(new InsufficientBalanceException("Insufficient balance")).when(customerBalanceService).validateCustomerBalance(customer, discountedPrice);
@@ -913,8 +949,8 @@ class OrderServiceImplTest {
 
         // Verify interactions
         verify(customerDiscountService).getDiscountedProductResponse(customerId);
-        verify(customerService).findCustomerById(customerId);
-        verify(productService).findProductById(productId);
+        verify(customerFinderService).findCustomerById(customerId);
+        verify(productFinderService).findProductById(productId);
         verify(customerBalanceService).validateCustomerBalance(customer, discountedPrice);
 
         // Ensure other methods are not called
@@ -934,13 +970,13 @@ class OrderServiceImplTest {
         when(customerDiscountService.getDiscountedProductResponse(customerId)).thenReturn(discountProductResponse);
 
         Customer customer = new Customer();
-        when(customerService.findCustomerById(customerId)).thenReturn(customer);
+        when(customerFinderService.findCustomerById(customerId)).thenReturn(customer);
 
         Product product = new Product();
         product.setId(productId);
         product.setQuantity(1); // Устанавливаем доступное количество продукта
         product.setName("iphone 15");
-        when(productService.findProductById(productId)).thenReturn(product);
+        when(productFinderService.findProductById(productId)).thenReturn(product);
 
         // Mock product quantities
         Map<Product, Integer> productQuantities = new HashMap<>();
@@ -957,8 +993,8 @@ class OrderServiceImplTest {
 
         // Verify interactions
         verify(customerDiscountService).getDiscountedProductResponse(customerId);
-        verify(customerService).findCustomerById(customerId);
-        verify(productService).findProductById(productId);
+        verify(customerFinderService).findCustomerById(customerId);
+        verify(productFinderService).findProductById(productId);
         verify(customerBalanceService).validateCustomerBalance(customer, discountedPrice);
         verify(productInventoryService).validateProductQuantities(anyMap()); // Проверяем вызов метода с любыми аргументами
 

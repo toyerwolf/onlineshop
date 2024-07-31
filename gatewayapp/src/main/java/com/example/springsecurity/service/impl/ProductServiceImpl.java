@@ -4,9 +4,13 @@ import com.example.springsecurity.dto.*;
 import com.example.springsecurity.entity.Category;
 import com.example.springsecurity.entity.Product;
 import com.example.springsecurity.entity.Rating;
+import com.example.springsecurity.exception.AlreadyExistException;
 import com.example.springsecurity.exception.InsufficientQuantityException;
 import com.example.springsecurity.exception.NotFoundException;
 import com.example.springsecurity.mapper.ProductMapper;
+import com.example.springsecurity.projection.ProductSalesProjection;
+import com.example.springsecurity.projection.ProductSalesProjectionByYear;
+import com.example.springsecurity.projection.SalesRevenueProjection;
 import com.example.springsecurity.repository.CategoryRepository;
 import com.example.springsecurity.repository.OrderRepository;
 import com.example.springsecurity.repository.ProductRepository;
@@ -14,8 +18,7 @@ import com.example.springsecurity.req.ProductRequest;
 import com.example.springsecurity.service.ImageService;
 import com.example.springsecurity.service.ProductService;
 import jakarta.transaction.Transactional;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -35,10 +38,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ImageService imageService;
+    private final ProductFinderService productFinderService;
+    private final CategoryFinderService categoryFinderService;
 
     private final Long categoryId = 1L;
 
@@ -51,11 +57,7 @@ public class ProductServiceImpl implements ProductService {
 
 
 
-    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository, ImageService imageService, OrderRepository orderRepository) {
-        this.productRepository = productRepository;
-        this.categoryRepository = categoryRepository;
-        this.imageService = imageService;
-    }
+
 
     private final ProductMapper productMapper=ProductMapper.INSTANCE;
 
@@ -67,9 +69,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public void addProductToCategory(ProductRequest productRequest, Long categoryId, MultipartFile image) throws IOException {
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new NotFoundException("Category not found"));
+    public void addProductToCategory(ProductRequest productRequest, Long categoryId, MultipartFile image) {
+        Category category = categoryFinderService.findCategoryById(categoryId);
+        boolean productExists = productRepository.findByName(productRequest.getName()).isPresent();
+        if (productExists) {
+            throw new AlreadyExistException("Product with this name already exists." + productRequest.getName() );
+        }
         Product product = new Product();
         product.setName(productRequest.getName());
         product.setDescription(productRequest.getDescription());
@@ -88,26 +93,19 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductDto> findProductsByCategoryId(Long categoryId) {
-        List<Product> products=productRepository.findProductsByCategoryId(categoryId);
-        if (products.isEmpty()) {
-            throw new NotFoundException("Products not found for category id: " + categoryId);
-        }
-        List<ProductDto> productDtos = new ArrayList<>();
-        for (Product product : products) {
-            ProductDto productDto = getProductDto(product);
-            String imageUrl = imageUrlPrefix + product.getImageUrl();
-            productDto.setImageUrl(imageUrl);
-            productDtos.add(productDto);
-        }
-
-        return productDtos;
+    public ProductDtoContainer findProductsByCategoryId(Long categoryId) {
+        List<Product> products = productRepository.findProductsByCategoryId(categoryId);
+        List<ProductDto> productDtos = products.stream()
+                .map(this::getProductDto)
+                .toList();
+        ProductDtoContainer container = new ProductDtoContainer();
+        container.setProducts(productDtos);
+        return container;
     }
 
     @Override
     public ProductDto getProductById(Long productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new NotFoundException("Product with " + productId + " not found"));
+        Product product = productFinderService.findProductById(productId);
         String imageUrl = imageUrlPrefix + product.getImageUrl();
         ProductDto productDto = productMapper.toDto(product);
         productDto.setImageUrl(imageUrl);
@@ -118,8 +116,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @Override
     public void updateProduct(Long productId, ProductRequest productRequest) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new NotFoundException("Product with " + productId + " notfound"));
+        Product product = productFinderService.findProductById(productId);
         productMapper.updateProductFromRequest(productRequest, product);
         productRepository.save(product);
     }
@@ -127,8 +124,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public void deleteProduct(Long productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new NotFoundException("Product with  " + productId +  " not found" ));
+        Product product = productFinderService.findProductById(productId);
         product.setDeleted(true);
         productRepository.save(product);
     }
@@ -137,15 +133,16 @@ public class ProductServiceImpl implements ProductService {
     public Page<ProductDto> getAllProducts(int page, int pageSize) {
         Pageable pageRequest = PageRequest.of(page - 1, pageSize);
         Page<Product> products = productRepository.findAll(pageRequest);
-        List<ProductDto> productDtos = productMapper.toDtoList(products.getContent());
-        for (ProductDto productDto : productDtos) {
-            String staticUrl = imageUrlPrefix + productDto.getImageUrl();
-            productDto.setImageUrl(staticUrl);
-        }
+        List<ProductDto> productDtos = products.stream().map(this::buildProductDto).toList();
         return new PageImpl<>(productDtos, pageRequest, products.getTotalElements());
     }
 
-
+    private ProductDto buildProductDto(Product product) {
+        ProductDto productDto = productMapper.toDto(product);
+        String staticUrl = imageUrlPrefix + productDto.getImageUrl();
+        productDto.setImageUrl(staticUrl);
+        return productDto;
+    }
 
     @Override
     public List<ProductDto> searchProductByName(String keyword) {
@@ -157,13 +154,13 @@ public class ProductServiceImpl implements ProductService {
                     productDto.setImageUrl(imageUrl);
                     return productDto;
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
 
     @Override
     public void decreaseCount(Long productId, int quantity) {
-        Product product = productRepository.findById(productId).orElseThrow(() -> new NotFoundException("Product not found"));
+        Product product = productFinderService.findProductById(productId);
         int currentQuantity = product.getQuantity();
         if (currentQuantity < quantity) {
             throw new InsufficientQuantityException("Insufficient quantity");
@@ -175,8 +172,7 @@ public class ProductServiceImpl implements ProductService {
 
 
 
-    @NotNull
-    static ProductDto getProductDto(Product product) {
+    @NotNull ProductDto getProductDto(Product product) {
         ProductDto productDto = new ProductDto();
         productDto.setId(product.getId());
         productDto.setName(product.getName());
@@ -192,10 +188,7 @@ public class ProductServiceImpl implements ProductService {
         return productDto;
     }
 
-    public Product findProductById(Long productId) {
-        return productRepository.findById(productId)
-                .orElseThrow(() -> new NotFoundException("Product not found"));
-    }
+
 
     public List<ProductDto> findProductsByOrderId(Long orderId) {
         List<Product> products = productRepository.findProductsByOrderId(orderId);
@@ -205,15 +198,16 @@ public class ProductServiceImpl implements ProductService {
     }
 
 //    @Override
+@Override
 public ProductSalesResponseDto countSoldProductsByYear(int year) {
     LocalDateTime startDate = LocalDateTime.of(year, 1, 1, 0, 0);
     LocalDateTime endDate = LocalDateTime.of(year, 12, 31, 23, 59, 59);
 
-    List<Object[]> results = productRepository.countSoldProductsByYear(startDate, endDate);
+    List<ProductSalesProjectionByYear> results = productRepository.countSoldProductsByYear(startDate, endDate);
     List<ProductSoldCountDTO> productSoldCounts = new ArrayList<>();
-    for (Object[] row : results) {
-        String productName = (String) row[2];
-        int totalSold = ((Number) row[1]).intValue();
+    for (ProductSalesProjectionByYear projection : results) {
+        String productName = projection.getProductName(); // Получаем название продукта
+        int totalSold = projection.getTotalSold(); // Получаем общее количество проданных товаров
         ProductSoldCountDTO productSoldCount = new ProductSoldCountDTO(productName, totalSold);
         productSoldCounts.add(productSoldCount);
     }
@@ -221,19 +215,32 @@ public ProductSalesResponseDto countSoldProductsByYear(int year) {
 }
 
 
+//    @Override
+//    public YearlySalesResponseDto getProductSalesStatistics() {
+//        List<Object[]> results = productRepository.getProductSalesStatistics();
+//        List<YearlyProductSalesDTO> yearlySales = new ArrayList<>();
+//
+//        for (Object[] row : results) {
+//            Integer yearValue = ((Number) row[0]).intValue(); // Преобразуем год в Integer
+//            Integer totalSold = ((Number) row[1]).intValue(); // Преобразуем общее количество продаж в Integer
+//
+//            YearlyProductSalesDTO yearlyProductSalesDTO = new YearlyProductSalesDTO(yearValue, totalSold);
+//            yearlySales.add(yearlyProductSalesDTO);
+//        }
+//
+//        return new YearlySalesResponseDto(yearlySales);
+//    }
+
     @Override
     public YearlySalesResponseDto getProductSalesStatistics() {
-        List<Object[]> results = productRepository.getProductSalesStatistics();
+        List<ProductSalesProjection> results = productRepository.getProductSalesStatistics();
         List<YearlyProductSalesDTO> yearlySales = new ArrayList<>();
-
-        for (Object[] row : results) {
-            Integer yearValue = ((Number) row[0]).intValue(); // Преобразуем год в Integer
-            Integer totalSold = ((Number) row[1]).intValue(); // Преобразуем общее количество продаж в Integer
-
+        for (ProductSalesProjection projection : results) {
+            Integer yearValue = projection.getSalesYear(); // Получаем год
+            Integer totalSold = projection.getTotalSold(); // Получаем общее количество продаж
             YearlyProductSalesDTO yearlyProductSalesDTO = new YearlyProductSalesDTO(yearValue, totalSold);
             yearlySales.add(yearlyProductSalesDTO);
         }
-
         return new YearlySalesResponseDto(yearlySales);
     }
 
@@ -241,17 +248,14 @@ public ProductSalesResponseDto countSoldProductsByYear(int year) {
     //
     @Override
     public YearlySalesRevenueResponseDTO getTotalProductSalesRevenueByYear() {
-        List<Object[]> results = productRepository.getSoldProductSalesStatistics();
+        List<SalesRevenueProjection> results = productRepository.getSoldProductSalesStatistics();
         List<YearlySalesRevenueDTO> salesByYear = new ArrayList<>();
-
-        for (Object[] row : results) {
-            Integer yearValue = ((Number) row[0]).intValue(); // Преобразуем год в Integer
-            BigDecimal totalRevenue = (BigDecimal) row[1]; // Оставляем totalRevenue как BigDecimal
-
+        for (SalesRevenueProjection projection : results) {
+            Integer yearValue = projection.getYear(); // Получаем год
+            BigDecimal totalRevenue = projection.getTotalRevenue(); // Получаем общую выручку
             YearlySalesRevenueDTO yearlySalesRevenueDTO = new YearlySalesRevenueDTO(yearValue, totalRevenue);
             salesByYear.add(yearlySalesRevenueDTO);
         }
-
         YearlySalesRevenueResponseDTO responseDTO = new YearlySalesRevenueResponseDTO();
         responseDTO.setYearlySales(salesByYear);
         return responseDTO;
@@ -283,12 +287,9 @@ public ProductSalesResponseDto countSoldProductsByYear(int year) {
 
     @Override
     public Integer getProductRating(Long productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new NotFoundException("Product not found"));
+        Product product = productFinderService.findProductById(productId);
         List<Rating> ratings = product.getRatings();
-        if (ratings.isEmpty()) {
-            return null;
-        }
+
 
         // Вычисляем средний рейтинг
         double averageRating = ratings.stream()

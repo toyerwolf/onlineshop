@@ -34,9 +34,8 @@ public class CategoryController {
 
     @GetMapping("/{categoryId}")
     public ResponseEntity<CategoryDtoForClient> getCategoryById(@PathVariable Long categoryId) {
-        return categoryService.getCategoryById(categoryId)
-                .map(category -> new ResponseEntity<>(category, HttpStatus.OK))
-                .orElse(ResponseEntity.notFound().build());
+        CategoryDtoForClient categoryDto = categoryService.getCategoryById(categoryId);
+        return ResponseEntity.ok(categoryDto);
     }
 
 
@@ -65,18 +64,10 @@ public class CategoryController {
         return ResponseEntity.noContent().build();
     }
 
-//    @GetMapping("/{categoryId}/with-products")
-//    public CategoryDto getCategoryByIdWithProducts(@PathVariable Long categoryId) {
-//        return categoryService.getCategoryByIdWithProducts(categoryId);
-//    }
-
-
     @Secured({"USER"})
     @GetMapping("/{categoryId}/products")
     public ResponseEntity<ProductDtoContainer> getProductsByCategoryId(@PathVariable Long categoryId) {
-        List<ProductDto> products = productService.findProductsByCategoryId(categoryId);
-        ProductDtoContainer container = new ProductDtoContainer();
-        container.setProducts(products);
+        ProductDtoContainer container = productService.findProductsByCategoryId(categoryId);
         return ResponseEntity.ok(container);
     }
 

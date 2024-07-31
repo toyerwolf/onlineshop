@@ -29,6 +29,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final CustomerBalanceService customerBalanceService;
     private final OrderRepository orderRepository;
+    private final CustomerFinderService customerFinderService;
 
 
 
@@ -36,7 +37,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
         public void processPaymentWithCard(PaymentRequest paymentRequest) {
-        Customer customer = customerService.findCustomerById(paymentRequest.getCustomerId());
+        Customer customer = customerFinderService.findCustomerById(paymentRequest.getCustomerId());
         CustomerCardDetails card = customerService.getCustomerCardById(customer, paymentRequest.getCardId());
         Order order = orderServiceimpl.getOrderOrThrow(paymentRequest.getOrderId());
         orderServiceimpl.validateOrderBelongsToCustomer(order, customer);
@@ -50,9 +51,9 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public void processPaymentWithPayPal(Long customerId, Long orderId) {
         Order order = orderServiceimpl.getOrderOrThrow(orderId);
-        orderServiceimpl.validateOrderBelongsToCustomer(order, customerService.findCustomerById(customerId));
+        orderServiceimpl.validateOrderBelongsToCustomer(order, customerFinderService.findCustomerById(customerId));
         orderServiceimpl.validateOrder(order);
-        Customer customer = customerService.findCustomerById(customerId);
+        Customer customer = customerFinderService.findCustomerById(customerId);
         BigDecimal totalAmount = order.getTotalAmount();
         customerBalanceService.decreaseBalance(customerId, totalAmount);
         orderRepository.save(order);

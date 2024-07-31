@@ -108,6 +108,33 @@ h1 {
     background-color: #45a049;
 }
 
+.image-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.zoomable-image {
+    display: block;
+    width: 100%;
+    transition: transform 0.3s ease;
+    transform-origin: center;
+}
+
+.image-container:hover .zoomable-image {
+    transform: scale(1.5);
+}
+
+.image-container:hover::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+}
+
 .product-list {
     display: flex;
     flex-wrap: wrap;

@@ -1,0 +1,47 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'adopt-openjdk'
+
+      - name: Build with Gradle
+        run: gradle build -x test bootJar
+
+      - name: List files in build/libs directory
+        run: ls -l build/libs
+
+      - name: Upload JAR file
+        uses: actions/upload-artifact@v2
+        with:
+          name: gatewayapp-jar
+          path: build/libs/gatewayapp-0.0.1-SNAPSHOT.jar
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v0.1.2
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ubuntu
+        
+            rm -f gatewayapp-0.0.1-SNAPSHOT.jar
+            scp -o StrictHostKeyChecking=no -i ${{ secrets.EC2_SSH_KEY }} /home/runner/work/onlineshop/onlineshop/build/libs/gatewayapp-0.0.1-SNAPSHOT.jar ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/
+     
+            sudo systemctl daemon-reload
+            sudo systemctl restart gatewayapp.service

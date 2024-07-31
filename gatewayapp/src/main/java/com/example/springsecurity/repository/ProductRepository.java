@@ -2,12 +2,17 @@ package com.example.springsecurity.repository;
 
 
 import com.example.springsecurity.entity.Product;
+import com.example.springsecurity.projection.ProductSalesProjection;
+import com.example.springsecurity.projection.ProductSalesProjectionByYear;
+import com.example.springsecurity.projection.SalesRevenueProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalLong;
 
 public interface ProductRepository extends JpaRepository<Product,Long> {
 
@@ -27,15 +32,23 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
             "JOIN product_test p ON op.product_id = p.id " +
             "WHERE o.created_at BETWEEN :startDate AND :endDate " +
             "AND o.status = 'PAID' " +
-            "GROUP BY p.name, op.product_id", nativeQuery = true)
-    List<Object[]> countSoldProductsByYear(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+            "GROUP BY p.name, op.product_id",
+            nativeQuery = true)
+    List<ProductSalesProjectionByYear> countSoldProductsByYear(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+//    @Query(value = "SELECT EXTRACT(YEAR FROM o.created_at) AS sales_year, SUM(op.quantity) AS totalSold " +
+//            "FROM order_test o " +
+//            "JOIN order_product op ON o.id = op.order_id " +
+//            "WHERE o.status = 'PAID' " +
+//            "GROUP BY EXTRACT(YEAR FROM o.created_at)", nativeQuery = true)
+//    List<Object[]> getProductSalesStatistics();
 
     @Query(value = "SELECT EXTRACT(YEAR FROM o.created_at) AS sales_year, SUM(op.quantity) AS totalSold " +
             "FROM order_test o " +
             "JOIN order_product op ON o.id = op.order_id " +
             "WHERE o.status = 'PAID' " +
             "GROUP BY EXTRACT(YEAR FROM o.created_at)", nativeQuery = true)
-    List<Object[]> getProductSalesStatistics();
+    List<ProductSalesProjection> getProductSalesStatistics();
 
 
 
@@ -55,8 +68,9 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
             "ORDER BY " +
             "   saleYear ASC",
             nativeQuery = true)
-    List<Object[]> getSoldProductSalesStatistics();
+    List<SalesRevenueProjection> getSoldProductSalesStatistics();
 
 
 
+    Optional<Product> findByName(String name);
 }

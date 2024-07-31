@@ -52,6 +52,9 @@ class PaymentServiceImplTest {
     @Mock
     private OrderServiceImpl orderServiceImpl;
 
+    @Mock
+    private  CustomerFinderService customerFinderService;
+
 
 
 
@@ -79,7 +82,7 @@ class PaymentServiceImplTest {
         order.setId(orderId);
         order.setTotalAmount(BigDecimal.valueOf(100.00));
 
-        when(customerService.findCustomerById(customerId)).thenReturn(customer);
+        when(customerFinderService.findCustomerById(customerId)).thenReturn(customer);
         when(customerService.getCustomerCardById(customer, cardId)).thenReturn(card);
         when(orderServiceImpl.getOrderOrThrow(orderId)).thenReturn(order);
 
@@ -87,7 +90,7 @@ class PaymentServiceImplTest {
         paymentService.processPaymentWithCard(paymentRequest);
 
         // Assert
-        verify(customerService).findCustomerById(customerId);
+        verify(customerFinderService).findCustomerById(customerId);
         verify(customerService).getCustomerCardById(customer, cardId);
         verify(orderServiceImpl).getOrderOrThrow(orderId);
         verify(orderServiceImpl).validateOrderBelongsToCustomer(order, customer);
@@ -110,7 +113,7 @@ class PaymentServiceImplTest {
 
         // Mocking methods
         when(orderServiceImpl.getOrderOrThrow(orderId)).thenReturn(order);
-        when(customerService.findCustomerById(customerId)).thenReturn(customer);
+        when(customerFinderService.findCustomerById(customerId)).thenReturn(customer);
 
         // Act
         paymentService.processPaymentWithPayPal(customerId, orderId);

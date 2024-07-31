@@ -7,6 +7,7 @@ import com.example.springsecurity.exception.InsufficientBalanceException;
 import com.example.springsecurity.repository.CustomerCardDetailsRepository;
 import com.example.springsecurity.repository.CustomerRepository;
 import com.example.springsecurity.req.CustomerCardReq;
+import com.example.springsecurity.service.AuthService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -38,35 +39,39 @@ class CardServiceImplTest {
     @Spy
     private CardServiceImpl cardService;
 
+    @Mock
+    private CustomerFinderService customerFinderService;
+
+
+    @Mock
+    private AuthService authService;
 
     @Test
     void testAddCardToCustomer() {
-
         Long customerId = 1L;
         CustomerCardReq customerCardReq = new CustomerCardReq();
-        customerCardReq.setCardNumber("1234567890123456");
+        customerCardReq.setCardNumber("1234567120123457");
         customerCardReq.setCardBalance(BigDecimal.valueOf(1000.0));
         customerCardReq.setCvv("333");
 
         Customer customer = new Customer();
         customer.setId(customerId);
 
-        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+        // Мокаем методы
+
+        when(customerFinderService.findCustomerById(customerId)).thenReturn(customer);
         when(customerRepository.save(any(Customer.class))).thenReturn(customer);
-        when(cardDetailsRepository.findByCardNumber(any())).thenReturn(Optional.empty());
         when(cardService.isCardNumberUnique(anyString())).thenReturn(true);
 
+        assertDoesNotThrow(() -> cardService.addCardToCustomer(customerCardReq, 1L));
 
-        assertDoesNotThrow(() -> cardService.addCardToCustomer(customerId, customerCardReq));
 
-        verify(customerRepository).findById(customerId);
-
+        verify(customerFinderService).findCustomerById(customerId);
         verify(customerRepository).save(any(Customer.class));
     }
 
     @Test
     void testAddCardToCustomer_CardAlreadyExists() {
-
         Long customerId = 1L;
         CustomerCardReq customerCardReq = new CustomerCardReq();
         customerCardReq.setCardNumber("1234567890123456");
@@ -76,14 +81,15 @@ class CardServiceImplTest {
         Customer customer = new Customer();
         customer.setId(customerId);
 
-        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
-        when(cardDetailsRepository.findByCardNumber(any())).thenReturn(Optional.of(new CustomerCardDetails()));
+        // Мокаем методы
+
+        when(customerFinderService.findCustomerById(customerId)).thenReturn(customer);
+        when(cardService.isCardNumberUnique(anyString())).thenReturn(false);
+
+        assertThrows(AlreadyExistException.class, () -> cardService.addCardToCustomer(customerCardReq, 1L));
 
 
-        assertThrows(AlreadyExistException.class, () -> cardService.addCardToCustomer(customerId, customerCardReq));
-
-
-        verify(customerRepository).findById(customerId);
+        verify(customerFinderService).findCustomerById(customerId);
     }
 
 

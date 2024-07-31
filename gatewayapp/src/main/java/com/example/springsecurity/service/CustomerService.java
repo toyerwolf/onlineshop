@@ -15,7 +15,7 @@ public interface CustomerService {
 
     CustomerDto getCustomerById(Long customerID);
 
-    Customer findCustomerById(Long customerId);
+//    Customer findCustomerById(Long customerId);
 
     List<CustomerDto> getAllCustomer(int pageNumber,int pageSize);
 

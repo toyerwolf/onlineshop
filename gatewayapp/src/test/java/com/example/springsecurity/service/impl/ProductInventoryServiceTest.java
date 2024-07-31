@@ -32,6 +32,9 @@ class ProductInventoryServiceTest {
     @Spy
     private ProductInventoryService productInventoryService;
 
+    @Mock
+    private ProductFinderService productFinderService;
+
 
 
     @Test
@@ -92,8 +95,8 @@ class ProductInventoryServiceTest {
         product2.setName("Product 2");
 
         // Stubbing productService
-        when(productService.findProductById(1L)).thenReturn(product1);
-        when(productService.findProductById(2L)).thenReturn(product2);
+        when(productFinderService.findProductById(1L)).thenReturn(product1);
+        when(productFinderService.findProductById(2L)).thenReturn(product2);
 
         // Act
         Map<Product, Integer> result = productInventoryService.getProductQuantities(productQuantities);
@@ -109,8 +112,8 @@ class ProductInventoryServiceTest {
         assertEquals(1, result.get(product2).intValue());
 
         // Verify that productService.findProductById is called for each product ID
-        verify(productService).findProductById(1L);
-        verify(productService).findProductById(2L);
+        verify(productFinderService).findProductById(1L);
+        verify(productFinderService).findProductById(2L);
     }
 
     @Test
@@ -148,7 +151,7 @@ class ProductInventoryServiceTest {
 
         int quantityToAdd = 3;
 
-        when(productRepository.findById(existingProduct.getId())).thenReturn(Optional.of(existingProduct));
+        when(productFinderService.findProductById(existingProduct.getId())).thenReturn(existingProduct);
 
         // Act
         productInventoryService.increaseProductCount(existingProduct, quantityToAdd);

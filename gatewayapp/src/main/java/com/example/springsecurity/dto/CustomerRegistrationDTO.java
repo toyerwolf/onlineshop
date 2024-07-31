@@ -1,6 +1,7 @@
 package com.example.springsecurity.dto;
 
 import jakarta.persistence.Access;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CustomerRegistrationDTO {
-    private int year;
-    private long registrations;
+    private Integer year;
+    private Long registrations;
 }

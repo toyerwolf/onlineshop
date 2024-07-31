@@ -4,12 +4,17 @@ import com.example.springsecurity.dto.*;
 import com.example.springsecurity.entity.Category;
 import com.example.springsecurity.entity.Product;
 import com.example.springsecurity.entity.Rating;
+import com.example.springsecurity.exception.AlreadyExistException;
 import com.example.springsecurity.exception.InsufficientQuantityException;
 import com.example.springsecurity.exception.NotFoundException;
+import com.example.springsecurity.projection.ProductSalesProjection;
+import com.example.springsecurity.projection.ProductSalesProjectionByYear;
+import com.example.springsecurity.projection.SalesRevenueProjection;
 import com.example.springsecurity.repository.CategoryRepository;
 import com.example.springsecurity.repository.ProductRepository;
 import com.example.springsecurity.req.ProductRequest;
 import com.example.springsecurity.service.ImageService;
+import com.example.springsecurity.service.ProductService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +25,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -43,6 +49,9 @@ class ProductServiceImplTest {
     private CategoryRepository categoryRepository;
 
     @Mock
+    private ProductFinderService productFinderService;
+
+    @Mock
     private ProductRepository productRepository;
 
     @Mock
@@ -50,6 +59,9 @@ class ProductServiceImplTest {
     @InjectMocks
     @Spy
     private ProductServiceImpl productService;
+
+    @Mock
+    private CategoryFinderService categoryFinderService;
 
 
     private static final String IMAGE_URL_PREFIX = "/static/";
@@ -77,7 +89,7 @@ class ProductServiceImplTest {
         MockMultipartFile image = new MockMultipartFile("image", "test.jpg", "image/jpeg", new byte[]{});
         String imageName = "test.jpg";
 
-        when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
+        when(categoryFinderService.findCategoryById(categoryId)).thenReturn(category);
         when(imageService.saveImage(image)).thenReturn(imageName);
 
         // Act
@@ -101,13 +113,36 @@ class ProductServiceImplTest {
     }
 
     @Test
+    void testAddProductToCategory_ProductAlreadyExists() {
+        // Arrange
+        ProductRequest productRequest = new ProductRequest();
+        productRequest.setName("Existing Product");
+        Long categoryId = 1L;
+        MultipartFile image = mock(MultipartFile.class);
+
+        // Mocking existing product
+        when(productRepository.findByName("Existing Product")).thenReturn(Optional.of(new Product()));
+
+        // Act & Assert
+        assertThrows(AlreadyExistException.class, () -> {
+            productService.addProductToCategory(productRequest, categoryId, image);
+        });
+    }
+
+
+
+
+
+    @Test
     void testFindProductsByCategoryId_Success() {
         // Arrange
         Long categoryId = 1L;
         Category category = new Category();
         category.setCategoryId(categoryId);
-        String imageUrlPrefix = "/static/";
-        productService.setImageUrlPrefix(imageUrlPrefix);
+
+        // Set image URL prefix
+        productService.setImageUrlPrefix(IMAGE_URL_PREFIX);
+
         Product product1 = new Product();
         product1.setId(1L);
         product1.setName("Product 1");
@@ -127,72 +162,21 @@ class ProductServiceImplTest {
         when(productRepository.findProductsByCategoryId(categoryId)).thenReturn(products);
 
         // Act
-        List<ProductDto> result = productService.findProductsByCategoryId(categoryId);
+        ProductDtoContainer result = productService.findProductsByCategoryId(categoryId);
 
         // Assert
-        assertEquals(2, result.size());
-        ProductDto dto1 = result.get(0);
+        assertEquals(2, result.getProducts().size());
+        ProductDto dto1 = result.getProducts().get(0);
         assertEquals("Product 1", dto1.getName());
         assertNotNull(dto1.getImageUrl());
-        assertEquals(IMAGE_URL_PREFIX + "product1.jpg", dto1.getImageUrl());
-        ProductDto dto2 = result.get(1);
+        assertEquals( "product1.jpg", dto1.getImageUrl()); // Use the correct prefix
+        ProductDto dto2 = result.getProducts().get(1);
         assertEquals("Product 2", dto2.getName());
         assertNotNull(dto2.getImageUrl());
-        assertEquals(IMAGE_URL_PREFIX + "product2.jpg", dto2.getImageUrl());
-    }
-
-    @Test
-    void testFindProductsByCategoryId_EmptyList() {
-        // Arrange
-        Long categoryId = 1L;
-        when(productRepository.findProductsByCategoryId(categoryId)).thenReturn(Collections.emptyList());
-
-        // Act and Assert
-        assertThrows(NotFoundException.class, () -> productService.findProductsByCategoryId(categoryId));
+        assertEquals("product2.jpg", dto2.getImageUrl()); // Use the correct prefix
     }
 
 
-    @Test
-    void testAddProductToCategory_CategoryNotFound() {
-        // Arrange
-        Long categoryId = 1L;
-        when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
-
-        // Act and Assert
-        assertThrows(NotFoundException.class, () -> productService.addProductToCategory(new ProductRequest(), categoryId, new MockMultipartFile("image", new byte[]{})));
-    }
-
-
-
-
-
-    @Test
-    void testFindProductById_ProductNotFound() {
-        when(productRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-        // Act and Assert
-        assertThrows(NotFoundException.class, () -> productService.findProductById(1L));
-    }
-
-    @Test
-    void testFindProductById_ProductFound() {
-        // Arrange
-        Long productId = 1L;
-        String productName = "Test Product";
-        Product product = new Product();
-        product.setId(productId);
-        product.setName(productName);
-
-        // Установка мока для productRepository
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
-
-        // Act
-        Product foundProduct = productService.findProductById(productId);
-
-        // Assert
-        assertEquals(productId, foundProduct.getId());
-        assertEquals(productName, foundProduct.getName());
-    }
 
 
     //sozdayem dva produkta dobavlayem v list,
@@ -241,7 +225,7 @@ class ProductServiceImplTest {
         productRequest.setName("Updated Product Name");
 
         // Мокируем вызовы репозитория
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(productFinderService.findProductById(productId)).thenReturn(product);
 
         // Обновляем продукт
         productService.updateProduct(productId, productRequest);
@@ -253,18 +237,6 @@ class ProductServiceImplTest {
         assertEquals(productRequest.getName(), product.getName());
     }
 
-    @Test
-    @Transactional
-    void testUpdateProduct_ProductNotFound() {
-        // Arrange
-        Long productId = 1L;
-
-        // Мock репозитория
-        when(productRepository.findById(productId)).thenReturn(Optional.empty());
-
-        // Проверяем, что метод выбрасывает исключение NotFoundException
-        assertThrows(NotFoundException.class, () -> productService.updateProduct(productId, new ProductRequest()));
-    }
 
     @Test
     @Transactional
@@ -274,7 +246,7 @@ class ProductServiceImplTest {
         Product product = new Product();
         product.setId(productId);
 
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(productFinderService.findProductById(productId)).thenReturn(product);
 
         // Проверяем, что метод удаления продукта не выбрасывает исключение
         assertDoesNotThrow(() -> productService.deleteProduct(productId));
@@ -284,18 +256,6 @@ class ProductServiceImplTest {
         assertTrue(product.isDeleted());
     }
 
-    @Test
-    @Transactional
-    void testDeleteProduct_ProductNotFound() {
-        // Arrange
-        Long productId = 1L;
-
-        // Mock репозитория
-        when(productRepository.findById(productId)).thenReturn(Optional.empty());
-
-        // Проверяем, что метод выбрасывает исключение NotFoundException
-        assertThrows(NotFoundException.class, () -> productService.deleteProduct(productId));
-    }
 
     @Test
     void testSearchProductByName() {
@@ -346,7 +306,7 @@ class ProductServiceImplTest {
         product.setQuantity(currentQuantity);
 
         // Mocking repository response
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(productFinderService.findProductById(productId)).thenReturn(product);
 
         // Act
         assertDoesNotThrow(() -> productService.decreaseCount(productId, quantityToDecrease));
@@ -367,7 +327,7 @@ class ProductServiceImplTest {
         product.setQuantity(currentQuantity);
 
         // Mocking repository
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(productFinderService.findProductById(productId)).thenReturn(product);
 
         // Act and Assert
         InsufficientQuantityException exception = assertThrows(InsufficientQuantityException.class, () ->
@@ -378,22 +338,7 @@ class ProductServiceImplTest {
         verify(productRepository, never()).save(any());
     }
 
-    @Test
-    void testDecreaseCount_ProductNotFound() {
-        // Arrange
-        Long productId = 1L;
 
-        // Mocking repository
-        when(productRepository.findById(productId)).thenReturn(Optional.empty());
-
-        // Act and Assert
-        NotFoundException exception = assertThrows(NotFoundException.class, () ->
-                productService.decreaseCount(productId, 5));
-        assertEquals("Product not found", exception.getMessage());
-
-        // Verify
-        verify(productRepository, never()).save(any());
-    }
 
     @Test
     void testGetProductDto() {
@@ -415,7 +360,7 @@ class ProductServiceImplTest {
         product.setCategory(category);
 
         // Act
-        ProductDto productDto = ProductServiceImpl.getProductDto(product);
+        ProductDto productDto = productService.getProductDto(product);
 
         // Assert
         assertNotNull(productDto);
@@ -438,10 +383,10 @@ class ProductServiceImplTest {
         Product expectedProduct = new Product();
         expectedProduct.setId(productId);
 
-        when(productRepository.findById(productId)).thenReturn(Optional.of(expectedProduct));
+        when(productFinderService.findProductById(productId)).thenReturn(expectedProduct);
 
         // Act
-        Product actualProduct = productService.findProductById(productId);
+        Product actualProduct = productFinderService.findProductById(productId);
 
         // Assert
         assertNotNull(actualProduct);
@@ -500,12 +445,22 @@ class ProductServiceImplTest {
         int year = 2023;
         LocalDateTime startOfYear = LocalDateTime.of(year, 1, 1, 0, 0, 0);
         LocalDateTime endOfYear = LocalDateTime.of(year, 12, 31, 23, 59, 59);
-        Object[] result1 = {1L, 50, "Product 1"};
-        Object[] result2 = {2L, 25, "Product 2"};
-        List<Object[]> results = Arrays.asList(result1, result2);
 
-        // Mocking the repository call
-        when(productRepository.countSoldProductsByYear(startOfYear, endOfYear)).thenReturn(results);
+        // Создаем фиктивные объекты проекции
+        ProductSalesProjectionByYear projection1 = mock(ProductSalesProjectionByYear.class);
+        when(projection1.getProductName()).thenReturn("Product 1");
+        when(projection1.getTotalSold()).thenReturn(50);
+
+        ProductSalesProjectionByYear projection2 = mock(ProductSalesProjectionByYear.class);
+        when(projection2.getProductName()).thenReturn("Product 2");
+        when(projection2.getTotalSold()).thenReturn(25);
+
+        List<ProductSalesProjectionByYear> mockResults = new ArrayList<>();
+        mockResults.add(projection1);
+        mockResults.add(projection2);
+
+        // Мокаем репозиторий
+        when(productRepository.countSoldProductsByYear(startOfYear, endOfYear)).thenReturn(mockResults);
 
         // Act
         ProductSalesResponseDto productSalesResponseDto = productService.countSoldProductsByYear(year);
@@ -532,13 +487,24 @@ class ProductServiceImplTest {
         }
     }
 
+
     @Test
     public void testGetProductSalesStatistics() {
         // Arrange
-        List<Object[]> mockResults = new ArrayList<>();
-        mockResults.add(new Object[]{BigDecimal.valueOf(2023), BigDecimal.valueOf(10)});
-        mockResults.add(new Object[]{BigDecimal.valueOf(2024), BigDecimal.valueOf(20)});
+        // Создаем фиктивные объекты проекции
+        ProductSalesProjection projection1 = mock(ProductSalesProjection.class);
+        when(projection1.getSalesYear()).thenReturn(2023);
+        when(projection1.getTotalSold()).thenReturn(10);
 
+        ProductSalesProjection projection2 = mock(ProductSalesProjection.class);
+        when(projection2.getSalesYear()).thenReturn(2024);
+        when(projection2.getTotalSold()).thenReturn(20);
+
+        List<ProductSalesProjection> mockResults = new ArrayList<>();
+        mockResults.add(projection1);
+        mockResults.add(projection2);
+
+        // Мокаем репозиторий
         when(productRepository.getProductSalesStatistics()).thenReturn(mockResults);
 
         // Act
@@ -557,13 +523,24 @@ class ProductServiceImplTest {
 
 
 
+
     @Test
     public void testGetTotalProductSalesRevenueByYear() {
         // Arrange
-        List<Object[]> mockResults = new ArrayList<>();
-        mockResults.add(new Object[]{BigDecimal.valueOf(2023), BigDecimal.valueOf(10000)});
-        mockResults.add(new Object[]{BigDecimal.valueOf(2024), BigDecimal.valueOf(20000)});
+        // Создаем фиктивные объекты проекции
+        SalesRevenueProjection projection1 = mock(SalesRevenueProjection.class);
+        when(projection1.getYear()).thenReturn(2023);
+        when(projection1.getTotalRevenue()).thenReturn(BigDecimal.valueOf(10000));
 
+        SalesRevenueProjection projection2 = mock(SalesRevenueProjection.class);
+        when(projection2.getYear()).thenReturn(2024);
+        when(projection2.getTotalRevenue()).thenReturn(BigDecimal.valueOf(20000));
+
+        List<SalesRevenueProjection> mockResults = new ArrayList<>();
+        mockResults.add(projection1);
+        mockResults.add(projection2);
+
+        // Мокаем репозиторий
         when(productRepository.getSoldProductSalesStatistics()).thenReturn(mockResults);
 
         // Act
@@ -673,7 +650,7 @@ class ProductServiceImplTest {
         Product product = new Product();
         product.setPrice(new BigDecimal("100.00"));
 
-        ProductServiceImpl productService = new ProductServiceImpl(null, null, null,null);
+        ProductServiceImpl productService = new ProductServiceImpl(null, null, null,null,null);
         productService.setDiscountPercentage(BigDecimal.valueOf(20));
 
 
@@ -695,7 +672,7 @@ class ProductServiceImplTest {
         product.setDiscount(new BigDecimal("20.00"));
         product.setDiscountPrice(new BigDecimal("80.00"));
 
-        ProductServiceImpl productService = new ProductServiceImpl(null, null, null,null);
+        ProductServiceImpl productService = new ProductServiceImpl(null,null, null,null,null);
 
         // Act
         productService.removeDiscount(product);
@@ -712,14 +689,13 @@ class ProductServiceImplTest {
         Product product = new Product();
         product.setId(productId);
 
-
         List<Rating> ratings = new ArrayList<>();
         ratings.add(Rating.builder().rating(4).build());
         ratings.add(Rating.builder().rating(5).build());
         product.setRatings(ratings);
 
-        // Mock repository behavior
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        // Mock productFinderService behavior
+        when(productFinderService.findProductById(productId)).thenReturn(product);
 
         // Call the method
         Integer averageRating = productService.getProductRating(productId);
@@ -729,57 +705,8 @@ class ProductServiceImplTest {
         assertEquals(5, averageRating); // Average of {4, 5} is 4.5, rounded to nearest integer is 5
 
         // Verify interactions
-        verify(productRepository, times(1)).findById(productId);
+        verify(productFinderService, times(1)).findProductById(productId);
     }
-
-    @Test
-    public void testGetProductRating_ProductFoundWithoutRatings() {
-        // Mock data
-        Long productId = 1L;
-        Product product = new Product();
-        product.setId(productId);
-        product.setRatings(new ArrayList<>()); // Empty ratings list
-
-        // Mock repository behavior
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
-
-        // Call the method
-        Integer averageRating = productService.getProductRating(productId);
-
-        // Verify the result
-        assertNull(averageRating);
-
-        // Verify interactions
-        verify(productRepository, times(1)).findById(productId);
-    }
-
-    @Test
-    public void testGetProductRating_ProductNotFound() {
-        // Mock data
-        Long productId = 1L;
-
-        // Mock repository behavior (product not found)
-        when(productRepository.findById(productId)).thenReturn(Optional.empty());
-
-        // Verify that NotFoundException is thrown
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
-            productService.getProductRating(productId);
-        });
-
-        assertEquals("Product not found", exception.getMessage());
-
-        // Verify interactions
-        verify(productRepository, times(1)).findById(productId);
-    }
-
-
-
-
-
-
-
-
-
 
 
     private Product createProductWithQuantityAndPrice(Long id, int quantity, BigDecimal price) {

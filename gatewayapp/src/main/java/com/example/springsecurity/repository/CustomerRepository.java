@@ -4,6 +4,7 @@ import com.example.springsecurity.entity.Customer;
 import com.example.springsecurity.entity.CustomerCardDetails;
 import com.example.springsecurity.entity.Order;
 import com.example.springsecurity.entity.User;
+import com.example.springsecurity.projection.CustomerRegistrationsProjection;
 import org.jetbrains.annotations.NotNull;
 import org.mapstruct.control.MappingControl;
 import org.springframework.data.domain.Page;
@@ -28,16 +29,16 @@ public interface CustomerRepository extends JpaRepository<Customer,Long> {
 
     //Object potomu chto vozrashayets dva znacheniya
     @Query(value = "SELECT " +
-            "   c.registered_at, " +
+            "   EXTRACT(YEAR FROM c.registered_at) AS registration_year, " +
             "   COUNT(*) AS customer_registrations " +
             "FROM " +
             "   customer c " +
             "GROUP BY " +
-            "   c.registered_at " +
+            "   EXTRACT(YEAR FROM c.registered_at) " +
             "ORDER BY " +
-            "   c.registered_at ASC",
+            "   EXTRACT(YEAR FROM c.registered_at) ASC",
             nativeQuery = true)
-    List<Object[]> getCustomerRegistrationsByYear();
+    List<CustomerRegistrationsProjection> getCustomerRegistrationsByYear();
 
 //Lower nujen dlya preobrozaniya stroki v nujniy registr
     //etot query budet iskat nezavisimo v poiske pishesh s bolshoy bukvi ili s malenkoy

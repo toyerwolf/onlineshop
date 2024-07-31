@@ -16,9 +16,9 @@ import java.util.Map;
 
 public interface ProductService {
 
-    void addProductToCategory(ProductRequest productRequest, Long categoryId, MultipartFile image) throws IOException;
+    void addProductToCategory(ProductRequest productRequest, Long categoryId, MultipartFile image);
 
-    List<ProductDto> findProductsByCategoryId(Long categoryId);
+    ProductDtoContainer findProductsByCategoryId(Long categoryId);
 
     ProductDto getProductById(Long productId);
 
@@ -31,13 +31,13 @@ public interface ProductService {
 
    void decreaseCount(Long productId, int quantity);
 
-     Product findProductById(Long productId);
+//     Product findProductById(Long productId);
      List<ProductDto> findProductsByOrderId(Long orderId);
     ProductSalesResponseDto countSoldProductsByYear(int year);
 
     YearlySalesResponseDto getProductSalesStatistics();
 
-    public YearlySalesRevenueResponseDTO getTotalProductSalesRevenueByYear();
+    YearlySalesRevenueResponseDTO getTotalProductSalesRevenueByYear();
 
     void applyNewYearDiscount();
 

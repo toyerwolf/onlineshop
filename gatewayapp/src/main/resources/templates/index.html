@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Shopping</title>
     <link rel="stylesheet" href="/styles.css">
+<!--    <script src="https://unpkg.com/zooming/build/zooming.min.js"></script>-->
+<!--    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/zooming/build/zooming.min.js"></script>
+    <script src="/js/zoom.js"></script>
 </head>
 <body>
 <!--<div id="orders-section"></div>-->
@@ -51,7 +56,9 @@
         <div id="products-section" class="product-list">
             <!-- Карточки продуктов здесь -->
             <div class="product-card" th:each="product : ${products.content}" th:data-product-id="${product.id}">
-                <img th:src="${product.imageUrl}" alt="Product Image">
+                <div class="image-container">
+                    <img class="zoomable-image" th:src="${product.imageUrl}" alt="Product Image">
+                </div>
                 <h3 th:text="${product.name}"></h3>
                 <p th:text="${product.categoryName}"></p>
                 <p class="price" th:if="${product.discountPrice != null}">
@@ -75,14 +82,13 @@
                     <span class="star" data-value="2" onclick="rateProduct(this)">☆</span>
                     <span class="star" data-value="1" onclick="rateProduct(this)">☆</span>
                 </div>
-
                 <div class="average-rating">
                     <!-- Средний рейтинг продукта будет здесь -->
                 </div>
                 <button class="make-order-button" onclick="makeOrder(this.closest('.product-card').getAttribute('data-product-id'))">Make Order</button>
-
                 <span class="heart" onclick="toggleFavorite(this)">♡</span>
             </div>
+        </div>
 
             <div id="wishlist-section" class="product-list">
                 <!-- Карточки избранных продуктов здесь -->
@@ -111,14 +117,25 @@
     </div>
 
     <script src="/js/currency.js"></script>
-</div>
-
-
-
 
 
 <script>
 
+    document.addEventListener('DOMContentLoaded', function() {
+        const images = document.querySelectorAll('.zoomable-image');
+        images.forEach(img => {
+            img.addEventListener('mousemove', function(event) {
+                const rect = event.target.getBoundingClientRect();
+                const x = event.clientX - rect.left; // x позиция внутри элемента
+                const y = event.clientY - rect.top;  // y позиция внутри элемента
+                img.style.transformOrigin = `${x}px ${y}px`;
+            });
+
+            img.addEventListener('mouseleave', function() {
+                img.style.transformOrigin = 'center center';
+            });
+        });
+    });
 
     function toggleFavorite(element) {
         const isFavorite = element.classList.toggle('favorite');
@@ -821,7 +838,9 @@
 
         fetch(`/home/${categoryId}/products`)
             .then(response => response.json())
-            .then(products => {
+            .then(data => {
+                // Теперь ожидаем объект, содержащий контейнер с продуктами
+                const products = data.products;
                 localStorage.setItem('products', JSON.stringify(products));
                 productsSection.innerHTML = '';
 
@@ -835,32 +854,32 @@
                     productCard.className = 'product-card';
                     productCard.dataset.productId = product.id;
                     productCard.innerHTML = `
-                <img src="${product.imageUrl}" alt="Изображение товара">
-                <h3>${product.name}</h3>
-                <p>${product.description}</p>
-                <p class="price">
-                    ${product.discountPrice ? `
-                        <span class="original-price">${product.price}</span>
-                        <span class="discounted-price">${product.discountPrice}</span>` :
+                    <img src="${product.imageUrl}" alt="Изображение товара">
+                    <h3>${product.name}</h3>
+                    <p>${product.description}</p>
+                    <p class="price">
+                        ${product.discountPrice ? `
+                            <span class="original-price">${product.price}</span>
+                            <span class="discounted-price">${product.discountPrice}</span>` :
                         `<span>${product.price}</span>`}
-                </p>
-                <div class="quantity">
-                    <button data-action="quantity-btn" class="quantity-btn" onclick="decrementQuantity(this)" style="display: none;">-</button>
-                    <input type="number" class="quantity-input" value="1" min="1">
-                    <button data-action="quantity-btn" class="quantity-btn" onclick="incrementQuantity(this)" style="display: none;">+</button>
-                </div>
-                <button data-action="make-order" onclick="makeOrder(${product.id})" style="display: none;">Make Order</button>
-                <div class="rating">
-                    ${localStorage.getItem('access_token') ? `
-                        <span class="star" data-value="1" onclick="rateProduct(this)">☆</span>
-                        <span class="star" data-value="2" onclick="rateProduct(this)">☆</span>
-                        <span class="star" data-value="3" onclick="rateProduct(this)">☆</span>
-                        <span class="star" data-value="4" onclick="rateProduct(this)">☆</span>
-                        <span class="star" data-value="5" onclick="rateProduct(this)">☆</span>` :
+                    </p>
+                    <div class="quantity">
+                        <button data-action="quantity-btn" class="quantity-btn" onclick="decrementQuantity(this)" style="display: none;">-</button>
+                        <input type="number" class="quantity-input" value="1" min="1">
+                        <button data-action="quantity-btn" class="quantity-btn" onclick="incrementQuantity(this)" style="display: none;">+</button>
+                    </div>
+                    <button data-action="make-order" onclick="makeOrder(${product.id})" style="display: none;">Make Order</button>
+                    <div class="rating">
+                        ${localStorage.getItem('access_token') ? `
+                            <span class="star" data-value="1" onclick="rateProduct(this)">☆</span>
+                            <span class="star" data-value="2" onclick="rateProduct(this)">☆</span>
+                            <span class="star" data-value="3" onclick="rateProduct(this)">☆</span>
+                            <span class="star" data-value="4" onclick="rateProduct(this)">☆</span>
+                            <span class="star" data-value="5" onclick="rateProduct(this)">☆</span>` :
                         ''}
-                </div>
-                <div class="average-rating"></div>
-            `;
+                    </div>
+                    <div class="average-rating"></div>
+                `;
                     productsSection.appendChild(productCard);
 
                     const productImage = productCard.querySelector('img');

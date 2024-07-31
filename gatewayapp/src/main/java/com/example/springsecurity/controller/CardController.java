@@ -1,6 +1,7 @@
 package com.example.springsecurity.controller;
 
 import com.example.springsecurity.req.CustomerCardReq;
+import com.example.springsecurity.service.AuthService;
 import com.example.springsecurity.service.CardService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,14 +15,14 @@ import org.springframework.web.bind.annotation.*;
 public class CardController {
 
     private final CardService cardService;
+    private final AuthService authService;
 
 
     @Secured({"USER"})
-@PostMapping("/{customerId}")
-    public ResponseEntity<String> addCardToCustomer(
-            @PathVariable Long customerId,
-            @RequestBody CustomerCardReq customerCardReq) {
-        cardService.addCardToCustomer(customerId, customerCardReq);
+    @PostMapping()
+    public ResponseEntity<String> addCardToCustomer(@RequestBody CustomerCardReq customerCardReq, @RequestHeader("Authorization") String authHeader) {
+        Long customerId = authService.getCustomerIdFromToken(authHeader);
+        cardService.addCardToCustomer(customerCardReq, customerId);
         return ResponseEntity.ok("Card added successfully");
     }
 

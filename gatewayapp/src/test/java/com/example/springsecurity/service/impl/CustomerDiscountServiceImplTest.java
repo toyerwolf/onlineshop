@@ -38,6 +38,12 @@ class CustomerDiscountServiceImplTest {
     @Mock
     private ProductService productService;
 
+    @Mock
+    private ProductFinderService productFinderService;
+
+    @Mock
+    private CustomerFinderService customerFinderService;
+
     @Test
     void testApplyDiscountWhenDiceRollsAreSix() {
         Long customerId = 1L;
@@ -54,8 +60,8 @@ class CustomerDiscountServiceImplTest {
         newDiscount.setDiceRolled(false);
 
         when(customerDiscountRepository.findByCustomerIdAndProductId(customerId, productId)).thenReturn(null);
-        when(customerService.findCustomerById(customerId)).thenReturn(customer);
-        when(productService.findProductById(productId)).thenReturn(product);
+        when(customerFinderService.findCustomerById(customerId)).thenReturn(customer);
+        when(productFinderService.findProductById(productId)).thenReturn(product);
 
         // Use reflection to set dice values to 6
         CustomerDiscountServiceImpl customerDiscountServiceSpy = spy(customerDiscountService);

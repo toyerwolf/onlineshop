@@ -26,10 +26,12 @@ public class CustomerDiscountServiceImpl implements CustomerDiscountService {
     private static final BigDecimal DISCOUNT_PERCENTAGE = BigDecimal.valueOf(0.10); // 10% discount
     private static final int TARGET_DICE_VALUE = 6;
     private static final int DICE_SIDES = 6;
+    private final ProductFinderService productFinderService;
 
     private final CustomerDiscountRepository customerDiscountRepository;
     private final ProductService productService;
     private final CustomerService customerService;
+    private final CustomerFinderService customerFinderService;
     @Transactional
     public DiceRollResult applyDiscountIfDiceRollsAreSix(Long customerId, Long productId) {
         CustomerDiscount customerDiscount = getOrCreateCustomerDiscount(customerId, productId);
@@ -80,8 +82,8 @@ public class CustomerDiscountServiceImpl implements CustomerDiscountService {
 
         if (customerDiscount == null) {
             customerDiscount = new CustomerDiscount();
-            customerDiscount.setCustomer(customerService.findCustomerById(customerId));
-            customerDiscount.setProduct(productService.findProductById(productId));
+            customerDiscount.setCustomer(customerFinderService.findCustomerById(customerId));
+            customerDiscount.setProduct(productFinderService.findProductById(productId));
         }
         return customerDiscount;
     }
@@ -93,7 +95,7 @@ public class CustomerDiscountServiceImpl implements CustomerDiscountService {
 
 
     public void applyDiscountIfApplicable(CustomerDiscount customerDiscount, Long productId) {
-        Product product = productService.findProductById(productId);
+        Product product = productFinderService.findProductById(productId);
         if (TARGET_PRODUCT_NAME.equals(product.getName())) {
             customerDiscount.setDiscount(DISCOUNT_PERCENTAGE);
             customerDiscount.setDiscountPrice(calculateDiscountPrice(product.getPrice()));

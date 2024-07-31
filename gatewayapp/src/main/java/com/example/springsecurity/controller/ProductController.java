@@ -36,19 +36,15 @@ public class ProductController {
     @PostMapping("/{categoryId}")
     public ResponseEntity<String> addProductToCategory(@ModelAttribute ProductRequest productRequest,
                                                        @PathVariable Long categoryId,
-                                                       @RequestParam("image")MultipartFile image) throws IOException {
+                                                       @RequestParam("image")MultipartFile image) {
         productService.addProductToCategory(productRequest, categoryId,image);
         return ResponseEntity.ok("Product added to category successfully");
     }
 
-//    @GetMapping("/category/{categoryId}")
-//    public List<ProductDto> findProductsByCategoryId(@PathVariable Long categoryId) {
-//        return productService.findProductsByCategoryId(categoryId);
-//    }
 
     @Secured("ADMIN")
     @PatchMapping("/{productId}/images")
-    public ResponseEntity<?> changeProductImages(@PathVariable Long productId, @RequestParam("image") MultipartFile image) throws IOException {
+    public ResponseEntity<?> changeProductImages(@PathVariable Long productId, @RequestParam("image") MultipartFile image) {
         imageService.changeImage(productId, image);
         return ResponseEntity.ok().build();
     }

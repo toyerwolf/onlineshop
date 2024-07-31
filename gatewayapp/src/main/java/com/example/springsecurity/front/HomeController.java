@@ -79,7 +79,7 @@ public class HomeController {
 
     @GetMapping("/home/{categoryId}/products")
     @ResponseBody
-    public List<ProductDto> getProductsByCategoryId(@PathVariable Long categoryId) {
+    public ProductDtoContainer getProductsByCategoryId(@PathVariable Long categoryId) {
         return productService.findProductsByCategoryId(categoryId);
     }
 
@@ -179,6 +179,13 @@ public class HomeController {
     public String showCurrencyPage() {
         return "currency"; // Это имя представления (view name), которое соответствует currency.html
     }
+
+//    @GetMapping("/login/oauth2/code/google")
+//    public String googleLoginRedirect(@RequestParam String code, HttpSession session) {
+//        // Обработка кода авторизации и получение токенов
+//        // Перенаправление пользователя на домашнюю страницу или другую защищенную страницу
+//        return "redirect:/";
+//    }
 
 
 

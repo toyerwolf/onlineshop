@@ -44,12 +44,15 @@ public class AuthServiceImpl implements AuthService {
 
 
     public Long getCustomerIdFromToken(String authHeader) {
-        // Извлекаем токен из заголовка "Authorization"
-        String token = authHeader.replace("Bearer ", "");
-
-        // Парсим токен и извлекаем идентификатор клиента
-        Claims claims = jwtTokenProvider.getAllClaimsFromToken(token);
-        return claims.get("customerId", Long.class);
+        try {
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                throw new AppException(HttpStatus.BAD_REQUEST,"Invalid Authorization header");
+            }
+            String token = authHeader.replace("Bearer ", "");
+            return jwtTokenProvider.getUserIdFromJWT(token);
+        } catch (Exception e) {
+            throw new AppException(HttpStatus.BAD_REQUEST,"Invalid token");
+        }
     }
     }
 
