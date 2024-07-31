@@ -14,18 +14,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: app-jar
-
       - name: Install lftp
         run: sudo apt-get install -y lftp
 
       - name: Upload JAR file via SFTP
         run: |
           lftp -u ${{ secrets.EC2_USER }},${{ secrets.EC2_SSH_KEY }} -e "
-            put C:\Users\mameh1\Downloads\projects\spring-security\gatewayapp\build\libs\gatewayapp-0.0.1-SNAPSHOT.jar -o /home/ubuntu/gatewayapp-0.0.1-SNAPSHOT.jar
+            put ./gatewayapp/build/libs/gatewayapp-0.0.1-SNAPSHOT.jar -o /home/ubuntu/gatewayapp-0.0.1-SNAPSHOT.jar
             bye
           " sftp://${{ secrets.EC2_HOST }}
 
