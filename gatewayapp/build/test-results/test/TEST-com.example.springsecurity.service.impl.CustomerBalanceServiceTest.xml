@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.example.springsecurity.service.impl.CustomerBalanceServiceTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2024-07-30T06:31:13" hostname="E-AA-2Y5HDK3-L" time="0.131">
-  <properties/>
-  <testcase name="testDecreaseBalance_SufficientBalance()" classname="com.example.springsecurity.service.impl.CustomerBalanceServiceTest" time="0.005"/>
-  <testcase name="testDecreaseBalance_InsufficientBalance()" classname="com.example.springsecurity.service.impl.CustomerBalanceServiceTest" time="0.003"/>
-  <testcase name="testValidateCustomerBalance_InsufficientBalance()" classname="com.example.springsecurity.service.impl.CustomerBalanceServiceTest" time="0.12"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

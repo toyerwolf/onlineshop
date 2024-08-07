@@ -1,1 +1,0 @@
-insert into category_test (category_id,description,is_deleted,name)     values (1,'electronica',false,'phones')
