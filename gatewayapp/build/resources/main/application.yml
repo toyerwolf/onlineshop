@@ -1,0 +1,58 @@
+server:
+  port: 8098
+
+spring:
+  profiles:
+    include: db,actuator,google
+  main:
+    allow-bean-definition-overriding: true
+  mvc:
+    static-path-pattern: /static/**
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+  web:
+    resources:
+      static-locations: classpath:/static/
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: debug
+
+jwtSecret: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9123saddsaA2sdGgfsa
+jwtExpirationInMs: 360000
+refreshTokenExpiration: 600000
+allowed-file-extension: jpg,jpeg,gif,ico,png
+
+
+jwt:
+  secret: ${jwtSecret}
+  expirationInMs: ${jwtExpirationInMs}
+  refreshTokenExpiration: ${refreshTokenExpiration}
+
+
+file:
+  allowed-extensions: ${allowed-file-extension}
+
+image-url-prefix: /static/
+
+
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+weatherperson:
+  apiKey: 90a85ee6b6971e314b8bb9c2f34e0571
+
+feign:
+  compression:
+    request:
+      enabled: true
+    response:
+      enabled: true

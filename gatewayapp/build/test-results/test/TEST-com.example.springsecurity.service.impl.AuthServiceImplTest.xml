@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.springsecurity.service.impl.AuthServiceImplTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2024-07-30T06:31:11" hostname="E-AA-2Y5HDK3-L" time="0.919">
+  <properties/>
+  <testcase name="testLogin_Success()" classname="com.example.springsecurity.service.impl.AuthServiceImplTest" time="0.851"/>
+  <testcase name="testRefreshAccessTokenAndGenerateNewToken_ValidOldToken()" classname="com.example.springsecurity.service.impl.AuthServiceImplTest" time="0.036"/>
+  <testcase name="testRefreshAccessTokenAndGenerateNewToken_InvalidOldToken()" classname="com.example.springsecurity.service.impl.AuthServiceImplTest" time="0.014"/>
+  <system-out><![CDATA[2024-07-30T10:31:11.634+04:00 DEBUG 2876 --- [pool-6-thread-1] org.hibernate.SQL                        : 
+    select
+        o1_0.id,
+        o1_0.created_at,
+        c1_0.id,
+        c1_0.address,
+        c1_0.balance,
+        c1_0.name,
+        c1_0.registered_at,
+        c1_0.surname,
+        c1_0.user_id,
+        w1_0.id,
+        w1_0.created_at,
+        c2_0.id,
+        c2_0.address,
+        c2_0.balance,
+        c2_0.name,
+        c2_0.registered_at,
+        c2_0.surname,
+        c2_0.user_id,
+        c2_0.wishlist_id,
+        o1_0.is_paid,
+        o1_0.status,
+        o1_0.total_amount,
+        o1_0.updated_at 
+    from
+        order_test o1_0 
+    left join
+        customer c1_0 
+            on c1_0.id=o1_0.customer_id 
+    left join
+        wishlist w1_0 
+            on w1_0.id=c1_0.wishlist_id 
+    left join
+        customer c2_0 
+            on c2_0.id=w1_0.customer_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.created_at,
+        c1_0.id,
+        c1_0.address,
+        c1_0.balance,
+        c1_0.name,
+        c1_0.registered_at,
+        c1_0.surname,
+        c1_0.user_id,
+        w1_0.id,
+        w1_0.created_at,
+        c2_0.id,
+        c2_0.address,
+        c2_0.balance,
+        c2_0.name,
+        c2_0.registered_at,
+        c2_0.surname,
+        c2_0.user_id,
+        c2_0.wishlist_id,
+        o1_0.is_paid,
+        o1_0.status,
+        o1_0.total_amount,
+        o1_0.updated_at 
+    from
+        order_test o1_0 
+    left join
+        customer c1_0 
+            on c1_0.id=o1_0.customer_id 
+    left join
+        wishlist w1_0 
+            on w1_0.id=c1_0.wishlist_id 
+    left join
+        customer c2_0 
+            on c2_0.id=w1_0.customer_id 
+    where
+        o1_0.id=?
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

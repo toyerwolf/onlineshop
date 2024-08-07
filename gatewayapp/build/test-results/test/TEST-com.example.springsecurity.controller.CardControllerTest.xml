@@ -1,0 +1,1327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.springsecurity.controller.CardControllerTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-07-30T06:28:58" hostname="E-AA-2Y5HDK3-L" time="3.643">
+  <properties/>
+  <testcase name="testAddCardToCustomer()" classname="com.example.springsecurity.controller.CardControllerTest" time="3.643"/>
+  <system-out><![CDATA[2024-07-30T10:28:55.098+04:00  INFO 2876 --- [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.example.springsecurity.controller.CardControllerTest]: CardControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2024-07-30T10:28:55.102+04:00  INFO 2876 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.example.springsecurity.GatewayappApplication for test class com.example.springsecurity.controller.CardControllerTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.3)
+
+2024-07-30T10:28:55.283+04:00  INFO 2876 --- [    Test worker] c.e.s.controller.CardControllerTest      : Starting CardControllerTest using Java 17.0.11 with PID 2876 (started by mameh1 in C:\Users\mameh1\Downloads\projects\spring-security\gatewayapp)
+2024-07-30T10:28:55.283+04:00  INFO 2876 --- [    Test worker] c.e.s.controller.CardControllerTest      : The following 4 profiles are active: "db", "actuator", "google", "integration"
+2024-07-30T10:28:55.933+04:00  INFO 2876 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-07-30T10:28:56.034+04:00  INFO 2876 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 99 ms. Found 12 JPA repository interfaces.
+2024-07-30T10:28:56.107+04:00  INFO 2876 --- [    Test worker] o.s.cloud.context.scope.GenericScope     : BeanFactory id=fdf0a751-b714-323a-ae6a-061dba5ac89f
+2024-07-30T10:28:56.162+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration$LoadBalancerInterceptorConfig' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration$LoadBalancerInterceptorConfig] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [lbRestClientPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2024-07-30T10:28:56.164+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.loadbalancer.config.BlockingLoadBalancerClientAutoConfiguration' of type [org.springframework.cloud.loadbalancer.config.BlockingLoadBalancerClientAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:56.166+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.loadbalancer.config.LoadBalancerAutoConfiguration' of type [org.springframework.cloud.loadbalancer.config.LoadBalancerAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:56.169+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.commons.config.CommonsConfigAutoConfiguration' of type [org.springframework.cloud.commons.config.CommonsConfigAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:56.171+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:56.173+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'loadBalancerClientsDefaultsMappingsProvider' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration$$Lambda$1032/0x000002791c5e3010] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:56.175+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'defaultsBindHandlerAdvisor' of type [org.springframework.cloud.commons.config.DefaultsBindHandlerAdvisor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:56.178+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'spring.cloud.loadbalancer-org.springframework.cloud.client.loadbalancer.LoadBalancerClientsProperties' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerClientsProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:56.181+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'default.org.springframework.cloud.loadbalancer.config.LoadBalancerAutoConfiguration.LoadBalancerClientSpecification' of type [org.springframework.cloud.loadbalancer.annotation.LoadBalancerClientSpecification] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:56.183+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'default.org.springframework.cloud.loadbalancer.config.BlockingLoadBalancerClientAutoConfiguration.LoadBalancerClientSpecification' of type [org.springframework.cloud.loadbalancer.annotation.LoadBalancerClientSpecification] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:56.183+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'loadBalancerClientFactory' of type [org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:56.186+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'blockingLoadBalancerClient' of type [org.springframework.cloud.loadbalancer.blocking.client.BlockingLoadBalancerClient] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:56.191+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'loadBalancerServiceInstanceCookieTransformer' of type [org.springframework.cloud.loadbalancer.core.LoadBalancerServiceInstanceCookieTransformer] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:56.193+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'xForwarderHeadersTransformer' of type [org.springframework.cloud.loadbalancer.blocking.XForwardedHeadersTransformer] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:56.194+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:56.196+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'loadBalancerRequestFactory' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerRequestFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:56.197+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'loadBalancerInterceptor' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerInterceptor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:56.200+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.client.loadbalancer.reactive.LoadBalancerBeanPostProcessorAutoConfiguration' of type [org.springframework.cloud.client.loadbalancer.reactive.LoadBalancerBeanPostProcessorAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [loadBalancerWebClientBuilderBeanPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2024-07-30T10:28:56.202+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.client.loadbalancer.reactive.LoadBalancerBeanPostProcessorAutoConfiguration$ReactorDeferringLoadBalancerFilterConfig' of type [org.springframework.cloud.client.loadbalancer.reactive.LoadBalancerBeanPostProcessorAutoConfiguration$ReactorDeferringLoadBalancerFilterConfig] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [loadBalancerWebClientBuilderBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:56.203+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'reactorDeferringLoadBalancerExchangeFilterFunction' of type [org.springframework.cloud.client.loadbalancer.reactive.DeferringLoadBalancerExchangeFilterFunction] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [loadBalancerWebClientBuilderBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:56.280+04:00  INFO 2876 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 0 (http)
+2024-07-30T10:28:56.281+04:00  INFO 2876 --- [    Test worker] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2024-07-30T10:28:56.281+04:00  INFO 2876 --- [    Test worker] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.19]
+2024-07-30T10:28:56.343+04:00  INFO 2876 --- [    Test worker] o.a.c.c.C.[Tomcat-1].[localhost].[/]     : Initializing Spring embedded WebApplicationContext
+2024-07-30T10:28:56.343+04:00  INFO 2876 --- [    Test worker] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1058 ms
+2024-07-30T10:28:56.467+04:00  INFO 2876 --- [    Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-07-30T10:28:56.474+04:00  INFO 2876 --- [    Test worker] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2024-07-30T10:28:56.485+04:00  INFO 2876 --- [    Test worker] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-07-30T10:28:56.487+04:00  INFO 2876 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Starting...
+2024-07-30T10:28:56.489+04:00  INFO 2876 --- [    Test worker] com.zaxxer.hikari.pool.HikariPool        : HikariPool-4 - Added connection conn30: url=jdbc:h2:mem:demo user=POSTGRES
+2024-07-30T10:28:56.489+04:00  INFO 2876 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Start completed.
+2024-07-30T10:28:56.489+04:00  WARN 2876 --- [    Test worker] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2024-07-30T10:28:56.725+04:00  INFO 2876 --- [    Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2024-07-30T10:28:56.725+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists category_test cascade 
+Hibernate: 
+    drop table if exists category_test cascade 
+2024-07-30T10:28:56.726+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists customer cascade 
+Hibernate: 
+    drop table if exists customer cascade 
+2024-07-30T10:28:56.727+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists customer_discount cascade 
+Hibernate: 
+    drop table if exists customer_discount cascade 
+2024-07-30T10:28:56.728+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists customer_card_details cascade 
+Hibernate: 
+    drop table if exists customer_card_details cascade 
+2024-07-30T10:28:56.729+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists order_product cascade 
+Hibernate: 
+    drop table if exists order_product cascade 
+2024-07-30T10:28:56.729+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists order_test cascade 
+Hibernate: 
+    drop table if exists order_test cascade 
+2024-07-30T10:28:56.730+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists payment cascade 
+Hibernate: 
+    drop table if exists payment cascade 
+2024-07-30T10:28:56.730+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists product_test cascade 
+Hibernate: 
+    drop table if exists product_test cascade 
+2024-07-30T10:28:56.731+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists rating cascade 
+Hibernate: 
+    drop table if exists rating cascade 
+2024-07-30T10:28:56.731+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists users_test cascade 
+Hibernate: 
+    drop table if exists users_test cascade 
+2024-07-30T10:28:56.732+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists wishlist cascade 
+Hibernate: 
+    drop table if exists wishlist cascade 
+2024-07-30T10:28:56.733+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists wishlist_item cascade 
+Hibernate: 
+    drop table if exists wishlist_item cascade 
+2024-07-30T10:28:56.733+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    create table category_test (
+        is_deleted boolean not null,
+        category_id bigint generated by default as identity,
+        description varchar(255),
+        name varchar(255),
+        primary key (category_id)
+    )
+Hibernate: 
+    create table category_test (
+        is_deleted boolean not null,
+        category_id bigint generated by default as identity,
+        description varchar(255),
+        name varchar(255),
+        primary key (category_id)
+    )
+2024-07-30T10:28:56.735+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    create table customer (
+        balance numeric(38,2),
+        id bigint generated by default as identity,
+        registered_at timestamp(6),
+        user_id bigint unique,
+        wishlist_id bigint unique,
+        address varchar(255),
+        name varchar(255),
+        surname varchar(255),
+        primary key (id)
+    )
+Hibernate: 
+    create table customer (
+        balance numeric(38,2),
+        id bigint generated by default as identity,
+        registered_at timestamp(6),
+        user_id bigint unique,
+        wishlist_id bigint unique,
+        address varchar(255),
+        name varchar(255),
+        surname varchar(255),
+        primary key (id)
+    )
+2024-07-30T10:28:56.740+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    create table customer_discount (
+        dice_rolled boolean not null,
+        die1 integer not null,
+        die2 integer not null,
+        discount numeric(38,2),
+        discount_price numeric(38,2),
+        customer_id bigint unique,
+        expires_at timestamp(6),
+        id bigint generated by default as identity,
+        product_id bigint,
+        primary key (id),
+        unique (customer_id, product_id)
+    )
+Hibernate: 
+    create table customer_discount (
+        dice_rolled boolean not null,
+        die1 integer not null,
+        die2 integer not null,
+        discount numeric(38,2),
+        discount_price numeric(38,2),
+        customer_id bigint unique,
+        expires_at timestamp(6),
+        id bigint generated by default as identity,
+        product_id bigint,
+        primary key (id),
+        unique (customer_id, product_id)
+    )
+2024-07-30T10:28:56.742+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    create table customer_card_details (
+        card_balance numeric(38,2),
+        expiration_date date,
+        customer_id bigint,
+        id bigint generated by default as identity,
+        card_number varchar(255) unique,
+        cvv varchar(255),
+        primary key (id)
+    )
+Hibernate: 
+    create table customer_card_details (
+        card_balance numeric(38,2),
+        expiration_date date,
+        customer_id bigint,
+        id bigint generated by default as identity,
+        card_number varchar(255) unique,
+        cvv varchar(255),
+        primary key (id)
+    )
+2024-07-30T10:28:56.743+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    create table order_product (
+        quantity integer not null,
+        id bigint generated by default as identity,
+        order_id bigint,
+        product_id bigint,
+        product_name varchar(255),
+        primary key (id)
+    )
+Hibernate: 
+    create table order_product (
+        quantity integer not null,
+        id bigint generated by default as identity,
+        order_id bigint,
+        product_id bigint,
+        product_name varchar(255),
+        primary key (id)
+    )
+2024-07-30T10:28:56.744+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    create table order_test (
+        is_paid boolean not null,
+        total_amount numeric(38,2),
+        created_at timestamp(6),
+        customer_id bigint,
+        id bigint generated by default as identity,
+        updated_at timestamp(6),
+        status varchar(255) check (status in ('DELIVERED','PENDING','CANCEL','PAID','AWAITING')),
+        primary key (id)
+    )
+Hibernate: 
+    create table order_test (
+        is_paid boolean not null,
+        total_amount numeric(38,2),
+        created_at timestamp(6),
+        customer_id bigint,
+        id bigint generated by default as identity,
+        updated_at timestamp(6),
+        status varchar(255) check (status in ('DELIVERED','PENDING','CANCEL','PAID','AWAITING')),
+        primary key (id)
+    )
+2024-07-30T10:28:56.746+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    create table payment (
+        amount numeric(38,2),
+        customer_id bigint,
+        id bigint generated by default as identity,
+        order_id bigint,
+        payment_date timestamp(6),
+        payment_status varchar(255) check (payment_status in ('CREDIT_CARD','DEBIT_CARD','PAYPAL','APPLE_PAY','GOOGLE_PAY')),
+        primary key (id)
+    )
+Hibernate: 
+    create table payment (
+        amount numeric(38,2),
+        customer_id bigint,
+        id bigint generated by default as identity,
+        order_id bigint,
+        payment_date timestamp(6),
+        payment_status varchar(255) check (payment_status in ('CREDIT_CARD','DEBIT_CARD','PAYPAL','APPLE_PAY','GOOGLE_PAY')),
+        primary key (id)
+    )
+2024-07-30T10:28:56.748+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    create table product_test (
+        discount numeric(38,2),
+        discount_price numeric(38,2),
+        is_deleted boolean not null,
+        price numeric(38,2),
+        quantity integer not null,
+        category_id bigint,
+        created_at timestamp(6),
+        id bigint generated by default as identity,
+        updated_at timestamp(6),
+        description varchar(255),
+        image_url varchar(255),
+        name varchar(255) unique,
+        primary key (id)
+    )
+Hibernate: 
+    create table product_test (
+        discount numeric(38,2),
+        discount_price numeric(38,2),
+        is_deleted boolean not null,
+        price numeric(38,2),
+        quantity integer not null,
+        category_id bigint,
+        created_at timestamp(6),
+        id bigint generated by default as identity,
+        updated_at timestamp(6),
+        description varchar(255),
+        image_url varchar(255),
+        name varchar(255) unique,
+        primary key (id)
+    )
+2024-07-30T10:28:56.749+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    create table rating (
+        rating integer,
+        created_at timestamp(6),
+        customer_id bigint,
+        id bigint generated by default as identity,
+        product_id bigint,
+        primary key (id)
+    )
+Hibernate: 
+    create table rating (
+        rating integer,
+        created_at timestamp(6),
+        customer_id bigint,
+        id bigint generated by default as identity,
+        product_id bigint,
+        primary key (id)
+    )
+2024-07-30T10:28:56.750+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    create table users_test (
+        locked boolean not null,
+        created_at timestamp(6),
+        id bigint generated by default as identity,
+        password varchar(255) unique,
+        role varchar(255) check (role in ('USER','ADMIN')),
+        username varchar(255),
+        primary key (id)
+    )
+Hibernate: 
+    create table users_test (
+        locked boolean not null,
+        created_at timestamp(6),
+        id bigint generated by default as identity,
+        password varchar(255) unique,
+        role varchar(255) check (role in ('USER','ADMIN')),
+        username varchar(255),
+        primary key (id)
+    )
+2024-07-30T10:28:56.752+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    create table wishlist (
+        created_at timestamp(6),
+        customer_id bigint unique,
+        id bigint generated by default as identity,
+        primary key (id)
+    )
+Hibernate: 
+    create table wishlist (
+        created_at timestamp(6),
+        customer_id bigint unique,
+        id bigint generated by default as identity,
+        primary key (id)
+    )
+2024-07-30T10:28:56.754+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    create table wishlist_item (
+        created_at timestamp(6),
+        id bigint generated by default as identity,
+        product_id bigint,
+        wishlist_id bigint,
+        primary key (id)
+    )
+Hibernate: 
+    create table wishlist_item (
+        created_at timestamp(6),
+        id bigint generated by default as identity,
+        product_id bigint,
+        wishlist_id bigint,
+        primary key (id)
+    )
+2024-07-30T10:28:56.754+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists customer 
+       add constraint FKark4ctv4ntkwoy4noakb0d8ml 
+       foreign key (user_id) 
+       references users_test
+Hibernate: 
+    alter table if exists customer 
+       add constraint FKark4ctv4ntkwoy4noakb0d8ml 
+       foreign key (user_id) 
+       references users_test
+2024-07-30T10:28:56.756+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists customer 
+       add constraint FKpkpd7h3y46hd6mdeg7wqvpr5c 
+       foreign key (wishlist_id) 
+       references wishlist
+Hibernate: 
+    alter table if exists customer 
+       add constraint FKpkpd7h3y46hd6mdeg7wqvpr5c 
+       foreign key (wishlist_id) 
+       references wishlist
+2024-07-30T10:28:56.757+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists customer_discount 
+       add constraint FK7dkdkmoy90h1bujr1rmanu0lv 
+       foreign key (customer_id) 
+       references customer
+Hibernate: 
+    alter table if exists customer_discount 
+       add constraint FK7dkdkmoy90h1bujr1rmanu0lv 
+       foreign key (customer_id) 
+       references customer
+2024-07-30T10:28:56.758+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists customer_discount 
+       add constraint FKtrcs0xnvyl8qc2df5y7ylkjx4 
+       foreign key (product_id) 
+       references product_test
+Hibernate: 
+    alter table if exists customer_discount 
+       add constraint FKtrcs0xnvyl8qc2df5y7ylkjx4 
+       foreign key (product_id) 
+       references product_test
+2024-07-30T10:28:56.759+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists customer_card_details 
+       add constraint FKmhdwuj27irdm4944qjnk0w85n 
+       foreign key (customer_id) 
+       references customer
+Hibernate: 
+    alter table if exists customer_card_details 
+       add constraint FKmhdwuj27irdm4944qjnk0w85n 
+       foreign key (customer_id) 
+       references customer
+2024-07-30T10:28:56.760+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists order_product 
+       add constraint FKayh03vge4huu6s586xbfsykn9 
+       foreign key (order_id) 
+       references order_test
+Hibernate: 
+    alter table if exists order_product 
+       add constraint FKayh03vge4huu6s586xbfsykn9 
+       foreign key (order_id) 
+       references order_test
+2024-07-30T10:28:56.761+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists order_product 
+       add constraint FKo602fm657h9jspk41f4gnmx22 
+       foreign key (product_id) 
+       references product_test
+Hibernate: 
+    alter table if exists order_product 
+       add constraint FKo602fm657h9jspk41f4gnmx22 
+       foreign key (product_id) 
+       references product_test
+2024-07-30T10:28:56.762+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists order_test 
+       add constraint FK5sdaieho0j5cyeurhq25i4cec 
+       foreign key (customer_id) 
+       references customer
+Hibernate: 
+    alter table if exists order_test 
+       add constraint FK5sdaieho0j5cyeurhq25i4cec 
+       foreign key (customer_id) 
+       references customer
+2024-07-30T10:28:56.764+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists payment 
+       add constraint FKby2skjf3ov608yb6nm16b49lg 
+       foreign key (customer_id) 
+       references customer
+Hibernate: 
+    alter table if exists payment 
+       add constraint FKby2skjf3ov608yb6nm16b49lg 
+       foreign key (customer_id) 
+       references customer
+2024-07-30T10:28:56.766+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists payment 
+       add constraint FKhljpso7llgtyfun73rsnkkcqp 
+       foreign key (order_id) 
+       references order_test
+Hibernate: 
+    alter table if exists payment 
+       add constraint FKhljpso7llgtyfun73rsnkkcqp 
+       foreign key (order_id) 
+       references order_test
+2024-07-30T10:28:56.767+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists product_test 
+       add constraint FK2hq85enq18gwx62b83r7bmaj8 
+       foreign key (category_id) 
+       references category_test
+Hibernate: 
+    alter table if exists product_test 
+       add constraint FK2hq85enq18gwx62b83r7bmaj8 
+       foreign key (category_id) 
+       references category_test
+2024-07-30T10:28:56.768+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists rating 
+       add constraint FK92d54lg7br8t0wb68h23u4jkn 
+       foreign key (customer_id) 
+       references customer
+Hibernate: 
+    alter table if exists rating 
+       add constraint FK92d54lg7br8t0wb68h23u4jkn 
+       foreign key (customer_id) 
+       references customer
+2024-07-30T10:28:56.770+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists rating 
+       add constraint FKkthk5w06fdouceg1vx51u26fh 
+       foreign key (product_id) 
+       references product_test
+Hibernate: 
+    alter table if exists rating 
+       add constraint FKkthk5w06fdouceg1vx51u26fh 
+       foreign key (product_id) 
+       references product_test
+2024-07-30T10:28:56.771+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists wishlist 
+       add constraint FKb6xak0rjui1rsok8ll7ln59cs 
+       foreign key (customer_id) 
+       references customer
+Hibernate: 
+    alter table if exists wishlist 
+       add constraint FKb6xak0rjui1rsok8ll7ln59cs 
+       foreign key (customer_id) 
+       references customer
+2024-07-30T10:28:56.773+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists wishlist_item 
+       add constraint FK5y7uu8ej8bpj54xbke3ak4x6 
+       foreign key (product_id) 
+       references product_test
+Hibernate: 
+    alter table if exists wishlist_item 
+       add constraint FK5y7uu8ej8bpj54xbke3ak4x6 
+       foreign key (product_id) 
+       references product_test
+2024-07-30T10:28:56.774+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists wishlist_item 
+       add constraint FK5iw5sajivrxnt4qjxqlgo8yb1 
+       foreign key (wishlist_id) 
+       references wishlist
+Hibernate: 
+    alter table if exists wishlist_item 
+       add constraint FK5iw5sajivrxnt4qjxqlgo8yb1 
+       foreign key (wishlist_id) 
+       references wishlist
+2024-07-30T10:28:56.792+04:00  INFO 2876 --- [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-07-30T10:28:57.203+04:00  WARN 2876 --- [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-07-30T10:28:57.523+04:00  INFO 2876 --- [    Test worker] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page template: index
+2024-07-30T10:28:57.912+04:00  INFO 2876 --- [    Test worker] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 15 endpoint(s) beneath base path '/actuator'
+2024-07-30T10:28:57.957+04:00  INFO 2876 --- [    Test worker] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@3f1522e, org.springframework.security.web.session.ForceEagerSessionCreationFilter@3262562c, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@701a0c4d, org.springframework.security.web.context.SecurityContextHolderFilter@11f66205, org.springframework.security.web.header.HeaderWriterFilter@6bcd6009, org.springframework.web.filter.CorsFilter@50f5a2f9, org.springframework.security.web.authentication.logout.LogoutFilter@71aa6cde, com.example.springsecurity.security.JwtAuthenticationFilter@453fd459, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@121476da, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@47702908, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@61fd43d7, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@591cfaeb, org.springframework.security.web.session.SessionManagementFilter@4aef70c4, org.springframework.security.web.access.ExceptionTranslationFilter@e63a7, org.springframework.security.web.access.intercept.AuthorizationFilter@8f337c4]
+2024-07-30T10:28:58.388+04:00  WARN 2876 --- [    Test worker] iguration$LoadBalancerCaffeineWarnLogger : Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+2024-07-30T10:28:58.418+04:00  INFO 2876 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 55375 (http) with context path ''
+2024-07-30T10:28:58.670+04:00  INFO 2876 --- [    Test worker] c.e.s.controller.CardControllerTest      : Started CardControllerTest in 3.564 seconds (process running for 32.489)
+2024-07-30T10:28:58.689+04:00  INFO 2876 --- [    Test worker] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-07-30T10:28:58.689+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists category_test cascade 
+Hibernate: 
+    drop table if exists category_test cascade 
+2024-07-30T10:28:58.690+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists customer cascade 
+Hibernate: 
+    drop table if exists customer cascade 
+2024-07-30T10:28:58.690+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists customer_discount cascade 
+Hibernate: 
+    drop table if exists customer_discount cascade 
+2024-07-30T10:28:58.691+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists customer_card_details cascade 
+Hibernate: 
+    drop table if exists customer_card_details cascade 
+2024-07-30T10:28:58.691+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists order_product cascade 
+Hibernate: 
+    drop table if exists order_product cascade 
+2024-07-30T10:28:58.692+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists order_test cascade 
+Hibernate: 
+    drop table if exists order_test cascade 
+2024-07-30T10:28:58.692+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists payment cascade 
+Hibernate: 
+    drop table if exists payment cascade 
+2024-07-30T10:28:58.693+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists product_test cascade 
+Hibernate: 
+    drop table if exists product_test cascade 
+2024-07-30T10:28:58.693+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists rating cascade 
+Hibernate: 
+    drop table if exists rating cascade 
+2024-07-30T10:28:58.693+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists users_test cascade 
+Hibernate: 
+    drop table if exists users_test cascade 
+2024-07-30T10:28:58.694+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists wishlist cascade 
+Hibernate: 
+    drop table if exists wishlist cascade 
+2024-07-30T10:28:58.694+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists wishlist_item cascade 
+Hibernate: 
+    drop table if exists wishlist_item cascade 
+2024-07-30T10:28:58.695+04:00  INFO 2876 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Shutdown initiated...
+2024-07-30T10:28:58.696+04:00  INFO 2876 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Shutdown completed.
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.3)
+
+2024-07-30T10:28:58.870+04:00  INFO 2876 --- [    Test worker] c.e.s.controller.CardControllerTest      : Starting CardControllerTest using Java 17.0.11 with PID 2876 (started by mameh1 in C:\Users\mameh1\Downloads\projects\spring-security\gatewayapp)
+2024-07-30T10:28:58.870+04:00  INFO 2876 --- [    Test worker] c.e.s.controller.CardControllerTest      : The following 4 profiles are active: "db", "actuator", "google", "integration"
+2024-07-30T10:28:59.483+04:00  INFO 2876 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-07-30T10:28:59.572+04:00  INFO 2876 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 88 ms. Found 12 JPA repository interfaces.
+2024-07-30T10:28:59.625+04:00  INFO 2876 --- [    Test worker] o.s.cloud.context.scope.GenericScope     : BeanFactory id=fdf0a751-b714-323a-ae6a-061dba5ac89f
+2024-07-30T10:28:59.661+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration$LoadBalancerInterceptorConfig' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration$LoadBalancerInterceptorConfig] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [lbRestClientPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2024-07-30T10:28:59.662+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.loadbalancer.config.BlockingLoadBalancerClientAutoConfiguration' of type [org.springframework.cloud.loadbalancer.config.BlockingLoadBalancerClientAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:59.663+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.loadbalancer.config.LoadBalancerAutoConfiguration' of type [org.springframework.cloud.loadbalancer.config.LoadBalancerAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:59.666+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.commons.config.CommonsConfigAutoConfiguration' of type [org.springframework.cloud.commons.config.CommonsConfigAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:59.668+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:59.669+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'loadBalancerClientsDefaultsMappingsProvider' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration$$Lambda$1032/0x000002791c5e3010] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:59.671+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'defaultsBindHandlerAdvisor' of type [org.springframework.cloud.commons.config.DefaultsBindHandlerAdvisor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:59.674+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'spring.cloud.loadbalancer-org.springframework.cloud.client.loadbalancer.LoadBalancerClientsProperties' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerClientsProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:59.677+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'default.org.springframework.cloud.loadbalancer.config.LoadBalancerAutoConfiguration.LoadBalancerClientSpecification' of type [org.springframework.cloud.loadbalancer.annotation.LoadBalancerClientSpecification] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:59.678+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'default.org.springframework.cloud.loadbalancer.config.BlockingLoadBalancerClientAutoConfiguration.LoadBalancerClientSpecification' of type [org.springframework.cloud.loadbalancer.annotation.LoadBalancerClientSpecification] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:59.678+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'loadBalancerClientFactory' of type [org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:59.680+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'blockingLoadBalancerClient' of type [org.springframework.cloud.loadbalancer.blocking.client.BlockingLoadBalancerClient] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:59.683+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'loadBalancerServiceInstanceCookieTransformer' of type [org.springframework.cloud.loadbalancer.core.LoadBalancerServiceInstanceCookieTransformer] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:59.685+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'xForwarderHeadersTransformer' of type [org.springframework.cloud.loadbalancer.blocking.XForwardedHeadersTransformer] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:59.685+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:59.686+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'loadBalancerRequestFactory' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerRequestFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:59.690+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'loadBalancerInterceptor' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerInterceptor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:59.693+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.client.loadbalancer.reactive.LoadBalancerBeanPostProcessorAutoConfiguration' of type [org.springframework.cloud.client.loadbalancer.reactive.LoadBalancerBeanPostProcessorAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [loadBalancerWebClientBuilderBeanPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2024-07-30T10:28:59.694+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.client.loadbalancer.reactive.LoadBalancerBeanPostProcessorAutoConfiguration$ReactorDeferringLoadBalancerFilterConfig' of type [org.springframework.cloud.client.loadbalancer.reactive.LoadBalancerBeanPostProcessorAutoConfiguration$ReactorDeferringLoadBalancerFilterConfig] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [loadBalancerWebClientBuilderBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:59.695+04:00  WARN 2876 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'reactorDeferringLoadBalancerExchangeFilterFunction' of type [org.springframework.cloud.client.loadbalancer.reactive.DeferringLoadBalancerExchangeFilterFunction] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [loadBalancerWebClientBuilderBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2024-07-30T10:28:59.768+04:00  INFO 2876 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 0 (http)
+2024-07-30T10:28:59.769+04:00  INFO 2876 --- [    Test worker] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2024-07-30T10:28:59.769+04:00  INFO 2876 --- [    Test worker] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.19]
+2024-07-30T10:28:59.828+04:00  INFO 2876 --- [    Test worker] o.a.c.c.C.[Tomcat-1].[localhost].[/]     : Initializing Spring embedded WebApplicationContext
+2024-07-30T10:28:59.828+04:00  INFO 2876 --- [    Test worker] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 956 ms
+2024-07-30T10:28:59.938+04:00  INFO 2876 --- [    Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-07-30T10:28:59.946+04:00  INFO 2876 --- [    Test worker] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2024-07-30T10:28:59.956+04:00  INFO 2876 --- [    Test worker] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-07-30T10:28:59.958+04:00  INFO 2876 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-5 - Starting...
+2024-07-30T10:28:59.959+04:00  INFO 2876 --- [    Test worker] com.zaxxer.hikari.pool.HikariPool        : HikariPool-5 - Added connection conn40: url=jdbc:h2:mem:demo user=POSTGRES
+2024-07-30T10:28:59.959+04:00  INFO 2876 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-5 - Start completed.
+2024-07-30T10:28:59.959+04:00  WARN 2876 --- [    Test worker] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2024-07-30T10:29:00.169+04:00  INFO 2876 --- [    Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2024-07-30T10:29:00.169+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists category_test cascade 
+Hibernate: 
+    drop table if exists category_test cascade 
+2024-07-30T10:29:00.170+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists customer cascade 
+Hibernate: 
+    drop table if exists customer cascade 
+2024-07-30T10:29:00.170+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists customer_discount cascade 
+Hibernate: 
+    drop table if exists customer_discount cascade 
+2024-07-30T10:29:00.170+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists customer_card_details cascade 
+Hibernate: 
+    drop table if exists customer_card_details cascade 
+2024-07-30T10:29:00.171+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists order_product cascade 
+Hibernate: 
+    drop table if exists order_product cascade 
+2024-07-30T10:29:00.171+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists order_test cascade 
+Hibernate: 
+    drop table if exists order_test cascade 
+2024-07-30T10:29:00.171+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists payment cascade 
+Hibernate: 
+    drop table if exists payment cascade 
+2024-07-30T10:29:00.172+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists product_test cascade 
+Hibernate: 
+    drop table if exists product_test cascade 
+2024-07-30T10:29:00.172+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists rating cascade 
+Hibernate: 
+    drop table if exists rating cascade 
+2024-07-30T10:29:00.172+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists users_test cascade 
+Hibernate: 
+    drop table if exists users_test cascade 
+2024-07-30T10:29:00.172+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists wishlist cascade 
+Hibernate: 
+    drop table if exists wishlist cascade 
+2024-07-30T10:29:00.172+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    drop table if exists wishlist_item cascade 
+Hibernate: 
+    drop table if exists wishlist_item cascade 
+2024-07-30T10:29:00.173+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    create table category_test (
+        is_deleted boolean not null,
+        category_id bigint generated by default as identity,
+        description varchar(255),
+        name varchar(255),
+        primary key (category_id)
+    )
+Hibernate: 
+    create table category_test (
+        is_deleted boolean not null,
+        category_id bigint generated by default as identity,
+        description varchar(255),
+        name varchar(255),
+        primary key (category_id)
+    )
+2024-07-30T10:29:00.174+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    create table customer (
+        balance numeric(38,2),
+        id bigint generated by default as identity,
+        registered_at timestamp(6),
+        user_id bigint unique,
+        wishlist_id bigint unique,
+        address varchar(255),
+        name varchar(255),
+        surname varchar(255),
+        primary key (id)
+    )
+Hibernate: 
+    create table customer (
+        balance numeric(38,2),
+        id bigint generated by default as identity,
+        registered_at timestamp(6),
+        user_id bigint unique,
+        wishlist_id bigint unique,
+        address varchar(255),
+        name varchar(255),
+        surname varchar(255),
+        primary key (id)
+    )
+2024-07-30T10:29:00.178+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    create table customer_discount (
+        dice_rolled boolean not null,
+        die1 integer not null,
+        die2 integer not null,
+        discount numeric(38,2),
+        discount_price numeric(38,2),
+        customer_id bigint unique,
+        expires_at timestamp(6),
+        id bigint generated by default as identity,
+        product_id bigint,
+        primary key (id),
+        unique (customer_id, product_id)
+    )
+Hibernate: 
+    create table customer_discount (
+        dice_rolled boolean not null,
+        die1 integer not null,
+        die2 integer not null,
+        discount numeric(38,2),
+        discount_price numeric(38,2),
+        customer_id bigint unique,
+        expires_at timestamp(6),
+        id bigint generated by default as identity,
+        product_id bigint,
+        primary key (id),
+        unique (customer_id, product_id)
+    )
+2024-07-30T10:29:00.181+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    create table customer_card_details (
+        card_balance numeric(38,2),
+        expiration_date date,
+        customer_id bigint,
+        id bigint generated by default as identity,
+        card_number varchar(255) unique,
+        cvv varchar(255),
+        primary key (id)
+    )
+Hibernate: 
+    create table customer_card_details (
+        card_balance numeric(38,2),
+        expiration_date date,
+        customer_id bigint,
+        id bigint generated by default as identity,
+        card_number varchar(255) unique,
+        cvv varchar(255),
+        primary key (id)
+    )
+2024-07-30T10:29:00.184+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    create table order_product (
+        quantity integer not null,
+        id bigint generated by default as identity,
+        order_id bigint,
+        product_id bigint,
+        product_name varchar(255),
+        primary key (id)
+    )
+Hibernate: 
+    create table order_product (
+        quantity integer not null,
+        id bigint generated by default as identity,
+        order_id bigint,
+        product_id bigint,
+        product_name varchar(255),
+        primary key (id)
+    )
+2024-07-30T10:29:00.186+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    create table order_test (
+        is_paid boolean not null,
+        total_amount numeric(38,2),
+        created_at timestamp(6),
+        customer_id bigint,
+        id bigint generated by default as identity,
+        updated_at timestamp(6),
+        status varchar(255) check (status in ('DELIVERED','PENDING','CANCEL','PAID','AWAITING')),
+        primary key (id)
+    )
+Hibernate: 
+    create table order_test (
+        is_paid boolean not null,
+        total_amount numeric(38,2),
+        created_at timestamp(6),
+        customer_id bigint,
+        id bigint generated by default as identity,
+        updated_at timestamp(6),
+        status varchar(255) check (status in ('DELIVERED','PENDING','CANCEL','PAID','AWAITING')),
+        primary key (id)
+    )
+2024-07-30T10:29:00.189+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    create table payment (
+        amount numeric(38,2),
+        customer_id bigint,
+        id bigint generated by default as identity,
+        order_id bigint,
+        payment_date timestamp(6),
+        payment_status varchar(255) check (payment_status in ('CREDIT_CARD','DEBIT_CARD','PAYPAL','APPLE_PAY','GOOGLE_PAY')),
+        primary key (id)
+    )
+Hibernate: 
+    create table payment (
+        amount numeric(38,2),
+        customer_id bigint,
+        id bigint generated by default as identity,
+        order_id bigint,
+        payment_date timestamp(6),
+        payment_status varchar(255) check (payment_status in ('CREDIT_CARD','DEBIT_CARD','PAYPAL','APPLE_PAY','GOOGLE_PAY')),
+        primary key (id)
+    )
+2024-07-30T10:29:00.192+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    create table product_test (
+        discount numeric(38,2),
+        discount_price numeric(38,2),
+        is_deleted boolean not null,
+        price numeric(38,2),
+        quantity integer not null,
+        category_id bigint,
+        created_at timestamp(6),
+        id bigint generated by default as identity,
+        updated_at timestamp(6),
+        description varchar(255),
+        image_url varchar(255),
+        name varchar(255) unique,
+        primary key (id)
+    )
+Hibernate: 
+    create table product_test (
+        discount numeric(38,2),
+        discount_price numeric(38,2),
+        is_deleted boolean not null,
+        price numeric(38,2),
+        quantity integer not null,
+        category_id bigint,
+        created_at timestamp(6),
+        id bigint generated by default as identity,
+        updated_at timestamp(6),
+        description varchar(255),
+        image_url varchar(255),
+        name varchar(255) unique,
+        primary key (id)
+    )
+2024-07-30T10:29:00.195+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    create table rating (
+        rating integer,
+        created_at timestamp(6),
+        customer_id bigint,
+        id bigint generated by default as identity,
+        product_id bigint,
+        primary key (id)
+    )
+Hibernate: 
+    create table rating (
+        rating integer,
+        created_at timestamp(6),
+        customer_id bigint,
+        id bigint generated by default as identity,
+        product_id bigint,
+        primary key (id)
+    )
+2024-07-30T10:29:00.196+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    create table users_test (
+        locked boolean not null,
+        created_at timestamp(6),
+        id bigint generated by default as identity,
+        password varchar(255) unique,
+        role varchar(255) check (role in ('USER','ADMIN')),
+        username varchar(255),
+        primary key (id)
+    )
+Hibernate: 
+    create table users_test (
+        locked boolean not null,
+        created_at timestamp(6),
+        id bigint generated by default as identity,
+        password varchar(255) unique,
+        role varchar(255) check (role in ('USER','ADMIN')),
+        username varchar(255),
+        primary key (id)
+    )
+2024-07-30T10:29:00.199+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    create table wishlist (
+        created_at timestamp(6),
+        customer_id bigint unique,
+        id bigint generated by default as identity,
+        primary key (id)
+    )
+Hibernate: 
+    create table wishlist (
+        created_at timestamp(6),
+        customer_id bigint unique,
+        id bigint generated by default as identity,
+        primary key (id)
+    )
+2024-07-30T10:29:00.201+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    create table wishlist_item (
+        created_at timestamp(6),
+        id bigint generated by default as identity,
+        product_id bigint,
+        wishlist_id bigint,
+        primary key (id)
+    )
+Hibernate: 
+    create table wishlist_item (
+        created_at timestamp(6),
+        id bigint generated by default as identity,
+        product_id bigint,
+        wishlist_id bigint,
+        primary key (id)
+    )
+2024-07-30T10:29:00.202+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists customer 
+       add constraint FKark4ctv4ntkwoy4noakb0d8ml 
+       foreign key (user_id) 
+       references users_test
+Hibernate: 
+    alter table if exists customer 
+       add constraint FKark4ctv4ntkwoy4noakb0d8ml 
+       foreign key (user_id) 
+       references users_test
+2024-07-30T10:29:00.204+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists customer 
+       add constraint FKpkpd7h3y46hd6mdeg7wqvpr5c 
+       foreign key (wishlist_id) 
+       references wishlist
+Hibernate: 
+    alter table if exists customer 
+       add constraint FKpkpd7h3y46hd6mdeg7wqvpr5c 
+       foreign key (wishlist_id) 
+       references wishlist
+2024-07-30T10:29:00.205+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists customer_discount 
+       add constraint FK7dkdkmoy90h1bujr1rmanu0lv 
+       foreign key (customer_id) 
+       references customer
+Hibernate: 
+    alter table if exists customer_discount 
+       add constraint FK7dkdkmoy90h1bujr1rmanu0lv 
+       foreign key (customer_id) 
+       references customer
+2024-07-30T10:29:00.208+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists customer_discount 
+       add constraint FKtrcs0xnvyl8qc2df5y7ylkjx4 
+       foreign key (product_id) 
+       references product_test
+Hibernate: 
+    alter table if exists customer_discount 
+       add constraint FKtrcs0xnvyl8qc2df5y7ylkjx4 
+       foreign key (product_id) 
+       references product_test
+2024-07-30T10:29:00.209+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists customer_card_details 
+       add constraint FKmhdwuj27irdm4944qjnk0w85n 
+       foreign key (customer_id) 
+       references customer
+Hibernate: 
+    alter table if exists customer_card_details 
+       add constraint FKmhdwuj27irdm4944qjnk0w85n 
+       foreign key (customer_id) 
+       references customer
+2024-07-30T10:29:00.210+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists order_product 
+       add constraint FKayh03vge4huu6s586xbfsykn9 
+       foreign key (order_id) 
+       references order_test
+Hibernate: 
+    alter table if exists order_product 
+       add constraint FKayh03vge4huu6s586xbfsykn9 
+       foreign key (order_id) 
+       references order_test
+2024-07-30T10:29:00.212+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists order_product 
+       add constraint FKo602fm657h9jspk41f4gnmx22 
+       foreign key (product_id) 
+       references product_test
+Hibernate: 
+    alter table if exists order_product 
+       add constraint FKo602fm657h9jspk41f4gnmx22 
+       foreign key (product_id) 
+       references product_test
+2024-07-30T10:29:00.215+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists order_test 
+       add constraint FK5sdaieho0j5cyeurhq25i4cec 
+       foreign key (customer_id) 
+       references customer
+Hibernate: 
+    alter table if exists order_test 
+       add constraint FK5sdaieho0j5cyeurhq25i4cec 
+       foreign key (customer_id) 
+       references customer
+2024-07-30T10:29:00.217+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists payment 
+       add constraint FKby2skjf3ov608yb6nm16b49lg 
+       foreign key (customer_id) 
+       references customer
+Hibernate: 
+    alter table if exists payment 
+       add constraint FKby2skjf3ov608yb6nm16b49lg 
+       foreign key (customer_id) 
+       references customer
+2024-07-30T10:29:00.218+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists payment 
+       add constraint FKhljpso7llgtyfun73rsnkkcqp 
+       foreign key (order_id) 
+       references order_test
+Hibernate: 
+    alter table if exists payment 
+       add constraint FKhljpso7llgtyfun73rsnkkcqp 
+       foreign key (order_id) 
+       references order_test
+2024-07-30T10:29:00.220+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists product_test 
+       add constraint FK2hq85enq18gwx62b83r7bmaj8 
+       foreign key (category_id) 
+       references category_test
+Hibernate: 
+    alter table if exists product_test 
+       add constraint FK2hq85enq18gwx62b83r7bmaj8 
+       foreign key (category_id) 
+       references category_test
+2024-07-30T10:29:00.221+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists rating 
+       add constraint FK92d54lg7br8t0wb68h23u4jkn 
+       foreign key (customer_id) 
+       references customer
+Hibernate: 
+    alter table if exists rating 
+       add constraint FK92d54lg7br8t0wb68h23u4jkn 
+       foreign key (customer_id) 
+       references customer
+2024-07-30T10:29:00.223+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists rating 
+       add constraint FKkthk5w06fdouceg1vx51u26fh 
+       foreign key (product_id) 
+       references product_test
+Hibernate: 
+    alter table if exists rating 
+       add constraint FKkthk5w06fdouceg1vx51u26fh 
+       foreign key (product_id) 
+       references product_test
+2024-07-30T10:29:00.226+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists wishlist 
+       add constraint FKb6xak0rjui1rsok8ll7ln59cs 
+       foreign key (customer_id) 
+       references customer
+Hibernate: 
+    alter table if exists wishlist 
+       add constraint FKb6xak0rjui1rsok8ll7ln59cs 
+       foreign key (customer_id) 
+       references customer
+2024-07-30T10:29:00.228+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists wishlist_item 
+       add constraint FK5y7uu8ej8bpj54xbke3ak4x6 
+       foreign key (product_id) 
+       references product_test
+Hibernate: 
+    alter table if exists wishlist_item 
+       add constraint FK5y7uu8ej8bpj54xbke3ak4x6 
+       foreign key (product_id) 
+       references product_test
+2024-07-30T10:29:00.231+04:00 DEBUG 2876 --- [    Test worker] org.hibernate.SQL                        : 
+    alter table if exists wishlist_item 
+       add constraint FK5iw5sajivrxnt4qjxqlgo8yb1 
+       foreign key (wishlist_id) 
+       references wishlist
+Hibernate: 
+    alter table if exists wishlist_item 
+       add constraint FK5iw5sajivrxnt4qjxqlgo8yb1 
+       foreign key (wishlist_id) 
+       references wishlist
+2024-07-30T10:29:00.236+04:00  INFO 2876 --- [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-07-30T10:29:00.624+04:00  WARN 2876 --- [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-07-30T10:29:00.929+04:00  INFO 2876 --- [    Test worker] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page template: index
+2024-07-30T10:29:01.370+04:00  INFO 2876 --- [    Test worker] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 15 endpoint(s) beneath base path '/actuator'
+2024-07-30T10:29:01.419+04:00  INFO 2876 --- [    Test worker] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@191440e2, org.springframework.security.web.session.ForceEagerSessionCreationFilter@2afa3ac4, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@68501eb7, org.springframework.security.web.context.SecurityContextHolderFilter@25a872d2, org.springframework.security.web.header.HeaderWriterFilter@7bbc120e, org.springframework.web.filter.CorsFilter@3453aae1, org.springframework.security.web.authentication.logout.LogoutFilter@543edb9, com.example.springsecurity.security.JwtAuthenticationFilter@17dad310, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@41f2b5f6, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@309b19fb, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@3a721bb5, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@ffbefd9, org.springframework.security.web.session.SessionManagementFilter@2aafae3e, org.springframework.security.web.access.ExceptionTranslationFilter@2a691c92, org.springframework.security.web.access.intercept.AuthorizationFilter@191ea4]
+2024-07-30T10:29:01.874+04:00  WARN 2876 --- [    Test worker] iguration$LoadBalancerCaffeineWarnLogger : Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+2024-07-30T10:29:01.906+04:00  INFO 2876 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 55379 (http) with context path ''
+2024-07-30T10:29:02.167+04:00  INFO 2876 --- [    Test worker] c.e.s.controller.CardControllerTest      : Started CardControllerTest in 3.468 seconds (process running for 35.987)
+Generated Token: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwicm9sZXMiOlsiUk9MRV9VU0VSIl0sImlhdCI6MTcyMjMyMDk0MiwiZXhwIjoxNzIyMzI0NTQyfQ.8KUbxV6cTrGZJm9VUL1GKdztSfkvheVbZWGzT86hDho
+2024-07-30T10:29:02.193+04:00  INFO 2876 --- [o-auto-5-exec-1] o.a.c.c.C.[Tomcat-1].[localhost].[/]     : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-07-30T10:29:02.193+04:00  INFO 2876 --- [o-auto-5-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2024-07-30T10:29:02.195+04:00  INFO 2876 --- [o-auto-5-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2024-07-30T10:29:02.196+04:00  INFO 2876 --- [o-auto-5-exec-1] c.e.s.security.JwtAuthenticationFilter   : Checking jwt token...
+2024-07-30T10:29:02.217+04:00 DEBUG 2876 --- [o-auto-5-exec-1] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.locked,
+        u1_0.password,
+        u1_0.role,
+        u1_0.username 
+    from
+        users_test u1_0 
+    where
+        u1_0.id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.locked,
+        u1_0.password,
+        u1_0.role,
+        u1_0.username 
+    from
+        users_test u1_0 
+    where
+        u1_0.id=?
+2024-07-30T10:29:02.220+04:00 DEBUG 2876 --- [o-auto-5-exec-1] org.hibernate.SQL                        : 
+    select
+        c1_0.id,
+        c1_0.address,
+        c1_0.balance,
+        c1_0.name,
+        c1_0.registered_at,
+        c1_0.surname,
+        c1_0.user_id,
+        w1_0.id,
+        w1_0.created_at,
+        c2_0.id,
+        c2_0.address,
+        c2_0.balance,
+        c2_0.name,
+        c2_0.registered_at,
+        c2_0.surname,
+        c2_0.user_id,
+        c2_0.wishlist_id 
+    from
+        customer c1_0 
+    left join
+        wishlist w1_0 
+            on w1_0.id=c1_0.wishlist_id 
+    left join
+        customer c2_0 
+            on c2_0.id=w1_0.customer_id 
+    where
+        c1_0.user_id=?
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.address,
+        c1_0.balance,
+        c1_0.name,
+        c1_0.registered_at,
+        c1_0.surname,
+        c1_0.user_id,
+        w1_0.id,
+        w1_0.created_at,
+        c2_0.id,
+        c2_0.address,
+        c2_0.balance,
+        c2_0.name,
+        c2_0.registered_at,
+        c2_0.surname,
+        c2_0.user_id,
+        c2_0.wishlist_id 
+    from
+        customer c1_0 
+    left join
+        wishlist w1_0 
+            on w1_0.id=c1_0.wishlist_id 
+    left join
+        customer c2_0 
+            on c2_0.id=w1_0.customer_id 
+    where
+        c1_0.user_id=?
+2024-07-30T10:29:02.222+04:00 DEBUG 2876 --- [o-auto-5-exec-1] org.hibernate.SQL                        : 
+    select
+        cd1_0.id,
+        cd1_0.customer_id,
+        cd1_0.dice_rolled,
+        cd1_0.die1,
+        cd1_0.die2,
+        cd1_0.discount,
+        cd1_0.discount_price,
+        cd1_0.expires_at,
+        cd1_0.product_id 
+    from
+        customer_discount cd1_0 
+    where
+        cd1_0.customer_id=?
+Hibernate: 
+    select
+        cd1_0.id,
+        cd1_0.customer_id,
+        cd1_0.dice_rolled,
+        cd1_0.die1,
+        cd1_0.die2,
+        cd1_0.discount,
+        cd1_0.discount_price,
+        cd1_0.expires_at,
+        cd1_0.product_id 
+    from
+        customer_discount cd1_0 
+    where
+        cd1_0.customer_id=?
+2024-07-30T10:29:02.245+04:00 DEBUG 2876 --- [o-auto-5-exec-1] org.hibernate.SQL                        : 
+    select
+        c1_0.id,
+        c1_0.address,
+        c1_0.balance,
+        c1_0.name,
+        c1_0.registered_at,
+        c1_0.surname,
+        c1_0.user_id,
+        w1_0.id,
+        w1_0.created_at,
+        c2_0.id,
+        c2_0.address,
+        c2_0.balance,
+        c2_0.name,
+        c2_0.registered_at,
+        c2_0.surname,
+        c2_0.user_id,
+        c2_0.wishlist_id 
+    from
+        customer c1_0 
+    left join
+        wishlist w1_0 
+            on w1_0.id=c1_0.wishlist_id 
+    left join
+        customer c2_0 
+            on c2_0.id=w1_0.customer_id 
+    where
+        c1_0.id=?
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.address,
+        c1_0.balance,
+        c1_0.name,
+        c1_0.registered_at,
+        c1_0.surname,
+        c1_0.user_id,
+        w1_0.id,
+        w1_0.created_at,
+        c2_0.id,
+        c2_0.address,
+        c2_0.balance,
+        c2_0.name,
+        c2_0.registered_at,
+        c2_0.surname,
+        c2_0.user_id,
+        c2_0.wishlist_id 
+    from
+        customer c1_0 
+    left join
+        wishlist w1_0 
+            on w1_0.id=c1_0.wishlist_id 
+    left join
+        customer c2_0 
+            on c2_0.id=w1_0.customer_id 
+    where
+        c1_0.id=?
+2024-07-30T10:29:02.255+04:00 DEBUG 2876 --- [o-auto-5-exec-1] org.hibernate.SQL                        : 
+    select
+        cd1_0.id,
+        cd1_0.customer_id,
+        cd1_0.dice_rolled,
+        cd1_0.die1,
+        cd1_0.die2,
+        cd1_0.discount,
+        cd1_0.discount_price,
+        cd1_0.expires_at,
+        cd1_0.product_id 
+    from
+        customer_discount cd1_0 
+    where
+        cd1_0.customer_id=?
+Hibernate: 
+    select
+        cd1_0.id,
+        cd1_0.customer_id,
+        cd1_0.dice_rolled,
+        cd1_0.die1,
+        cd1_0.die2,
+        cd1_0.discount,
+        cd1_0.discount_price,
+        cd1_0.expires_at,
+        cd1_0.product_id 
+    from
+        customer_discount cd1_0 
+    where
+        cd1_0.customer_id=?
+2024-07-30T10:29:02.259+04:00 DEBUG 2876 --- [o-auto-5-exec-1] org.hibernate.SQL                        : 
+    select
+        ccd1_0.id,
+        ccd1_0.card_balance,
+        ccd1_0.card_number,
+        ccd1_0.customer_id,
+        ccd1_0.cvv,
+        ccd1_0.expiration_date 
+    from
+        customer_card_details ccd1_0 
+    where
+        ccd1_0.card_number=?
+Hibernate: 
+    select
+        ccd1_0.id,
+        ccd1_0.card_balance,
+        ccd1_0.card_number,
+        ccd1_0.customer_id,
+        ccd1_0.cvv,
+        ccd1_0.expiration_date 
+    from
+        customer_card_details ccd1_0 
+    where
+        ccd1_0.card_number=?
+2024-07-30T10:29:02.295+04:00 DEBUG 2876 --- [o-auto-5-exec-1] org.hibernate.SQL                        : 
+    insert 
+    into
+        customer_card_details
+        (card_balance, card_number, customer_id, cvv, expiration_date, id) 
+    values
+        (?, ?, ?, ?, ?, default)
+Hibernate: 
+    insert 
+    into
+        customer_card_details
+        (card_balance, card_number, customer_id, cvv, expiration_date, id) 
+    values
+        (?, ?, ?, ?, ?, default)
+Response Status Code: 200 OK
+Response Body: Card added successfully
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
